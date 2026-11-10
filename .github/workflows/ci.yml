@@ -1,0 +1,118 @@
+# QualityOS CI (T-P1-15). Third-party actions are pinned to major versions here; pin them to
+# commit SHAs before the repository accepts outside contributions (P11 hardening).
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+
+jobs:
+  checks:
+    name: Lint, typecheck, unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Migrations match the schema
+        run: pnpm --filter @qos/db run check
+
+  integration:
+    name: Integration tests (Testcontainers)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:integration
+
+  web-e2e:
+    name: Web shell (Playwright)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm --filter @qos/web exec playwright install --with-deps chromium
+      # Screenshot baselines are per platform. Only Windows baselines are committed so far, so the
+      # first Linux run creates its own and uploads them for review instead of failing.
+      - run: pnpm --filter @qos/web exec playwright test --update-snapshots=missing
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-e2e
+          path: |
+            apps/web/e2e/__screenshots__/linux
+            apps/web/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  image:
+    name: Build image and scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build application image
+        run: docker build -f infra/images/app/Dockerfile -t qualityos/app:ci .
+      - name: Trivy (image vulnerabilities)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: qualityos/app:ci
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          # Report-only until the image is pruned to production dependencies (P11).
+          exit-code: '0'
+
+  secrets-and-deps:
+    name: Secret scan and dependency advisories
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: OSV-Scanner
+        uses: google/osv-scanner-action/osv-scanner-action@v2
+        with:
+          scan-args: |-
+            --lockfile=pnpm-lock.yaml
+        # Report-only for now: advisories are triaged by hand during the pilot.
+        continue-on-error: true

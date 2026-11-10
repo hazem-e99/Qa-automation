@@ -23,6 +23,7 @@
     "@qos/jobs": "workspace:*",
     "@qos/observability": "workspace:*",
     "@qos/ports": "workspace:*",
+    "undici": "^8.12.4",
     "zod": "~4.6.7"
   },
   "devDependencies": {

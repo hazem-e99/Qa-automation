@@ -1,0 +1,34 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { exitCodeFor, runDoctor } from './doctor.js';
+import { initEnv } from './init.js';
+
+const repoRoot = path.resolve(fileURLToPath(new URL('../../..', import.meta.url)));
+const [command] = process.argv.slice(2);
+
+const USAGE = `Usage: pnpm qos <command>
+
+  init     create infra/compose/.env with generated secrets (never overwrites)
+  doctor   check that this machine can run the local stack`;
+
+switch (command) {
+  case 'init': {
+    const result = await initEnv(repoRoot);
+    console.log(
+      result.created
+        ? `Created ${path.relative(repoRoot, result.path)} with generated secrets.`
+        : `${path.relative(repoRoot, result.path)} already exists; left unchanged.`,
+    );
+    break;
+  }
+  case 'doctor': {
+    const results = await runDoctor({ repoRoot });
+    const mark = { ok: 'OK  ', warn: 'WARN', fail: 'FAIL' } as const;
+    for (const r of results) console.log(`${mark[r.level]}  ${r.name.padEnd(16)} ${r.detail}`);
+    process.exitCode = exitCodeFor(results);
+    break;
+  }
+  default:
+    console.log(USAGE);
+    process.exitCode = command ? 2 : 0;
+}

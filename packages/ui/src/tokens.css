@@ -1,0 +1,57 @@
+/*
+ * QualityOS design tokens (doc 20). Semantic names only: components never use raw colours.
+ * Light is the default; dark applies with the system preference unless the user picked a theme.
+ */
+:root {
+  color-scheme: light;
+  --qos-bg: #f7f8fa;
+  --qos-surface: #ffffff;
+  --qos-surface-raised: #ffffff;
+  --qos-border: #d9dde4;
+  --qos-text: #16191f;
+  --qos-text-muted: #5b6472;
+  --qos-accent: #1f5fd1;
+  --qos-accent-contrast: #ffffff;
+  --qos-success: #177a45;
+  --qos-warning: #9a5b00;
+  --qos-danger: #b3261e;
+  --qos-focus: #1f5fd1;
+  --qos-radius: 8px;
+  --qos-sidebar-width: 15rem;
+  --qos-topbar-height: 3.25rem;
+  --qos-font-sans: system-ui, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', Tahoma, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --qos-bg: #0f1216;
+    --qos-surface: #171b21;
+    --qos-surface-raised: #1e232b;
+    --qos-border: #2c333d;
+    --qos-text: #e8ebf0;
+    --qos-text-muted: #9aa4b2;
+    --qos-accent: #7aa7ff;
+    --qos-accent-contrast: #0b1220;
+    --qos-success: #5fd08f;
+    --qos-warning: #f0b25a;
+    --qos-danger: #ff8a80;
+    --qos-focus: #7aa7ff;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --qos-bg: #0f1216;
+  --qos-surface: #171b21;
+  --qos-surface-raised: #1e232b;
+  --qos-border: #2c333d;
+  --qos-text: #e8ebf0;
+  --qos-text-muted: #9aa4b2;
+  --qos-accent: #7aa7ff;
+  --qos-accent-contrast: #0b1220;
+  --qos-success: #5fd08f;
+  --qos-warning: #f0b25a;
+  --qos-danger: #ff8a80;
+  --qos-focus: #7aa7ff;
+}

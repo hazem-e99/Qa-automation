@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { RuleTester } from 'eslint';
 import { describe, expect, it } from 'vitest';
+import physical from '../eslint-rules/no-physical-direction.js';
 import rule from '../eslint-rules/no-provider-literals.js';
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
@@ -20,6 +21,28 @@ describe('no-provider-literals', () => {
         { code: "const p = 'Azure Boards';", errors: [{ messageId: 'provider' }] },
         { code: 'const u = `https://api.${x}/n8n/hook`;', errors: [{ messageId: 'provider' }] },
         { code: "const m = { provider: 'gemini' };", errors: [{ messageId: 'provider' }] },
+      ],
+    });
+  });
+});
+
+describe('no-physical-direction', () => {
+  it('flags left/right utilities and accepts logical ones', () => {
+    new RuleTester().run('no-physical-direction', physical, {
+      valid: [
+        "const c = 'ms-3 pe-2 start-0 border-e rounded-s-md text-start';",
+        "const c = 'mx-auto px-4 flex-1 leading-tight';",
+        "const c = 'focus:start-2 hover:me-1';",
+        "const label = 'Turn left at the right time';",
+      ],
+      invalid: [
+        { code: "const c = 'flex ml-4';", errors: [{ messageId: 'physical' }] },
+        { code: "const c = 'pr-2';", errors: [{ messageId: 'physical' }] },
+        { code: "const c = 'absolute left-0';", errors: [{ messageId: 'physical' }] },
+        { code: "const c = 'md:text-right';", errors: [{ messageId: 'physical' }] },
+        { code: "const c = 'border-l rounded-r-lg';", errors: [{ messageId: 'physical' }] },
+        { code: "const c = '-mr-1';", errors: [{ messageId: 'physical' }] },
+        { code: 'const c = `p-2 ${x} float-left`;', errors: [{ messageId: 'physical' }] },
       ],
     });
   });

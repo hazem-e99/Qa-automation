@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import noPhysicalDirection from './packages/config/eslint-rules/no-physical-direction.js';
 import noProviderLiterals from './packages/config/eslint-rules/no-provider-literals.js';
 
 export default tseslint.config(
@@ -14,6 +15,9 @@ export default tseslint.config(
       'spikes/**',
       'docs/**',
       'var/**',
+      '**/next-env.d.ts',
+      '**/test-results/**',
+      '**/playwright-report/**',
     ],
   },
   js.configs.recommended,
@@ -28,7 +32,13 @@ export default tseslint.config(
   },
   {
     // Entry points and CLIs may print to the console before a logger exists.
-    files: ['**/src/main.ts', '**/src/*-cli.ts', '**/src/export-json-schema.ts', '**/*.cjs'],
+    files: [
+      '**/src/main.ts',
+      '**/src/*-cli.ts',
+      'tools/cli/src/**',
+      '**/src/export-json-schema.ts',
+      '**/*.cjs',
+    ],
     rules: { 'no-console': 'off' },
   },
   {
@@ -41,5 +51,11 @@ export default tseslint.config(
     ignores: ['packages/modules/*/src/infrastructure/**', '**/*.test.ts'],
     plugins: { qos: { rules: { 'no-provider-literals': noProviderLiterals } } },
     rules: { 'qos/no-provider-literals': 'error' },
+  },
+  {
+    // RTL lint: UI code uses logical direction utilities only.
+    files: ['apps/web/src/**/*.{ts,tsx}', 'packages/ui/src/**/*.{ts,tsx}'],
+    plugins: { qosUi: { rules: { 'no-physical-direction': noPhysicalDirection } } },
+    rules: { 'qosUi/no-physical-direction': 'error' },
   },
 );

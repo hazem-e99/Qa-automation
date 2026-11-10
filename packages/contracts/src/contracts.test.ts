@@ -29,6 +29,7 @@ describe('contracts', () => {
       'CreateProbeRequest',
       'EventEnvelope',
       'HealthResponse',
+      'OperationResponse',
       'ProbeResponse',
     ]);
     expect(schemas.CreateProbeRequest).toMatchObject({ type: 'object' });

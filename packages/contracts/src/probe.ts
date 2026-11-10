@@ -16,6 +16,8 @@ export const ProbeResponse = z.object({
   id: Uuid,
   label: z.string(),
   processedAt: z.iso.datetime().nullable(),
+  /** Follow progress at /api/v1/operations/{operationId} (JSON) or …/events (SSE). */
+  operationId: Uuid.nullable(),
 });
 export type ProbeResponse = z.infer<typeof ProbeResponse>;
 

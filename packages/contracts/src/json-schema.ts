@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { ApiError } from './common.js';
 import { EventEnvelope } from './events.js';
 import { HealthResponse } from './health.js';
+import { OperationResponse } from './operations.js';
 import { CreateProbeRequest, ProbeResponse } from './probe.js';
 
 /** Registry of exported contracts. OpenAPI assembly on top of this arrives with the first product API (P2). */
@@ -11,6 +12,7 @@ export const contractRegistry = {
   HealthResponse,
   CreateProbeRequest,
   ProbeResponse,
+  OperationResponse,
 } as const;
 
 export function exportJsonSchemas(): Record<string, unknown> {

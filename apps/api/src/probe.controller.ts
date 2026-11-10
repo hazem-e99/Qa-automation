@@ -1,8 +1,21 @@
-import { Body, Controller, Get, HttpCode, Inject, NotFoundException, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  Inject,
+  NotFoundException,
+  Param,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { CreateProbeRequest, Uuid, type ProbeResponse } from '@qos/contracts';
 import { DomainError } from '@qos/kernel-domain';
 import type { CoreInfra } from '@qos/kernel-infra';
+import { withIdempotency } from '@qos/platform';
 import { createProbe, getProbe } from '@qos/probe';
+import type { FastifyReply } from 'fastify';
 import type { ApiConfig } from './config.js';
 import { CONFIG, INFRA } from './tokens.js';
 
@@ -20,11 +33,30 @@ export class ProbeController {
 
   @Post()
   @HttpCode(201)
-  async create(@Body() body: unknown): Promise<ProbeResponse> {
+  async create(
+    @Body() body: unknown,
+    @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ): Promise<ProbeResponse> {
     this.assertEnabled();
     const input = CreateProbeRequest.parse(body);
-    const { id } = await createProbe({ db: this.infra.db, jobs: this.infra.jobs }, input, 'anonymous');
-    return { id, label: input.label, processedAt: null };
+    const deps = { db: this.infra.db, jobs: this.infra.jobs };
+    if (idempotencyKey === undefined) {
+      const { id, operationId } = await createProbe(deps, input, 'anonymous');
+      return { id, label: input.label, processedAt: null, operationId };
+    }
+    // The key record and the command share one transaction (doc 22 §4).
+    const result = await withIdempotency(
+      this.infra.db,
+      { scope: 'platform.probe.create', key: idempotencyKey, request: input },
+      async (tx) => {
+        const { id, operationId } = await createProbe(deps, input, 'anonymous', tx);
+        const response: ProbeResponse = { id, label: input.label, processedAt: null, operationId };
+        return { status: 201, body: response };
+      },
+    );
+    if (result.replayed) reply.header('idempotent-replayed', 'true');
+    return result.body as ProbeResponse;
   }
 
   @Get(':id')
@@ -32,7 +64,12 @@ export class ProbeController {
     this.assertEnabled();
     const row = await getProbe(this.infra.db, Uuid.parse(id));
     if (!row) throw new NotFoundException();
-    return { id: row.id, label: row.label, processedAt: row.processedAt?.toISOString() ?? null };
+    return {
+      id: row.id,
+      label: row.label,
+      processedAt: row.processedAt?.toISOString() ?? null,
+      operationId: row.operationId,
+    };
   }
 
   private assertEnabled(): void {

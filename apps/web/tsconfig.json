@@ -1,0 +1,26 @@
+{
+  "extends": "@qos/config/tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES2024"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "noEmit": true,
+    "incremental": true,
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": false,
+    "types": ["node"],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "src", "e2e", ".next/types/**/*.ts", "next.config.ts", "playwright.config.ts"],
+  "exclude": ["node_modules"]
+}

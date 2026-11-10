@@ -1,22 +1,41 @@
-# QualityOS local stack. P1 status: only the `db` profile exists.
-# The `core` profile (api, worker, web, migrate job) arrives with T-P1-13.
+# QualityOS local stack.
 #
-#   pnpm dev:db        start PostgreSQL for local development
+#   pnpm qos init          create infra/compose/.env with generated secrets (once)
+#   pnpm dev:db            PostgreSQL only, for running the apps on the host
+#   pnpm stack:up          build and start the `core` profile (postgres, migrate, api, worker, web)
+#   pnpm stack:down        stop it (data volumes are kept)
 #
-# Ports bind to 127.0.0.1 only. Credentials come from infra/compose/.env (gitignored);
-# copy .env.example to .env first.
+# Every published port binds to 127.0.0.1. Credentials come from infra/compose/.env (gitignored).
+# Profiles still to come: n8n (P7), exec (P6: execution-controller, socket proxy, egress proxy).
 name: qualityos
+
+x-app: &app
+  image: qualityos/app:dev
+  build:
+    context: ../..
+    dockerfile: infra/images/app/Dockerfile
+  init: true
+  restart: unless-stopped
+  cap_drop: [ALL]
+  security_opt: ['no-new-privileges:true']
+  networks: [core]
+
+x-app-env: &app-env
+  NODE_ENV: production
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  APP_VERSION: ${APP_VERSION:-0.0.0-dev}
+  DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-qualityos}
 
 services:
   postgres:
     profiles: [db, core]
     image: pgvector/pgvector:0.8.7-pg17
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in infra/compose/.env}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in infra/compose/.env}
+      POSTGRES_USER: ${POSTGRES_USER:?run "pnpm qos init" to create infra/compose/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run "pnpm qos init" to create infra/compose/.env}
       POSTGRES_DB: ${POSTGRES_DB:-qualityos}
     ports:
-      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+      - '127.0.0.1:${POSTGRES_PORT:-55432}:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -25,6 +44,100 @@ services:
       timeout: 3s
       retries: 30
     restart: unless-stopped
+    networks: [core]
+
+  migrate:
+    <<: *app
+    profiles: [core]
+    restart: 'no'
+    command: ['node', 'packages/db/dist/migrate-cli.js']
+    environment: *app-env
+    read_only: true
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    <<: *app
+    profiles: [core]
+    command: ['node', 'apps/api/dist/main.js']
+    environment:
+      <<: *app-env
+      API_HOST: 0.0.0.0
+      API_PORT: 3001
+      STORAGE_DIR: /data/storage
+      FILE_URL_SECRET: ${FILE_URL_SECRET:?run "pnpm qos init" to create infra/compose/.env}
+    ports:
+      - '127.0.0.1:${API_PORT:-3001}:3001'
+    volumes:
+      - storage:/data/storage
+    read_only: true
+    tmpfs: [/tmp]
+    healthcheck: &node-health
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3001/readyz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+      start_period: 5s
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  worker:
+    <<: *app
+    profiles: [core]
+    command: ['node', 'apps/worker/dist/main.js']
+    environment:
+      <<: *app-env
+      WORKER_HEALTH_HOST: 0.0.0.0
+      WORKER_HEALTH_PORT: 3002
+    read_only: true
+    tmpfs: [/tmp]
+    healthcheck:
+      <<: *node-health
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3002/readyz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+        ]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  web:
+    <<: *app
+    profiles: [core]
+    working_dir: /repo/apps/web
+    command: ['node', 'node_modules/next/dist/bin/next', 'start', '--port', '3000', '--hostname', '0.0.0.0']
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: '1'
+      QOS_API_URL: http://api:3001
+      QOS_WORKER_URL: http://worker:3002
+      QOS_CONTROLLER_URL: http://execution-controller:3003
+    ports:
+      - '127.0.0.1:${WEB_PORT:-3000}:3000'
+    tmpfs: [/tmp]
+    healthcheck:
+      <<: *node-health
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/en').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+        ]
+    depends_on:
+      api: { condition: service_healthy }
+
+networks:
+  core:
 
 volumes:
   pgdata:
+  storage:

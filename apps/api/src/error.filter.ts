@@ -5,6 +5,14 @@ import { currentCorrelationId, type Logger } from '@qos/observability';
 import type { FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 
+/** Domain codes that are not plain 422s. */
+const DOMAIN_STATUS: Readonly<Record<string, number>> = {
+  'idempotency.key_invalid': 400,
+  'idempotency.in_progress': 409,
+  'idempotency.retry': 409,
+  'operations.too_many_streams': 503,
+};
+
 /**
  * Maps every error to the ApiError envelope: a stable code plus params. Internal details
  * (stack traces, SQL, driver messages) are logged and never returned to the caller.
@@ -26,7 +34,9 @@ export class ApiErrorFilter implements ExceptionFilter {
       const fields = [...new Set(e.issues.map((i) => i.path.join('.') || '(body)'))].join(',');
       return { status: 400, code: 'request.invalid', params: { fields } };
     }
-    if (e instanceof DomainError) return { status: 422, code: e.code, params: { ...e.params } };
+    if (e instanceof DomainError) {
+      return { status: DOMAIN_STATUS[e.code] ?? 422, code: e.code, params: { ...e.params } };
+    }
     if (e instanceof HttpException) {
       const status = e.getStatus();
       return { status, code: `http.${status}`, params: {} };

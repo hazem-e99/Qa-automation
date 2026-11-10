@@ -15,6 +15,20 @@
       "when": 1794321916505,
       "tag": "0001_extensions_and_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794323019538,
+      "tag": "0002_idempotency_operations_inbox",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794323020437,
+      "tag": "0003_operations_notify",
+      "breakpoints": true
     }
   ]
 }

@@ -18,7 +18,11 @@
     "knip": "knip",
     "db:generate": "pnpm --filter @qos/db run generate",
     "db:migrate": "pnpm --filter @qos/db run migrate",
-    "dev:db": "docker compose -f infra/compose/docker-compose.yml --profile db up -d --wait"
+    "dev:db": "docker compose -f infra/compose/docker-compose.yml --profile db up -d --wait",
+    "qos": "node tools/cli/dist/main.js",
+    "stack:up": "docker compose -f infra/compose/docker-compose.yml --profile core up -d --build --wait",
+    "stack:down": "docker compose -f infra/compose/docker-compose.yml --profile core down",
+    "e2e": "pnpm --filter @qos/web run e2e"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",

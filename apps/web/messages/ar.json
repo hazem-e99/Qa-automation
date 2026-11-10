@@ -1,0 +1,40 @@
+{
+  "app": { "name": "QualityOS", "skipToContent": "انتقل إلى المحتوى" },
+  "nav": {
+    "label": "التنقل الرئيسي",
+    "overview": "نظرة عامة",
+    "requirements": "المتطلبات",
+    "tests": "إدارة الاختبارات",
+    "runs": "التشغيلات",
+    "defects": "العيوب",
+    "automation": "الأتمتة",
+    "integrations": "التكاملات",
+    "settings": "الإعدادات",
+    "comingSoon": "غير متاح بعد"
+  },
+  "topbar": {
+    "search": "ابحث أو نفّذ أمرًا",
+    "theme": "المظهر",
+    "themeSystem": "النظام",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "language": "اللغة"
+  },
+  "palette": {
+    "title": "لوحة الأوامر",
+    "placeholder": "اكتب أمرًا…",
+    "empty": "لا توجد أوامر بعد. ستُضاف الأوامر مع أول مزايا المنتج.",
+    "close": "إغلاق"
+  },
+  "overview": {
+    "title": "نظرة عامة",
+    "subtitle": "مرحلة التأسيس. لم تُبنَ مزايا المنتج بعد.",
+    "systemStatus": "حالة النظام",
+    "service": "الخدمة",
+    "status": "الحالة",
+    "ok": "جاهز",
+    "fail": "غير جاهز",
+    "unreachable": "تعذّر الوصول",
+    "version": "الإصدار"
+  }
+}

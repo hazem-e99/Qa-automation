@@ -1,0 +1,45 @@
+@import 'tailwindcss';
+@import '@qos/ui/tokens.css';
+
+/* Map design tokens to Tailwind colour names. Components use these, never raw colours. */
+@theme inline {
+  --color-bg: var(--qos-bg);
+  --color-surface: var(--qos-surface);
+  --color-raised: var(--qos-surface-raised);
+  --color-line: var(--qos-border);
+  --color-fg: var(--qos-text);
+  --color-muted: var(--qos-text-muted);
+  --color-accent: var(--qos-accent);
+  --color-accent-contrast: var(--qos-accent-contrast);
+  --color-success: var(--qos-success);
+  --color-warning: var(--qos-warning);
+  --color-danger: var(--qos-danger);
+  --font-sans: var(--qos-font-sans);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--qos-bg);
+  color: var(--qos-text);
+  font-family: var(--qos-font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--qos-focus);
+  outline-offset: 2px;
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

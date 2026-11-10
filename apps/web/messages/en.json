@@ -1,0 +1,40 @@
+{
+  "app": { "name": "QualityOS", "skipToContent": "Skip to content" },
+  "nav": {
+    "label": "Main navigation",
+    "overview": "Overview",
+    "requirements": "Requirements",
+    "tests": "Test management",
+    "runs": "Runs",
+    "defects": "Defects",
+    "automation": "Automation",
+    "integrations": "Integrations",
+    "settings": "Settings",
+    "comingSoon": "Not available yet"
+  },
+  "topbar": {
+    "search": "Search or run a command",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "language": "Language"
+  },
+  "palette": {
+    "title": "Command palette",
+    "placeholder": "Type a command…",
+    "empty": "No commands yet. Commands arrive with the first product features.",
+    "close": "Close"
+  },
+  "overview": {
+    "title": "Overview",
+    "subtitle": "Foundation phase. Product features are not built yet.",
+    "systemStatus": "System status",
+    "service": "Service",
+    "status": "Status",
+    "ok": "Ready",
+    "fail": "Not ready",
+    "unreachable": "Unreachable",
+    "version": "Version"
+  }
+}
