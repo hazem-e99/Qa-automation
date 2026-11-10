@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - packages/*
+  - packages/modules/*
+  - tools/*
+
+# Install scripts are denied by default (supply-chain rule). Only the packages listed here may run them.
+allowBuilds:
+  esbuild: true
+  cpu-features: false
+  ssh2: false
+  protobufjs: false

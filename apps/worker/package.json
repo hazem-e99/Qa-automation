@@ -1,0 +1,32 @@
+{
+  "name": "@qos/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/main.js",
+    "test": "vitest run --passWithNoTests",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "~12.4.2",
+    "@nestjs/core": "~12.4.2",
+    "@qos/contracts": "workspace:*",
+    "@qos/jobs": "workspace:*",
+    "@qos/kernel-domain": "workspace:*",
+    "@qos/kernel-infra": "workspace:*",
+    "@qos/observability": "workspace:*",
+    "@qos/ports": "workspace:*",
+    "@qos/probe": "workspace:*",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "zod": "~4.6.7"
+  },
+  "devDependencies": {
+    "@qos/config": "workspace:*",
+    "@qos/db": "workspace:*"
+  }
+}

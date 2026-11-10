@@ -1,0 +1,14 @@
+{
+  "name": "@qos/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./eslint": "./eslint.config.base.js",
+    "./eslint-rules/no-provider-literals": "./eslint-rules/no-provider-literals.js"
+  },
+  "scripts": {
+    "test": "vitest run"
+  }
+}

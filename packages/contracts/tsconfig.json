@@ -1,0 +1,5 @@
+{
+  "extends": "@qos/config/tsconfig.base.json",
+  "compilerOptions": { "rootDir": ".", "noEmit": true },
+  "include": ["src", "test"]
+}

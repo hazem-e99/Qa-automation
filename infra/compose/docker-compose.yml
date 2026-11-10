@@ -1,0 +1,30 @@
+# QualityOS local stack. P1 status: only the `db` profile exists.
+# The `core` profile (api, worker, web, migrate job) arrives with T-P1-13.
+#
+#   pnpm dev:db        start PostgreSQL for local development
+#
+# Ports bind to 127.0.0.1 only. Credentials come from infra/compose/.env (gitignored);
+# copy .env.example to .env first.
+name: qualityos
+
+services:
+  postgres:
+    profiles: [db, core]
+    image: pgvector/pgvector:0.8.7-pg17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in infra/compose/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in infra/compose/.env}
+      POSTGRES_DB: ${POSTGRES_DB:-qualityos}
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+volumes:
+  pgdata:
