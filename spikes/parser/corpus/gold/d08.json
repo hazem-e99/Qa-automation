@@ -1,0 +1,90 @@
+{
+ "file": "d08-library-mixed-numbered.docx",
+ "requirements": [
+  {
+   "text": "يجب أن يتيح النظام للعضو استعارة 5 مواد كحد أقصى في نفس الوقت.",
+   "ac": [
+    "استعارة المادة السادسة تُظهر «تم بلوغ حد الإعارة»."
+   ],
+   "lang": "ar",
+   "section": "2",
+   "id": "REQ-1"
+  },
+  {
+   "text": "يجب أن يحدد النظام مدة الإعارة بـ 14 يوماً.",
+   "ac": [
+    "تاريخ الاستحقاق يساوي تاريخ الاستعارة مضافاً إليه 14 يوماً."
+   ],
+   "lang": "ar",
+   "section": "2",
+   "id": "REQ-2"
+  },
+  {
+   "text": "يجب أن يتيح النظام تجديداً واحداً إذا لم يحجز عضو آخر المادة.",
+   "ac": [
+    "يُرفض التجديد عند وجود حجز."
+   ],
+   "lang": "ar",
+   "section": "2",
+   "id": "REQ-3"
+  },
+  {
+   "text": "يجب أن يرسل النظام تذكيراً قبل يومين من تاريخ الاستحقاق.",
+   "ac": [
+    "يُرسل التذكير بالبريد الساعة 09:00 بالتوقيت المحلي."
+   ],
+   "lang": "ar",
+   "section": "2",
+   "id": "REQ-4"
+  },
+  {
+   "text": "يجب أن يمنع النظام الاستعارة للأعضاء الذين لديهم مواد متأخرة.",
+   "ac": [
+    "العضو الذي لديه مادة متأخرة واحدة لا يمكنه الاستعارة."
+   ],
+   "lang": "ar",
+   "section": "2",
+   "id": "REQ-5"
+  },
+  {
+   "text": "The system shall allow a member to borrow up to 5 items at the same time.",
+   "ac": [
+    "Borrowing a 6th item shows 'Borrowing limit reached'."
+   ],
+   "lang": "en",
+   "section": "2"
+  },
+  {
+   "text": "The system shall set the loan period to 14 days.",
+   "ac": [
+    "The due date equals the borrow date plus 14 days."
+   ],
+   "lang": "en",
+   "section": "2"
+  },
+  {
+   "text": "The system shall allow one renewal if no other member has reserved the item.",
+   "ac": [
+    "Renewal is refused when a reservation exists."
+   ],
+   "lang": "en",
+   "section": "2"
+  },
+  {
+   "text": "The system shall send a reminder 2 days before the due date.",
+   "ac": [
+    "The reminder is sent by email at 09:00 local time."
+   ],
+   "lang": "en",
+   "section": "2"
+  },
+  {
+   "text": "The system must block borrowing for members with overdue items.",
+   "ac": [
+    "A member with one overdue item cannot borrow."
+   ],
+   "lang": "en",
+   "section": "2"
+  }
+ ]
+}

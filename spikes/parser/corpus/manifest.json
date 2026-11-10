@@ -1,0 +1,338 @@
+{
+ "generated_by": "corpus/generate.py",
+ "conflicts": [
+  {
+   "domain": "auth",
+   "type": "numeric",
+   "a": "en: password at least 8 characters",
+   "b": "ar: password at least 12 characters"
+  },
+  {
+   "domain": "booking",
+   "type": "numeric",
+   "a": "en: free cancellation up to 48 hours",
+   "b": "ar: free cancellation up to 24 hours"
+  }
+ ],
+ "files": [
+  {
+   "file": "d01-checkout-en-numbered.docx",
+   "format": "docx",
+   "lang": "en",
+   "domain": "checkout",
+   "variant": "numbered",
+   "expected": "parse",
+   "gold": "gold/d01.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "d02-auth-en-table.docx",
+   "format": "docx",
+   "lang": "en",
+   "domain": "auth",
+   "variant": "table",
+   "expected": "parse",
+   "gold": "gold/d02.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "d03-booking-en-stories.docx",
+   "format": "docx",
+   "lang": "en",
+   "domain": "booking",
+   "variant": "stories",
+   "expected": "parse",
+   "gold": "gold/d03.json",
+   "requirements": 5,
+   "acs": 6
+  },
+  {
+   "file": "d04-leave-en-prose.docx",
+   "format": "docx",
+   "lang": "en",
+   "domain": "leave",
+   "variant": "prose",
+   "expected": "parse",
+   "gold": "gold/d04.json",
+   "requirements": 5,
+   "acs": 5
+  },
+  {
+   "file": "d05-checkout-ar-numbered.docx",
+   "format": "docx",
+   "lang": "ar",
+   "domain": "checkout",
+   "variant": "numbered",
+   "expected": "parse",
+   "gold": "gold/d05.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "d06-auth-ar-table.docx",
+   "format": "docx",
+   "lang": "ar",
+   "domain": "auth",
+   "variant": "table",
+   "expected": "parse",
+   "gold": "gold/d06.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "d07-booking-ar-stories.docx",
+   "format": "docx",
+   "lang": "ar",
+   "domain": "booking",
+   "variant": "stories",
+   "expected": "parse",
+   "gold": "gold/d07.json",
+   "requirements": 5,
+   "acs": 6
+  },
+  {
+   "file": "d08-library-mixed-numbered.docx",
+   "format": "docx",
+   "lang": "mixed",
+   "domain": "library",
+   "variant": "numbered",
+   "expected": "parse",
+   "gold": "gold/d08.json",
+   "requirements": 10,
+   "acs": 10
+  },
+  {
+   "file": "p09-library-en-numbered.pdf",
+   "format": "pdf",
+   "lang": "en",
+   "domain": "library",
+   "variant": "numbered",
+   "expected": "parse",
+   "pages": 1,
+   "gold": "gold/p09.json",
+   "requirements": 5,
+   "acs": 5
+  },
+  {
+   "file": "p10-checkout-en-table.pdf",
+   "format": "pdf",
+   "lang": "en",
+   "domain": "checkout",
+   "variant": "table",
+   "expected": "parse",
+   "pages": 1,
+   "gold": "gold/p10.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "p11-leave-en-stories.pdf",
+   "format": "pdf",
+   "lang": "en",
+   "domain": "leave",
+   "variant": "stories",
+   "expected": "parse",
+   "pages": 1,
+   "gold": "gold/p11.json",
+   "requirements": 5,
+   "acs": 5
+  },
+  {
+   "file": "p12-auth-en-prose.pdf",
+   "format": "pdf",
+   "lang": "en",
+   "domain": "auth",
+   "variant": "prose",
+   "expected": "parse",
+   "pages": 4,
+   "gold": "gold/p12.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "p13-library-ar-numbered.pdf",
+   "format": "pdf",
+   "lang": "ar",
+   "domain": "library",
+   "variant": "numbered",
+   "expected": "parse",
+   "pages": 1,
+   "gold": "gold/p13.json",
+   "requirements": 5,
+   "acs": 5
+  },
+  {
+   "file": "p14-leave-ar-table.pdf",
+   "format": "pdf",
+   "lang": "ar",
+   "domain": "leave",
+   "variant": "table",
+   "expected": "parse",
+   "pages": 1,
+   "gold": "gold/p14.json",
+   "requirements": 5,
+   "acs": 5
+  },
+  {
+   "file": "p15-auth-ar-stories.pdf",
+   "format": "pdf",
+   "lang": "ar",
+   "domain": "auth",
+   "variant": "stories",
+   "expected": "parse",
+   "pages": 1,
+   "gold": "gold/p15.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "p16-booking-ar-prose.pdf",
+   "format": "pdf",
+   "lang": "ar",
+   "domain": "booking",
+   "variant": "prose",
+   "expected": "parse",
+   "pages": 1,
+   "gold": "gold/p16.json",
+   "requirements": 5,
+   "acs": 6
+  },
+  {
+   "file": "s17-booking-en-numbered.pdf",
+   "format": "scanned",
+   "lang": "en",
+   "domain": "booking",
+   "variant": "numbered",
+   "expected": "ocr",
+   "pages": 1,
+   "gold": "gold/s17.json",
+   "requirements": 5,
+   "acs": 6
+  },
+  {
+   "file": "s18-leave-en-table.pdf",
+   "format": "scanned",
+   "lang": "en",
+   "domain": "leave",
+   "variant": "table",
+   "expected": "ocr",
+   "pages": 1,
+   "gold": "gold/s18.json",
+   "requirements": 5,
+   "acs": 5
+  },
+  {
+   "file": "s19-checkout-en-stories.pdf",
+   "format": "scanned",
+   "lang": "en",
+   "domain": "checkout",
+   "variant": "stories",
+   "expected": "ocr",
+   "pages": 1,
+   "gold": "gold/s19.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "x22-auth-en-sheet.xlsx",
+   "format": "xlsx",
+   "lang": "en",
+   "domain": "auth",
+   "variant": null,
+   "expected": "parse",
+   "gold": "gold/x22.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "x23-checkout-ar-sheet.xlsx",
+   "format": "xlsx",
+   "lang": "ar",
+   "domain": "checkout",
+   "variant": null,
+   "expected": "parse",
+   "gold": "gold/x23.json",
+   "requirements": 6,
+   "acs": 8
+  },
+  {
+   "file": "x24-booking-en-sheet.xlsx",
+   "format": "xlsx",
+   "lang": "en",
+   "domain": "booking",
+   "variant": null,
+   "expected": "parse",
+   "gold": "gold/x24.json",
+   "requirements": 5,
+   "acs": 6
+  },
+  {
+   "file": "c25-library-en-sheet.csv",
+   "format": "csv",
+   "lang": "en",
+   "domain": "library",
+   "variant": null,
+   "expected": "parse",
+   "gold": "gold/c25.json",
+   "requirements": 5,
+   "acs": 5
+  },
+  {
+   "file": "c26-leave-ar-sheet.csv",
+   "format": "csv",
+   "lang": "ar",
+   "domain": "leave",
+   "variant": null,
+   "expected": "parse",
+   "gold": "gold/c26.json",
+   "requirements": 5,
+   "acs": 5
+  },
+  {
+   "file": "m27-truncated-en.pdf",
+   "format": "pdf",
+   "expected": "reject:corrupt"
+  },
+  {
+   "file": "m28-encrypted-en.pdf",
+   "format": "pdf",
+   "expected": "reject:encrypted"
+  },
+  {
+   "file": "m29-zipbomb.docx",
+   "format": "docx",
+   "expected": "reject:zip_bomb (expanded > 500 MB)"
+  },
+  {
+   "file": "m30-disguised-exe.pdf",
+   "format": "pdf",
+   "expected": "reject:magic_bytes"
+  },
+  {
+   "file": "s20-library-ar-scanned.pdf",
+   "format": "scanned",
+   "lang": "ar",
+   "domain": "library",
+   "variant": "numbered",
+   "expected": "ocr",
+   "gold": "gold/s20.json",
+   "requirements": 5,
+   "acs": 5,
+   "pages": 1
+  },
+  {
+   "file": "s21-booking-ar-scanned.pdf",
+   "format": "scanned",
+   "lang": "ar",
+   "domain": "booking",
+   "variant": "prose",
+   "expected": "ocr",
+   "gold": "gold/s21.json",
+   "requirements": 5,
+   "acs": 6,
+   "pages": 1
+  }
+ ]
+}

@@ -1,0 +1,61 @@
+{
+ "file": "d02-auth-en-table.docx",
+ "requirements": [
+  {
+   "text": "The system shall require a password of at least 8 characters.",
+   "ac": [
+    "A 7-character password is rejected.",
+    "An 8-character password is accepted."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-1"
+  },
+  {
+   "text": "The system shall lock the account after 5 consecutive failed login attempts.",
+   "ac": [
+    "The 6th attempt shows 'Account locked'.",
+    "The lock lasts 15 minutes."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-2"
+  },
+  {
+   "text": "The system shall allow users to reset their password via an emailed link valid for 30 minutes.",
+   "ac": [
+    "An expired link shows 'Link expired'."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-3"
+  },
+  {
+   "text": "The system should offer optional two-factor authentication using a one-time code.",
+   "ac": [
+    "Enabling 2FA requires confirming one valid code."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-4"
+  },
+  {
+   "text": "The system must log out an idle session after 20 minutes.",
+   "ac": [
+    "After 20 minutes of inactivity the next action redirects to login."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-5"
+  },
+  {
+   "text": "The system shall display a generic error message for invalid credentials.",
+   "ac": [
+    "The message does not reveal whether the email exists."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-6"
+  }
+ ]
+}

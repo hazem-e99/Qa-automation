@@ -1,0 +1,7 @@
+{
+  "name": "spike-sandbox-tests",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "1.65.0"
+  }
+}

@@ -1,0 +1,55 @@
+{
+ "file": "p09-library-en-numbered.pdf",
+ "requirements": [
+  {
+   "text": "The system shall allow a member to borrow up to 5 items at the same time.",
+   "ac": [
+    "Borrowing a 6th item shows 'Borrowing limit reached'."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "REQ-1",
+   "page": 1
+  },
+  {
+   "text": "The system shall set the loan period to 14 days.",
+   "ac": [
+    "The due date equals the borrow date plus 14 days."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "REQ-2",
+   "page": 1
+  },
+  {
+   "text": "The system shall allow one renewal if no other member has reserved the item.",
+   "ac": [
+    "Renewal is refused when a reservation exists."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "REQ-3",
+   "page": 1
+  },
+  {
+   "text": "The system shall send a reminder 2 days before the due date.",
+   "ac": [
+    "The reminder is sent by email at 09:00 local time."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "REQ-4",
+   "page": 1
+  },
+  {
+   "text": "The system must block borrowing for members with overdue items.",
+   "ac": [
+    "A member with one overdue item cannot borrow."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "REQ-5",
+   "page": 1
+  }
+ ]
+}

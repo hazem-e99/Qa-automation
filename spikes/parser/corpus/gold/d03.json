@@ -1,0 +1,46 @@
+{
+ "file": "d03-booking-en-stories.docx",
+ "requirements": [
+  {
+   "text": "The system shall show available rooms for the selected dates and number of guests.",
+   "ac": [
+    "Rooms with no availability on any selected night are hidden."
+   ],
+   "lang": "en",
+   "section": "2.1"
+  },
+  {
+   "text": "The system shall not allow a check-out date earlier than or equal to the check-in date.",
+   "ac": [
+    "Same-day check-out shows a validation error."
+   ],
+   "lang": "en",
+   "section": "2.2"
+  },
+  {
+   "text": "The system shall allow free cancellation up to 48 hours before check-in.",
+   "ac": [
+    "Cancellation 49 hours before is free.",
+    "Cancellation 47 hours before charges one night."
+   ],
+   "lang": "en",
+   "section": "2.3"
+  },
+  {
+   "text": "The system must hold a reservation for 15 minutes while payment is in progress.",
+   "ac": [
+    "After 15 minutes without payment the hold is released."
+   ],
+   "lang": "en",
+   "section": "2.4"
+  },
+  {
+   "text": "The system shall display prices in the currency selected by the guest.",
+   "ac": [
+    "Switching currency updates all prices on the page."
+   ],
+   "lang": "en",
+   "section": "2.5"
+  }
+ ]
+}

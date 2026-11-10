@@ -1,0 +1,67 @@
+{
+ "file": "p10-checkout-en-table.pdf",
+ "requirements": [
+  {
+   "text": "The system shall allow a customer to review the cart before payment.",
+   "ac": [
+    "Cart page lists item name, quantity, unit price and line total.",
+    "Customer can change quantity or remove an item."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-1",
+   "page": 1
+  },
+  {
+   "text": "The system shall calculate the order total including VAT at 14 percent.",
+   "ac": [
+    "Total equals the sum of line totals plus 14% VAT, rounded to two decimals."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-2",
+   "page": 1
+  },
+  {
+   "text": "The system must reject a coupon code that has expired.",
+   "ac": [
+    "An expired coupon shows the message 'Coupon expired' and the total is unchanged."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-3",
+   "page": 1
+  },
+  {
+   "text": "The system shall support guest checkout without creating an account.",
+   "ac": [
+    "Guest checkout requires only email, phone and delivery address."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-4",
+   "page": 1
+  },
+  {
+   "text": "The system shall send an order confirmation email within 5 minutes of successful payment.",
+   "ac": [
+    "Email contains order number, items and total."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-5",
+   "page": 1
+  },
+  {
+   "text": "The system must not allow an order with a quantity greater than 10 for a single item.",
+   "ac": [
+    "Quantity 11 shows a validation error.",
+    "Quantity 10 is accepted."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-6",
+   "page": 1
+  }
+ ]
+}

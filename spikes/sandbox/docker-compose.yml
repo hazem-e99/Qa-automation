@@ -1,0 +1,38 @@
+# T-P0-04 sandbox spike infrastructure (throwaway). Sandboxes themselves are started by run.sh with `docker run`.
+#   spike-sbx    : internal network (no route out). Sandboxes + squid only.
+#   spike-egress : normal network. squid + target + forbidden.
+# A sandbox can only reach "target" through squid; "forbidden" and the internet must be denied.
+networks:
+  spike-sbx:
+    name: spike-sbx
+    internal: true
+  spike-egress:
+    name: spike-egress
+
+services:
+  squid:
+    image: ubuntu/squid:6.6-24.04_edge
+    volumes: ["./squid.conf:/etc/squid/squid.conf:ro"]
+    networks: [spike-sbx, spike-egress]
+
+  target:            # allow-listed "environment under test"
+    image: nginx:1.29-alpine
+    volumes: ["./site:/usr/share/nginx/html:ro"]
+    networks: [spike-egress]
+
+  forbidden:         # must NOT be reachable from a sandbox
+    image: nginx:1.29-alpine
+    networks: [spike-egress]
+
+  socket-proxy:      # checks that exec/build/volumes are denied
+    image: tecnativa/docker-socket-proxy:v0.5.0
+    environment:
+      CONTAINERS: 1
+      IMAGES: 1
+      POST: 1
+      EXEC: 0
+      BUILD: 0
+      VOLUMES: 0
+      NETWORKS: 0
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock:ro"]
+    ports: ["127.0.0.1:23750:2375"]

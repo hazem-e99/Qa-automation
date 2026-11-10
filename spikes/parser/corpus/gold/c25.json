@@ -1,0 +1,50 @@
+{
+ "file": "c25-library-en-sheet.csv",
+ "requirements": [
+  {
+   "id": "FR-1",
+   "text": "The system shall allow a member to borrow up to 5 items at the same time.",
+   "ac": [
+    "Borrowing a 6th item shows 'Borrowing limit reached'."
+   ],
+   "lang": "en",
+   "row": 2
+  },
+  {
+   "id": "FR-2",
+   "text": "The system shall set the loan period to 14 days.",
+   "ac": [
+    "The due date equals the borrow date plus 14 days."
+   ],
+   "lang": "en",
+   "row": 3
+  },
+  {
+   "id": "FR-3",
+   "text": "The system shall allow one renewal if no other member has reserved the item.",
+   "ac": [
+    "Renewal is refused when a reservation exists."
+   ],
+   "lang": "en",
+   "row": 4
+  },
+  {
+   "id": "FR-4",
+   "text": "The system shall send a reminder 2 days before the due date.",
+   "ac": [
+    "The reminder is sent by email at 09:00 local time."
+   ],
+   "lang": "en",
+   "row": 5
+  },
+  {
+   "id": "FR-5",
+   "text": "The system must block borrowing for members with overdue items.",
+   "ac": [
+    "A member with one overdue item cannot borrow."
+   ],
+   "lang": "en",
+   "row": 6
+  }
+ ]
+}

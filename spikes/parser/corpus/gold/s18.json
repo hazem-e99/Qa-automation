@@ -1,0 +1,55 @@
+{
+ "file": "s18-leave-en-table.pdf",
+ "requirements": [
+  {
+   "text": "The system shall allow an employee to submit an annual leave request with start and end dates.",
+   "ac": [
+    "The request shows the number of working days requested."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-1",
+   "page": 1
+  },
+  {
+   "text": "The system shall prevent a leave request that exceeds the remaining balance.",
+   "ac": [
+    "Requesting 6 days with a balance of 5 shows an error."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-2",
+   "page": 1
+  },
+  {
+   "text": "The system shall notify the direct manager when a request is submitted.",
+   "ac": [
+    "The manager receives an in-app notification and an email."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-3",
+   "page": 1
+  },
+  {
+   "text": "The manager must approve or reject a request within 3 working days.",
+   "ac": [
+    "After 3 working days the request escalates to HR."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-4",
+   "page": 1
+  },
+  {
+   "text": "The system shall exclude public holidays from the calculated leave days.",
+   "ac": [
+    "A request spanning a public holiday counts one day fewer."
+   ],
+   "lang": "en",
+   "section": "2",
+   "id": "FR-5",
+   "page": 1
+  }
+ ]
+}

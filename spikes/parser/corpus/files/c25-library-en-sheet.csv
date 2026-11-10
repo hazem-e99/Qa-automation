@@ -1,0 +1,6 @@
+﻿ID,Requirement,Acceptance Criteria,Priority
+FR-1,The system shall allow a member to borrow up to 5 items at the same time.,Borrowing a 6th item shows 'Borrowing limit reached'.,Medium
+FR-2,The system shall set the loan period to 14 days.,The due date equals the borrow date plus 14 days.,Low
+FR-3,The system shall allow one renewal if no other member has reserved the item.,Renewal is refused when a reservation exists.,High
+FR-4,The system shall send a reminder 2 days before the due date.,The reminder is sent by email at 09:00 local time.,Medium
+FR-5,The system must block borrowing for members with overdue items.,A member with one overdue item cannot borrow.,Low

@@ -1,0 +1,40 @@
+{
+  "id": "qosSpikeHmac0001",
+  "name": "qos.spike-hmac",
+  "active": false,
+  "nodes": [
+    {
+      "id": "a1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "parameters": { "httpMethod": "POST", "path": "qos-spike-hmac", "responseMode": "responseNode" },
+      "webhookId": "qos-spike-hmac"
+    },
+    {
+      "id": "a2",
+      "name": "Verify signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const crypto = require('crypto');\nconst item = $input.first().json;\nconst ts = item.headers['x-qos-timestamp'];\nconst sig = item.headers['x-qos-signature'] || '';\nconst body = JSON.stringify(item.body);\nconst secret = $env.QOS_WEBHOOK_SECRET;\nconst expected = crypto.createHmac('sha256', secret).update(ts + '.' + body).digest('hex');\nconst fresh = Math.abs(Date.now()/1000 - Number(ts)) < 300;\nconst ok = fresh && sig.length === expected.length && crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));\nreturn [{ json: { ok } }];"
+      }
+    },
+    {
+      "id": "a3",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [480, 0],
+      "parameters": { "respondWith": "json", "responseBody": "={{ JSON.stringify($json) }}" }
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Verify signature", "type": "main", "index": 0 }]] },
+    "Verify signature": { "main": [[{ "node": "Respond", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
