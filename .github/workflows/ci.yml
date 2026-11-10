@@ -89,7 +89,7 @@ jobs:
       - name: Build application image
         run: docker build -f infra/images/app/Dockerfile -t qualityos/app:ci .
       - name: Trivy (image vulnerabilities)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: qualityos/app:ci
           severity: CRITICAL,HIGH
@@ -110,7 +110,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: OSV-Scanner
-        uses: google/osv-scanner-action/osv-scanner-action@v2
+        uses: google/osv-scanner-action/osv-scanner-action@v2.7.0
         with:
           scan-args: |-
             --lockfile=pnpm-lock.yaml
