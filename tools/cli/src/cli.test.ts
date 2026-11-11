@@ -26,6 +26,19 @@ describe('qos init', () => {
     expect(await readFile(first.path, 'utf8')).toBe(content);
   });
 
+  it('adds keys a newer version needs without touching existing values', async () => {
+    const first = await initEnv(root);
+    await writeFile(first.path, 'POSTGRES_PASSWORD=keep-this-existing-value\nPOSTGRES_USER=qos');
+    const second = await initEnv(root);
+    expect(second.created).toBe(false);
+    expect(second.added).toEqual(expect.arrayContaining(['SETUP_TOKEN', 'FILE_URL_SECRET']));
+    expect(second.added).not.toContain('POSTGRES_PASSWORD');
+    const env = parseEnv(await readFile(first.path, 'utf8'));
+    expect(env.POSTGRES_PASSWORD).toBe('keep-this-existing-value');
+    expect(env.SETUP_TOKEN).toMatch(/^[0-9a-f]{64}$/);
+    expect((await initEnv(root)).added).toEqual([]);
+  });
+
   it('generates different secrets every time', () => {
     expect(parseEnv(renderEnv()).POSTGRES_PASSWORD).not.toBe(parseEnv(renderEnv()).POSTGRES_PASSWORD);
   });
@@ -65,7 +78,7 @@ describe('qos doctor', () => {
   it('rejects placeholder secrets without printing them, and only warns when the stack is down', async () => {
     await initEnv(root);
     const file = path.join(root, 'infra', 'compose', '.env');
-    await writeFile(file, 'POSTGRES_PASSWORD=change-me-local-only\nFILE_URL_SECRET=short\n');
+    await writeFile(file, 'POSTGRES_PASSWORD=change-me-local-only\nFILE_URL_SECRET=short\nSETUP_TOKEN=x\n');
     const results = await runDoctor({ repoRoot: root, ...healthy, fetchStatus: async () => null });
     const env = results.find((r) => r.name === 'env file')!;
     expect(env.level).toBe('fail');

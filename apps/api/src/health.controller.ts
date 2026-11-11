@@ -2,6 +2,7 @@ import { Controller, Get, Inject, Res } from '@nestjs/common';
 import type { HealthResponse } from '@qos/contracts';
 import { evaluateReadiness, liveness, type CoreInfra } from '@qos/kernel-infra';
 import type { FastifyReply } from 'fastify';
+import { Public } from './access.js';
 import type { ApiConfig } from './config.js';
 import { CONFIG, INFRA } from './tokens.js';
 
@@ -16,12 +17,14 @@ export class HealthController {
 
   /** Liveness: the process is up. Never touches dependencies. */
   @Get('healthz')
+  @Public()
   healthz(): HealthResponse {
     return liveness({ service: SERVICE, version: this.config.APP_VERSION });
   }
 
   /** Readiness: dependencies answer. 503 when any check fails. */
   @Get('readyz')
+  @Public()
   async readyz(@Res({ passthrough: true }) reply: FastifyReply): Promise<HealthResponse> {
     const result = await evaluateReadiness({
       service: SERVICE,

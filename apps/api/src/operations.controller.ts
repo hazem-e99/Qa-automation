@@ -4,6 +4,7 @@ import { DomainError } from '@qos/kernel-domain';
 import type { CoreInfra } from '@qos/kernel-infra';
 import { getOperation, isTerminal } from '@qos/platform';
 import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Authenticated } from './access.js';
 import type { ApiConfig } from './config.js';
 import type { OperationEvents } from './operation-events.js';
 import { CONFIG, INFRA, OPERATION_EVENTS } from './tokens.js';
@@ -23,6 +24,7 @@ export class OperationsController {
   ) {}
 
   @Get(':id')
+  @Authenticated()
   async get(@Param('id') id: string): Promise<OperationResponse> {
     const op = await getOperation(this.infra.db, Uuid.parse(id));
     if (!op) throw new NotFoundException();
@@ -35,6 +37,7 @@ export class OperationsController {
    * each connection starts from the current state, so no event history is needed.
    */
   @Get(':id/events')
+  @Authenticated()
   async stream(
     @Param('id') rawId: string,
     @Req() req: FastifyRequest,

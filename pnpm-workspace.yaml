@@ -12,3 +12,4 @@ allowBuilds:
   protobufjs: false
   '@parcel/watcher': false
   '@swc/core': false
+  argon2: false

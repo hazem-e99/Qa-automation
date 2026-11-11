@@ -66,6 +66,8 @@ services:
       API_PORT: 3001
       STORAGE_DIR: /data/storage
       FILE_URL_SECRET: ${FILE_URL_SECRET:?run "pnpm qos init" to create infra/compose/.env}
+      SETUP_TOKEN: ${SETUP_TOKEN:?run "pnpm qos init" to add it to infra/compose/.env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
     ports:
       - '127.0.0.1:${API_PORT:-3001}:3001'
     volumes:

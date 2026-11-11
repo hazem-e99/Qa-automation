@@ -3,14 +3,17 @@ import { ApiError, OperationResponse, ProbeResponse } from '@qos/contracts';
 import { startTestDatabase, type TestDatabase } from '@qos/db/testing';
 import { processProbeJob } from '@qos/probe';
 import { createApiApp, type ApiApp } from '../dist/bootstrap.js';
+import { AUTH_ENV, setupAndSignIn, type Session } from './helpers.js';
 
 let t: TestDatabase;
 let api: ApiApp;
 let base: string;
+let s: Session;
 const env = (extra: Record<string, string>) => ({
   DATABASE_URL: t.url,
   NODE_ENV: 'test',
   LOG_LEVEL: 'silent',
+  ...AUTH_ENV,
   ...extra,
 });
 
@@ -18,6 +21,7 @@ beforeAll(async () => {
   t = await startTestDatabase();
   api = await createApiApp(env({ API_PORT: '39021', RATE_LIMIT_BURST: '1000', RATE_LIMIT_RPS: '1000' }));
   base = await api.listen();
+  s = await setupAndSignIn(base);
 }, 180_000);
 afterAll(async () => {
   await api?.close();
@@ -25,7 +29,7 @@ afterAll(async () => {
 });
 
 const post = (body: unknown, headers: Record<string, string> = {}) =>
-  fetch(`${base}/api/v1/platform/probes`, {
+  s.fetch(`${base}/api/v1/platform/probes`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', ...headers },
     body: JSON.stringify(body),
@@ -95,18 +99,20 @@ describe('Idempotency-Key over HTTP', () => {
 describe('operations', () => {
   it('returns the operation as JSON and 404/400 for unknown or malformed ids', async () => {
     const probe = ProbeResponse.parse(await (await post({ label: 'op' })).json());
-    const res = await fetch(`${base}/api/v1/operations/${probe.operationId}`);
+    const res = await s.fetch(`${base}/api/v1/operations/${probe.operationId}`);
     expect(OperationResponse.parse(await res.json())).toMatchObject({
       status: 'queued',
       type: 'platform.probe',
     });
-    expect((await fetch(`${base}/api/v1/operations/0190a5e0-7c1a-7000-8000-000000000001`)).status).toBe(404);
-    expect((await fetch(`${base}/api/v1/operations/nope/events`)).status).toBe(400);
+    expect((await s.fetch(`${base}/api/v1/operations/0190a5e0-7c1a-7000-8000-000000000001`)).status).toBe(
+      404,
+    );
+    expect((await s.fetch(`${base}/api/v1/operations/nope/events`)).status).toBe(400);
   });
 
   it('streams state changes over SSE and closes on the final status', async () => {
     const probe = ProbeResponse.parse(await (await post({ label: 'sse' })).json());
-    const res = await fetch(`${base}/api/v1/operations/${probe.operationId}/events`);
+    const res = await s.fetch(`${base}/api/v1/operations/${probe.operationId}/events`);
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toContain('text/event-stream');
     const reader = res.body!.getReader();
@@ -134,7 +140,7 @@ describe('operations', () => {
   it('a stream opened after completion sends the final state once and closes', async () => {
     const probe = ProbeResponse.parse(await (await post({ label: 'late' })).json());
     await runJob(probe.id);
-    const res = await fetch(`${base}/api/v1/operations/${probe.operationId}/events`);
+    const res = await s.fetch(`${base}/api/v1/operations/${probe.operationId}/events`);
     const body = await res.text();
     expect(body.match(/^event: operation$/gm)).toHaveLength(1);
     expect(body).toContain('"status":"succeeded"');
@@ -151,7 +157,8 @@ describe('rate limiting', () => {
       const probe = '/api/v1/operations/0190a5e0-7c1a-7000-8000-000000000001';
       const statuses: number[] = [];
       for (let i = 0; i < 5; i++) statuses.push((await fetch(url + probe)).status);
-      expect(statuses).toEqual([404, 404, 404, 429, 429]);
+      // The limit applies before authentication: unauthenticated callers are throttled too.
+      expect(statuses).toEqual([401, 401, 401, 429, 429]);
       const refused = await fetch(url + probe);
       expect(Number(refused.headers.get('retry-after'))).toBeGreaterThanOrEqual(1);
       const body = ApiError.parse(await refused.json());

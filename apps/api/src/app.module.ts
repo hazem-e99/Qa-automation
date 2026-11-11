@@ -1,6 +1,7 @@
 import { Module, type DynamicModule } from '@nestjs/common';
 import type { CoreInfra } from '@qos/kernel-infra';
 import type { ObjectStorage } from '@qos/ports';
+import { AuthController } from './auth.controller.js';
 import type { ApiConfig } from './config.js';
 import { FilesController } from './files.controller.js';
 import { HealthController } from './health.controller.js';
@@ -20,7 +21,7 @@ export class AppModule {
   ): DynamicModule {
     return {
       module: AppModule,
-      controllers: [HealthController, ProbeController, OperationsController, FilesController],
+      controllers: [HealthController, AuthController, ProbeController, OperationsController, FilesController],
       providers: [
         { provide: CONFIG, useValue: config },
         { provide: INFRA, useValue: infra },

@@ -75,7 +75,7 @@ export async function runDoctor(opts: DoctorOptions): Promise<CheckResult[]> {
     add('env file', 'fail', 'infra/compose/.env is missing. Run: pnpm qos init');
   } else {
     const env = parseEnv(readFileSync(envFile, 'utf8'));
-    const weak = ['POSTGRES_PASSWORD', 'FILE_URL_SECRET'].filter(
+    const weak = ['POSTGRES_PASSWORD', 'FILE_URL_SECRET', 'SETUP_TOKEN'].filter(
       (k) => !env[k] || env[k]!.length < 32 || /change-me|<generated/i.test(env[k]!),
     );
     add(

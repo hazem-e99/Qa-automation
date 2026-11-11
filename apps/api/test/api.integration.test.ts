@@ -3,15 +3,24 @@ import { ApiError, HealthResponse, ProbeResponse } from '@qos/contracts';
 import { startTestDatabase, type TestDatabase } from '@qos/db/testing';
 // Boot tests run against the compiled output, exactly what `node dist/main.js` runs.
 import { createApiApp, type ApiApp } from '../dist/bootstrap.js';
+import { AUTH_ENV, setupAndSignIn, type Session } from './helpers.js';
 
 let t: TestDatabase;
 let api: ApiApp;
 let base: string;
+let s: Session;
 
 beforeAll(async () => {
   t = await startTestDatabase();
-  api = await createApiApp({ DATABASE_URL: t.url, NODE_ENV: 'test', LOG_LEVEL: 'silent', API_PORT: '39001' });
+  api = await createApiApp({
+    DATABASE_URL: t.url,
+    NODE_ENV: 'test',
+    LOG_LEVEL: 'silent',
+    API_PORT: '39001',
+    ...AUTH_ENV,
+  });
   base = await api.listen();
+  s = await setupAndSignIn(base);
 }, 180_000);
 afterAll(async () => {
   await api?.close();
@@ -19,7 +28,7 @@ afterAll(async () => {
 });
 
 const post = (body: unknown, headers: Record<string, string> = {}) =>
-  fetch(`${base}/api/v1/platform/probes`, {
+  s.fetch(`${base}/api/v1/platform/probes`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', ...headers },
     body: typeof body === 'string' ? body : JSON.stringify(body),
@@ -77,7 +86,7 @@ describe('probe command over HTTP', () => {
       [body.id],
     );
     expect(job.rows[0].c).toBe('corr-http-00001');
-    const got = await fetch(`${base}/api/v1/platform/probes/${body.id}`);
+    const got = await s.fetch(`${base}/api/v1/platform/probes/${body.id}`);
     expect(ProbeResponse.parse(await got.json()).label).toBe('http');
   });
 
@@ -100,9 +109,9 @@ describe('probe command over HTTP', () => {
     expect(badJson.status).toBe(400);
     expect(JSON.stringify(await badJson.json())).not.toMatch(/stack|at .*\.js|SyntaxError/);
 
-    const notUuid = await fetch(`${base}/api/v1/platform/probes/not-a-uuid`);
+    const notUuid = await s.fetch(`${base}/api/v1/platform/probes/not-a-uuid`);
     expect(notUuid.status).toBe(400);
-    const missing = await fetch(`${base}/api/v1/platform/probes/0190a5e0-7c1a-7000-8000-000000000001`);
+    const missing = await s.fetch(`${base}/api/v1/platform/probes/0190a5e0-7c1a-7000-8000-000000000001`);
     expect(missing.status).toBe(404);
     expect(ApiError.parse(await missing.json()).code).toBe('http.404');
   });

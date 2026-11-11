@@ -17,7 +17,9 @@ switch (command) {
     console.log(
       result.created
         ? `Created ${path.relative(repoRoot, result.path)} with generated secrets.`
-        : `${path.relative(repoRoot, result.path)} already exists; left unchanged.`,
+        : result.added.length
+          ? `${path.relative(repoRoot, result.path)}: added ${result.added.join(', ')}; existing values unchanged.`
+          : `${path.relative(repoRoot, result.path)} already exists; left unchanged.`,
     );
     break;
   }

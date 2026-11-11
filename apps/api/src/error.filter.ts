@@ -7,6 +7,16 @@ import { ZodError } from 'zod';
 
 /** Domain codes that are not plain 422s. */
 const DOMAIN_STATUS: Readonly<Record<string, number>> = {
+  'auth.invalid_credentials': 401,
+  'auth.rate_limited': 429,
+  'csrf.invalid': 403,
+  forbidden: 403,
+  'route.undeclared': 403,
+  'setup.already_done': 409,
+  'password.too_short': 400,
+  'password.too_long': 400,
+  'password.too_common': 400,
+  'email.invalid': 400,
   'idempotency.key_invalid': 400,
   'idempotency.in_progress': 409,
   'idempotency.retry': 409,
@@ -26,6 +36,9 @@ export class ApiErrorFilter implements ExceptionFilter {
     const { status, code, params } = this.classify(exception);
     if (status >= 500) this.logger.error({ err: exception }, 'unhandled error');
     const body: ApiError = { code, params, correlationId: currentCorrelationId() };
+    if (status === 429 && typeof params.retryAfterSeconds === 'number') {
+      void reply.header('retry-after', String(params.retryAfterSeconds));
+    }
     void reply.status(status).send(body);
   }
 

@@ -1,11 +1,36 @@
 # QualityOS — Implementation status
 
 > Statuses: `planned` → `in_progress` → `implemented` (code and tests exist) → `verified` (the task's Verify criterion in [26](../planning/26-task-breakdown.md) was run and passed; evidence listed).
-> Planning package approved by the owner: **2026-11-09**. Closed gates: [P0](gates/P0.md) (2026-11-10).
+> Planning package approved by the owner: **2026-11-09**. Closed gates: [P0](gates/P0.md) (2026-11-10), [P1](gates/P1.md) (2026-11-10).
 
-## Current phase: P1 — Monorepo and core foundation
+## Current phase: P2 — Identity, projects, provider framework, governance base (in progress, started 2026-11-10)
 
-**All 18 tasks have code. The gate is not closed:** CI has never run (nothing is pushed), and the owner has not signed off. Draft gate record: [gates/P1.md](gates/P1.md).
+Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batch 1 (identity core) is built. Last full run on 2026-11-11: build, typecheck, lint and format clean; 59 unit, 74 integration and 10 browser tests pass locally.
+
+| Task | Status | Evidence / what is missing |
+| --- | --- | --- |
+| T-P2-01 Users, local auth, sessions, CSRF, login rate limit | **implemented** | `packages/modules/identity`, `apps/api/test/auth.integration.test.ts`. argon2id; opaque session token stored only as a hash; idle (8 h) and absolute (7 d) timeouts; CSRF token bound to the session; 5 login attempts per minute per account and per address; one generic error for every login failure. First administrator is created through a one-time setup endpoint guarded by a setup token. **Missing:** password change/reset, session rotation on privilege change, account lockout beyond the rate limit, breached-password list |
+| T-P2-40 Roles/permissions catalog + seed | **verified** | M13-AC-06: `rbac.test.ts` compares the matrix rendered from the catalog with the table in `docs/planning/modules/M13-team-permissions.md`, cell by cell. Catalog is synchronized to the database at API start |
+| T-P2-41 Policy guard + route declaration test | **verified** | M13-AC-01: `route inventory` test lists every route and fails on a missing declaration; a route without one is refused at runtime. Only 5 routes are public (health ×2, login, setup, signed file links). **Limit:** permission checks are org-scope only until projects exist |
+| T-P2-45 `/me/permissions` | **implemented** | API endpoint returns org-scope permissions. **Missing:** project permissions (`?projectKey=`) and the UI gating helper |
+| All other P2 tasks | planned | Including MFA, invitations, memberships UI, service tokens, projects, connections, SecretStore, approval engine, mock adapters, the provider adapters and all P2 screens |
+
+Acceptance criteria touched so far: M13-AC-01 (met), M13-AC-06 (met), M13-AC-03 (session part met: a deactivated user's next request is 401; API tokens do not exist yet), M13-AC-02 (authorization logic tested at module level with project ids; no project resources or routes exist yet).
+
+### Decisions made in P2 so far
+| Item | What | Why |
+| --- | --- | --- |
+| `project.create` permission | Added to the org-scope list in M13 (org_admin) | The matrix had no permission for creating a project; needed by the project wizard |
+| "Policy-dependent" grants (◐) | Treated as denied | The approval policy engine (T-P2-52) does not exist yet |
+| First user gets `org_admin` and `platform_admin` | Single-organization pilot | One person operates and administers the pilot |
+| Authorization source | Decisions come from the catalog in code; the database tables mirror it | Keeps the documented matrix, the code and the data from drifting apart |
+| Web shell has no login screen yet | The API is protected; the shell's only page (system status) calls public health endpoints | UI for sign-in arrives with the users/projects screens |
+| `argon2` install script denied | The package ships prebuilt binaries | Keeps the deny-by-default rule for install scripts |
+| Probe endpoints | Now need `system.settings` (platform admin) | They were unauthenticated in P1 |
+
+## P1 — Monorepo and core foundation (closed 2026-11-10)
+
+All 18 tasks have code and CI is green. Gate record: [gates/P1.md](gates/P1.md). Items marked **implemented** below have known gaps that were carried forward, not closed.
 
 Last full run on 2026-11-10 (Windows 11, Node 24.18, Docker Desktop 4.99):
 
@@ -36,7 +61,7 @@ Last full run on 2026-11-10 (Windows 11, Node 24.18, Docker Desktop 4.99):
 | T-P1-12 localfs storage + signed URLs | **verified** | Shared contract suite (`packages/contract-tests`) passes for localfs: 9 tests including traversal keys and concurrent writes. Signed link endpoint: tampered, expired, re-targeted links refused; HTML never served inline |
 | T-P1-13 Compose `core`, CLI | **implemented** | `pnpm qos init`, `pnpm qos doctor`, `pnpm stack:up` work on this Windows machine. **Not verified:** "fresh-clone boot" (it was run in the working tree, not from a new clone). Image keeps dev dependencies (1.37 GB) |
 | T-P1-14 Web shell | **verified** | Next.js shell with sidebar, top bar, light/dark tokens, English/Arabic with RTL, command palette stub. Playwright: 4 visual variants + 6 behaviour tests. RTL lint rule active. **Limits:** baselines exist for Windows only |
-| T-P1-15 CI pipeline | **implemented** | `.github/workflows/ci.yml` written (lint, typecheck, unit, integration, web e2e, image build, Trivy, Gitleaks, OSV). **Never run:** nothing is pushed. Action versions are unverified until the first run |
+| T-P1-15 CI pipeline | **verified** | `.github/workflows/ci.yml` written (lint, typecheck, unit, integration, web e2e, image build, Trivy, Gitleaks, OSV). All five jobs passed on GitHub on 2026-11-10 (run 42905492449, commit `e3047e9`). Trivy and OSV-Scanner are report-only: they do not fail the build, and their findings have not been triaged |
 | T-P1-16 Status file + gate template | **verified** | This file, [gates/TEMPLATE.md](gates/TEMPLATE.md) |
 | T-P1-17 SafeHttpClient | **verified** | SSRF suite (11 tests): private/metadata/IPv6 ranges, mixed DNS answers, pinned connection, redirect re-validation, credential stripping, timeout, size cap, retries, rate limit |
 | T-P1-18 API rate limiting | **verified** | Token bucket per client address; 429 with `Retry-After`; health exempt. Per-session and per-token limits need identity (P2) |
@@ -61,8 +86,9 @@ Last full run on 2026-11-10 (Windows 11, Node 24.18, Docker Desktop 4.99):
 
 ### Not exercised
 - The job and outbox path inside containers (the probe is disabled in production mode). The same code is covered by the worker integration test on the host.
-- CI on GitHub, Linux screenshot baselines, a boot from a fresh clone.
+- A boot from a fresh clone. Linux screenshot baselines are created in CI on each run and uploaded as an artifact; none are committed, so CI does not yet compare screenshots.
 - Firefox and WebKit for the shell.
 
 ### Next
-Owner decisions: repository visibility before the first push; P1 gate sign-off. Then P2 (identity, projects, provider framework).
+
+P2 batch 2: SecretStore (T-P2-51), projects aggregate (T-P2-10), memberships (T-P2-42), then the provider registry and connections (T-P2-20…23). Before that: commitlint git hook and a clean Knip run, carried from P1.

@@ -101,6 +101,7 @@ J1 (admin invites the team), an access change (QA lead adds a developer as `deve
 Org-scope permissions:
 - `connection.manage`, `connection.secret.rotate`, `connection.retire`: org_admin, platform_admin
 - `user.manage`: org_admin
+- `project.create`: org_admin
 - `org.analytics.read`: org_admin, platform_admin, org viewer
 - `cost.read`: org_admin, platform_admin
 - `system.settings`, `backup.manage`: platform_admin

@@ -11,6 +11,7 @@ import {
 import { verifyFileLink } from '@qos/kernel-infra';
 import { InvalidObjectKeyError, ObjectNotFoundError, type ObjectStorage } from '@qos/ports';
 import type { FastifyReply, FastifyRequest } from 'fastify';
+import { Public } from './access.js';
 import type { ApiConfig } from './config.js';
 import { CONFIG, STORAGE } from './tokens.js';
 
@@ -36,6 +37,7 @@ export class FilesController {
 
   /** Serves one stored object for a valid, unexpired signed link. */
   @Get('*')
+  @Public() // authorized by the signed link itself
   async download(
     @Req() req: FastifyRequest,
     @Query('exp') exp: unknown,

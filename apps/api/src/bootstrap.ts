@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { LocalFsObjectStorage } from '@qos/adapters-storage-localfs';
 import type { ApiError } from '@qos/contracts';
+import { syncRbacCatalog } from '@qos/identity';
 import { createCoreInfra, loadConfig, TokenBucketLimiter, type CoreInfra } from '@qos/kernel-infra';
 import { currentCorrelationId, runWithCorrelation } from '@qos/observability';
 import type { ObjectStorage } from '@qos/ports';
@@ -10,6 +11,7 @@ import { AppModule } from './app.module.js';
 import { ApiConfig } from './config.js';
 import { ApiErrorFilter } from './error.filter.js';
 import { OperationEvents } from './operation-events.js';
+import { PolicyGuard } from './policy.guard.js';
 
 export interface ApiApp {
   readonly app: NestFastifyApplication;
@@ -31,6 +33,7 @@ export async function createApiApp(env: NodeJS.ProcessEnv = process.env): Promis
   // Composition root: the only place that names a concrete storage adapter.
   const storage: ObjectStorage = new LocalFsObjectStorage(config.STORAGE_DIR);
   try {
+    await syncRbacCatalog(infra.db);
     await operationEvents.start();
     const adapter = new FastifyAdapter({ bodyLimit: 1_048_576, requestTimeout: 30_000 });
     const app = await NestFactory.create<NestFastifyApplication>(
@@ -76,6 +79,13 @@ export async function createApiApp(env: NodeJS.ProcessEnv = process.env): Promis
       done();
     });
     app.useGlobalFilters(new ApiErrorFilter(infra.logger));
+    // Deny by default: every route must declare its access (BR-M13-1).
+    app.useGlobalGuards(
+      new PolicyGuard(infra, {
+        idleMinutes: config.SESSION_IDLE_MINUTES,
+        absoluteDays: config.SESSION_ABSOLUTE_DAYS,
+      }),
+    );
     await app.init();
     let closed = false;
     return {

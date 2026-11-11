@@ -16,13 +16,13 @@ import type { CoreInfra } from '@qos/kernel-infra';
 import { withIdempotency } from '@qos/platform';
 import { createProbe, getProbe } from '@qos/probe';
 import type { FastifyReply } from 'fastify';
+import { RequirePermission } from './access.js';
 import type { ApiConfig } from './config.js';
 import { CONFIG, INFRA } from './tokens.js';
 
 /**
  * Platform probe endpoints: a diagnostic command that exercises the transaction path end to end.
- * There is no authentication yet (identity arrives in P2), so the API binds to loopback only and
- * these routes are disabled in production.
+ * Only platform administrators may use it, and the routes are disabled in production.
  */
 @Controller('api/v1/platform/probes')
 export class ProbeController {
@@ -32,6 +32,7 @@ export class ProbeController {
   ) {}
 
   @Post()
+  @RequirePermission('system.settings')
   @HttpCode(201)
   async create(
     @Body() body: unknown,
@@ -60,6 +61,7 @@ export class ProbeController {
   }
 
   @Get(':id')
+  @RequirePermission('system.settings')
   async get(@Param('id') id: string): Promise<ProbeResponse> {
     this.assertEnabled();
     const row = await getProbe(this.infra.db, Uuid.parse(id));
