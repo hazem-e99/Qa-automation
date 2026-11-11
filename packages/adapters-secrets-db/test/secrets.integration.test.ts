@@ -15,7 +15,7 @@ import {
 let t: TestDatabase;
 let store: DbEnvelopeSecretStore;
 const master = parseMasterKey(generateMasterKey());
-const SECRET = 'ghp_exampleTokenValue0123456789abcdefXYZ';
+const SECRET = 'example-provider-token-value-0123456789';
 const owner = { ownerType: 'connection', ownerId: 'c1', purpose: 'api_token' };
 
 beforeAll(async () => {

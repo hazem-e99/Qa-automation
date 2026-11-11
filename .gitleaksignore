@@ -1,0 +1,3 @@
+# Known false positives. Each line is a gitleaks fingerprint with the reason above it.
+# A made-up token-shaped string used as test data for the secret store (never a real credential).
+53031f37a1b6071484bcf7a12e16b800e4bf78ab:packages/adapters-secrets-db/test/secrets.integration.test.ts:github-pat:18
