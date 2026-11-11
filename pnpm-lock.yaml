@@ -260,12 +260,18 @@ importers:
         specifier: ~4.6.7
         version: 4.6.7
     devDependencies:
+      '@qos/adapters-secrets-db':
+        specifier: workspace:*
+        version: link:../../packages/adapters-secrets-db
       '@qos/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@qos/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@qos/projects':
+        specifier: workspace:*
+        version: link:../../packages/modules/projects
       '@types/pg':
         specifier: ^8.23.1
         version: 8.23.1
@@ -398,6 +404,22 @@ importers:
       '@qos/db':
         specifier: workspace:*
         version: link:../../packages/db
+
+  packages/adapters-secrets-db:
+    dependencies:
+      '@qos/db':
+        specifier: workspace:*
+        version: link:../db
+      '@qos/kernel-domain':
+        specifier: workspace:*
+        version: link:../kernel-domain
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../config
 
   packages/adapters-storage-localfs:
     dependencies:
@@ -591,6 +613,25 @@ importers:
       '@qos/ports':
         specifier: workspace:*
         version: link:../../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../../config
+
+  packages/modules/projects:
+    dependencies:
+      '@qos/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@qos/identity':
+        specifier: workspace:*
+        version: link:../identity
+      '@qos/jobs':
+        specifier: workspace:*
+        version: link:../jobs
+      '@qos/kernel-domain':
+        specifier: workspace:*
+        version: link:../../kernel-domain
     devDependencies:
       '@qos/config':
         specifier: workspace:*

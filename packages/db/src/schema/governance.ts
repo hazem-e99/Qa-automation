@@ -30,3 +30,17 @@ export const auditEvents = governance.table(
   },
   (t) => [primaryKey({ columns: [t.id, t.createdAt] })],
 );
+
+/** Envelope-encrypted secrets (doc 21 §6). DDL lives in a hand-written migration, like audit_events. */
+export const secrets = governance.table('secrets', {
+  ref: uuid('ref').primaryKey(),
+  ownerType: text('owner_type').notNull(),
+  ownerId: text('owner_id').notNull(),
+  purpose: text('purpose').notNull(),
+  ciphertext: text('ciphertext').notNull(),
+  wrappedDek: text('wrapped_dek').notNull(),
+  keyId: text('key_id').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  rotatedAt: timestamp('rotated_at', { withTimezone: true }),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+});

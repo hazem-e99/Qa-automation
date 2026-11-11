@@ -8,6 +8,7 @@ import { HealthController } from './health.controller.js';
 import type { OperationEvents } from './operation-events.js';
 import { OperationsController } from './operations.controller.js';
 import { ProbeController } from './probe.controller.js';
+import { ProjectsController } from './projects.controller.js';
 import { CONFIG, INFRA, OPERATION_EVENTS, STORAGE } from './tokens.js';
 
 /** Composition root of the HTTP API. Infrastructure is built before Nest starts and passed in. */
@@ -21,7 +22,14 @@ export class AppModule {
   ): DynamicModule {
     return {
       module: AppModule,
-      controllers: [HealthController, AuthController, ProbeController, OperationsController, FilesController],
+      controllers: [
+        HealthController,
+        AuthController,
+        ProbeController,
+        ProjectsController,
+        OperationsController,
+        FilesController,
+      ],
       providers: [
         { provide: CONFIG, useValue: config },
         { provide: INFRA, useValue: infra },

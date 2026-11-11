@@ -1,12 +1,20 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
 import { LocalFsObjectStorage } from '@qos/adapters-storage-localfs';
 import type { ApiError } from '@qos/contracts';
+import type { Tx } from '@qos/db';
 import { syncRbacCatalog } from '@qos/identity';
-import { createCoreInfra, loadConfig, TokenBucketLimiter, type CoreInfra } from '@qos/kernel-infra';
+import {
+  ConfigError,
+  createCoreInfra,
+  loadConfig,
+  TokenBucketLimiter,
+  type CoreInfra,
+} from '@qos/kernel-infra';
 import { currentCorrelationId, runWithCorrelation } from '@qos/observability';
-import type { ObjectStorage } from '@qos/ports';
+import type { ObjectStorage, SecretStore } from '@qos/ports';
 import { AppModule } from './app.module.js';
 import { ApiConfig } from './config.js';
 import { ApiErrorFilter } from './error.filter.js';
@@ -18,6 +26,8 @@ export interface ApiApp {
   readonly config: ApiConfig;
   readonly infra: CoreInfra;
   readonly storage: ObjectStorage;
+  /** Null only outside production, when no master key file is configured. */
+  readonly secrets: SecretStore<Tx> | null;
   /** Starts listening and returns the base URL. */
   listen(): Promise<string>;
   /** Graceful shutdown: stop accepting requests, then close the job queue and the pool. */
@@ -28,10 +38,16 @@ const UNLIMITED_PATHS = new Set(['/healthz', '/readyz']);
 
 export async function createApiApp(env: NodeJS.ProcessEnv = process.env): Promise<ApiApp> {
   const config = loadConfig(ApiConfig, env);
+  // No plaintext fallback: production refuses to start without a readable master key (M14).
+  if (!config.QOS_MASTER_KEY_FILE && config.NODE_ENV === 'production') {
+    throw new ConfigError(['QOS_MASTER_KEY_FILE: required in production']);
+  }
+  const masterKey = config.QOS_MASTER_KEY_FILE ? loadMasterKeyFile(config.QOS_MASTER_KEY_FILE) : null;
   const infra = await createCoreInfra(config, { service: 'api', superviseJobs: false });
   const operationEvents = new OperationEvents(config.DATABASE_URL, infra.logger);
   // Composition root: the only place that names a concrete storage adapter.
   const storage: ObjectStorage = new LocalFsObjectStorage(config.STORAGE_DIR);
+  const secrets = masterKey ? new DbEnvelopeSecretStore(infra.db, masterKey) : null;
   try {
     await syncRbacCatalog(infra.db);
     await operationEvents.start();
@@ -93,6 +109,7 @@ export async function createApiApp(env: NodeJS.ProcessEnv = process.env): Promis
       config,
       infra,
       storage,
+      secrets,
       listen: async () => {
         await app.listen(config.API_PORT, config.API_HOST);
         return app.getUrl();

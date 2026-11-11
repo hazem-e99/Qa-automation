@@ -12,6 +12,8 @@ export const ApiConfig = BaseConfig.extend({
   STORAGE_DIR: z.string().min(1).default('./var/storage'),
   /** Secret for signed file links. When unset, the /files endpoint answers 404. */
   FILE_URL_SECRET: z.string().min(32, 'must be at least 32 characters').optional(),
+  /** File holding the 32-byte master key of the secret store. Required in production. */
+  QOS_MASTER_KEY_FILE: z.string().min(1).optional(),
   /** Token for the one-time first-run setup endpoint. When unset, setup answers 404. */
   SETUP_TOKEN: z.string().min(32, 'must be at least 32 characters').optional(),
   /** `Secure` flag on the session cookie. Off only for plain-HTTP local development. */

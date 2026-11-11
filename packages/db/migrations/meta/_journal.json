@@ -36,6 +36,20 @@
       "when": 1794346736167,
       "tag": "0004_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794393759672,
+      "tag": "0005_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794393760917,
+      "tag": "0006_secrets",
+      "breakpoints": true
     }
   ]
 }

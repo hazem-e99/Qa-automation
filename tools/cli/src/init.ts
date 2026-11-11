@@ -8,6 +8,8 @@ export interface InitResult {
   readonly created: boolean;
   /** Keys added to an existing file because a newer version needs them. */
   readonly added: readonly string[];
+  /** True when secrets/master.key was created by this run. */
+  readonly masterKeyCreated: boolean;
 }
 
 /** Hex only, so generated values are safe inside URLs and shell-free env files. */
@@ -44,7 +46,16 @@ export function renderEnv(): string {
  * database password would lock the stack out of its own data volume. Keys that a newer version
  * needs and the file lacks are appended.
  */
+async function ensureMasterKey(repoRoot: string): Promise<boolean> {
+  const file = path.join(repoRoot, 'secrets', 'master.key');
+  if (existsSync(file)) return false; // never replaced: stored secrets would become unreadable
+  await mkdir(path.dirname(file), { recursive: true });
+  await writeFile(file, secret(32) + '\n', { flag: 'wx', mode: 0o600 });
+  return true;
+}
+
 export async function initEnv(repoRoot: string): Promise<InitResult> {
+  const masterKeyCreated = await ensureMasterKey(repoRoot);
   const dir = path.join(repoRoot, 'infra', 'compose');
   const file = path.join(dir, '.env');
   if (existsSync(file)) {
@@ -55,10 +66,10 @@ export async function initEnv(repoRoot: string): Promise<InitResult> {
       const separator = text.endsWith('\n') ? '' : '\n';
       await appendFile(file, separator + missing.map(line).join('\n') + '\n');
     }
-    return { path: file, created: false, added: missing.map(([key]) => key) };
+    return { path: file, created: false, added: missing.map(([key]) => key), masterKeyCreated };
   }
   await mkdir(dir, { recursive: true });
   await writeFile(file, renderEnv(), { flag: 'wx', mode: 0o600 });
   await chmod(file, 0o600).catch(() => undefined); // no effect on Windows; harmless
-  return { path: file, created: true, added: [] };
+  return { path: file, created: true, added: [], masterKeyCreated };
 }

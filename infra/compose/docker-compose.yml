@@ -68,6 +68,8 @@ services:
       FILE_URL_SECRET: ${FILE_URL_SECRET:?run "pnpm qos init" to create infra/compose/.env}
       SETUP_TOKEN: ${SETUP_TOKEN:?run "pnpm qos init" to add it to infra/compose/.env}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      QOS_MASTER_KEY_FILE: /run/secrets/master_key
+    secrets: [master_key]
     ports:
       - '127.0.0.1:${API_PORT:-3001}:3001'
     volumes:
@@ -136,6 +138,11 @@ services:
         ]
     depends_on:
       api: { condition: service_healthy }
+
+secrets:
+  # Created by `pnpm qos init`. Lives outside the image and the database; back it up separately.
+  master_key:
+    file: ../../secrets/master.key
 
 networks:
   core:

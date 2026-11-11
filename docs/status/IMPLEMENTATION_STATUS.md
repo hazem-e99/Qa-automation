@@ -5,17 +5,21 @@
 
 ## Current phase: P2 — Identity, projects, provider framework, governance base (in progress, started 2026-11-10)
 
-Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batch 1 (identity core) is built. Last full run on 2026-11-11: build, typecheck, lint and format clean; 59 unit, 74 integration and 10 browser tests pass locally.
+Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity core) and 2 (secret store, projects, memberships) are built. Last full run on 2026-11-11: build, typecheck, lint and format clean; 59 unit, 100 integration and 10 browser tests pass locally; `pnpm stack:up` healthy and exercised by hand (setup, login, CSRF, create project).
 
 | Task | Status | Evidence / what is missing |
 | --- | --- | --- |
 | T-P2-01 Users, local auth, sessions, CSRF, login rate limit | **implemented** | `packages/modules/identity`, `apps/api/test/auth.integration.test.ts`. argon2id; opaque session token stored only as a hash; idle (8 h) and absolute (7 d) timeouts; CSRF token bound to the session; 5 login attempts per minute per account and per address; one generic error for every login failure. First administrator is created through a one-time setup endpoint guarded by a setup token. **Missing:** password change/reset, session rotation on privilege change, account lockout beyond the rate limit, breached-password list |
 | T-P2-40 Roles/permissions catalog + seed | **verified** | M13-AC-06: `rbac.test.ts` compares the matrix rendered from the catalog with the table in `docs/planning/modules/M13-team-permissions.md`, cell by cell. Catalog is synchronized to the database at API start |
 | T-P2-41 Policy guard + route declaration test | **verified** | M13-AC-01: `route inventory` test lists every route and fails on a missing declaration; a route without one is refused at runtime. Only 5 routes are public (health ×2, login, setup, signed file links). **Limit:** permission checks are org-scope only until projects exist |
-| T-P2-45 `/me/permissions` | **implemented** | API endpoint returns org-scope permissions. **Missing:** project permissions (`?projectKey=`) and the UI gating helper |
-| All other P2 tasks | planned | Including MFA, invitations, memberships UI, service tokens, projects, connections, SecretStore, approval engine, mock adapters, the provider adapters and all P2 screens |
+| T-P2-45 `/me/permissions` | **implemented** | Org-scope at `/me/permissions`, project-scope at `/projects/{key}/permissions`. **Missing:** the UI gating helper (no UI uses it yet) |
+| T-P2-51 SecretStore + envelope adapter + master key | **verified** | `packages/adapters-secrets-db`: AES-256-GCM per-secret data key wrapped with AES-KW; reference bound as authenticated data. Tests: database dump contains no secret, tampered and swapped rows are detected, wrong key cannot read, master key rotation re-wraps. Start-up refusal test: production does not start without a readable key file. `qos init` creates `secrets/master.key` (gitignored); Compose mounts it as a secret. **Limits:** nothing stores secrets yet (connections are next); no `secret_versions` table; key backup is manual |
+| T-P2-10 Projects aggregate, key sequences, lifecycle | **verified** | M02-AC-06: a PATCH changing the key answers 422. M02-AC-07: archived project answers 409 `project_archived` on writes and leaves default lists. Sequences are unique and gap-free under 20 concurrent callers. **Limits:** `draft` status and templates are unused; no project-owned resources exist yet, so "all write endpoints" means the 4 that exist |
+| T-P2-18 Archive / restore / delete | **implemented** | Expected-state transitions with audit and outbox events; deleted keys stay reserved. **Missing:** the "no active runs" precondition (no runs exist yet) and the 30-day purge job |
+| T-P2-42 Project memberships | **implemented** | API only. M13-AC-02: for every project route, a member of project A gets the same 404 for project B as for a project that does not exist. M13-AC-04: a lead cannot change their own role or assign org roles. The last lead cannot be removed. **Missing:** the members UI; BR-M13-4 (last `org_admin`) needs user administration (T-P2-44) |
+| All other P2 tasks | planned | Including MFA, invitations, service tokens, user administration, environments, bindings, settings, provider registry and connections, approval engine, notifications, mock adapters, the provider adapters and all P2 screens |
 
-Acceptance criteria touched so far: M13-AC-01 (met), M13-AC-06 (met), M13-AC-03 (session part met: a deactivated user's next request is 401; API tokens do not exist yet), M13-AC-02 (authorization logic tested at module level with project ids; no project resources or routes exist yet).
+Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, M02-AC-06, M02-AC-07. **Partly** M13-AC-03 (sessions yes; API tokens do not exist yet). Not started: M02-AC-01…05/08, M03-*, M13-AC-05, M14-AC-01/03/04/07.
 
 ### Decisions made in P2 so far
 | Item | What | Why |
@@ -25,6 +29,10 @@ Acceptance criteria touched so far: M13-AC-01 (met), M13-AC-06 (met), M13-AC-03 
 | First user gets `org_admin` and `platform_admin` | Single-organization pilot | One person operates and administers the pilot |
 | Authorization source | Decisions come from the catalog in code; the database tables mirror it | Keeps the documented matrix, the code and the data from drifting apart |
 | Web shell has no login screen yet | The API is protected; the shell's only page (system status) calls public health endpoints | UI for sign-in arrives with the users/projects screens |
+| Project creator becomes `qa_lead` | Added as the first member in the same transaction | A project is never without someone who can manage it; `org_admin` alone cannot do test work (BR-M13-2) |
+| Project deletion permission | Uses `project.settings.manage` | The matrix has no separate delete permission |
+| Master key outside production | Optional in `development` and `test`; the secret store is then absent, never a plaintext fallback | Lets tests and local host runs start without key material |
+| `/me/permissions?projectKey=` | Implemented as `/projects/{key}/permissions` | Goes through the same project guard, so it cannot leak project existence |
 | `argon2` install script denied | The package ships prebuilt binaries | Keeps the deny-by-default rule for install scripts |
 | Probe endpoints | Now need `system.settings` (platform admin) | They were unauthenticated in P1 |
 
@@ -91,4 +99,4 @@ Last full run on 2026-11-10 (Windows 11, Node 24.18, Docker Desktop 4.99):
 
 ### Next
 
-P2 batch 2: SecretStore (T-P2-51), projects aggregate (T-P2-10), memberships (T-P2-42), then the provider registry and connections (T-P2-20…23). Before that: commitlint git hook and a clean Knip run, carried from P1.
+P2 batch 3: provider registry and capability catalog (T-P2-20), connections with write-only credentials (T-P2-21…23), mock adapters (T-P2-26) and the contract harness (T-P2-34). Then environments, bindings and settings, then the P2 screens. Still carried from P1: commitlint git hook and a clean Knip run.

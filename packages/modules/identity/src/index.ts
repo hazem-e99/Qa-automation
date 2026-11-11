@@ -15,7 +15,15 @@ export {
   type SessionPolicy,
   type SetupInput,
 } from './application/auth.js';
-export { authorize, orgPermissionsOf, type Decision } from './application/authorize.js';
+export { authorize, orgPermissionsOf, projectPermissionsOf, type Decision } from './application/authorize.js';
+export {
+  addInitialProjectMember,
+  listProjectMembers,
+  projectRoleOf,
+  removeProjectMember,
+  setProjectMember,
+  type ProjectMember,
+} from './application/memberships.js';
 export { syncRbacCatalog } from './application/catalog.js';
 export { assertPasswordAcceptable, normalizeEmail, PASSWORD_MIN_LENGTH } from './domain/password.js';
 export {

@@ -21,6 +21,11 @@ switch (command) {
           ? `${path.relative(repoRoot, result.path)}: added ${result.added.join(', ')}; existing values unchanged.`
           : `${path.relative(repoRoot, result.path)} already exists; left unchanged.`,
     );
+    if (result.masterKeyCreated) {
+      console.log(
+        'Created secrets/master.key. Back it up: without it, stored credentials cannot be decrypted.',
+      );
+    }
     break;
   }
   case 'doctor': {

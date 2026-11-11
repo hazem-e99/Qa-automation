@@ -85,6 +85,14 @@ export async function runDoctor(opts: DoctorOptions): Promise<CheckResult[]> {
     );
   }
 
+  add(
+    'master key',
+    existsSync(path.join(opts.repoRoot, 'secrets', 'master.key')) ? 'ok' : 'fail',
+    existsSync(path.join(opts.repoRoot, 'secrets', 'master.key'))
+      ? 'present'
+      : 'secrets/master.key is missing. Run: pnpm qos init',
+  );
+
   try {
     const gb = (await freeBytes(opts.repoRoot)) / 1024 ** 3;
     add(

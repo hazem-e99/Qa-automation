@@ -44,6 +44,16 @@ const addUser = async (email: string, status = 'active') => {
   );
   return id;
 };
+let projectSeq = 0;
+const addProject = async (): Promise<string> => {
+  const id = uuidv7();
+  await t.pool.query(
+    `insert into projects.projects (id, org_id, key, name, status, created_by, created_at, updated_at)
+     values ($1, $2, $3, 'P', 'active', $4, now(), now())`,
+    [id, admin.orgId, 'T' + String(++projectSeq), admin.userId],
+  );
+  return id;
+};
 const addProjectMember = async (projectId: string, userId: string, role: RoleKey) =>
   t.pool.query(
     'insert into identity.project_memberships (project_id, user_id, role_id) select $1, $2, id from identity.roles where key = $3',
@@ -203,8 +213,8 @@ describe('authorization', () => {
   });
 
   it('scopes project permissions to the project the user is a member of (M13-AC-02)', async () => {
-    const projectA = uuidv7();
-    const projectB = uuidv7();
+    const projectA = await addProject();
+    const projectB = await addProject();
     const userId = await addUser('engineer@example.test');
     await addProjectMember(projectA, userId, 'qa_engineer');
     const p = await principalOf('engineer@example.test');
@@ -225,7 +235,7 @@ describe('authorization', () => {
   });
 
   it('org_admin can administer any project but cannot do test work without a membership', async () => {
-    const project = uuidv7();
+    const project = await addProject();
     const adminPrincipal = await principalOf(ADMIN.email, ADMIN.password);
     expect(await authorize(t.db, adminPrincipal, 'project.settings.manage', project)).toMatchObject({
       allowed: true,

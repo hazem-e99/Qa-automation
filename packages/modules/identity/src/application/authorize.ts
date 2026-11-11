@@ -5,6 +5,7 @@ import {
   isPermissionKey,
   isProjectPermission,
   isRoleKey,
+  PROJECT_PERMISSION_KEYS,
   type Grant,
 } from '../domain/rbac.js';
 import type { Principal } from './auth.js';
@@ -58,4 +59,17 @@ export function orgPermissionsOf(principal: Principal): string[] {
   return ALL_PERMISSION_KEYS.filter(
     (p) => !isProjectPermission(p) && principal.orgRoles.some((role) => grantFor(role, p) === 'granted'),
   ).sort();
+}
+
+/** Project-scope permissions the principal holds in one project ("policy" grants excluded). */
+export async function projectPermissionsOf(
+  db: Db,
+  principal: Principal,
+  projectId: string,
+): Promise<string[]> {
+  const out: string[] = [];
+  for (const permission of PROJECT_PERMISSION_KEYS) {
+    if ((await authorize(db, principal, permission, projectId)).allowed) out.push(permission);
+  }
+  return out.sort();
 }
