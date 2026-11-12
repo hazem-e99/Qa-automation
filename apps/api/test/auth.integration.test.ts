@@ -28,7 +28,7 @@ const code = async (res: Response) => ApiError.parse(await res.json()).code;
 
 beforeAll(async () => {
   t = await startTestDatabase();
-  api = await createApiApp(env({ API_PORT: '39041' }));
+  api = await createApiApp(env({ API_PORT: '0' }));
   base = await api.listen();
 }, 180_000);
 afterAll(async () => {
@@ -89,7 +89,7 @@ describe('first-run setup', () => {
       DATABASE_URL: t.url,
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
-      API_PORT: '39042',
+      API_PORT: '0',
     });
     const url = await plain.listen();
     try {
@@ -133,7 +133,7 @@ describe('login, session cookie and CSRF', () => {
   });
 
   it('marks the cookie Secure by default', async () => {
-    const secure = await createApiApp({ ...env({ API_PORT: '39043' }), COOKIE_SECURE: 'true' });
+    const secure = await createApiApp({ ...env({ API_PORT: '0' }), COOKIE_SECURE: 'true' });
     const url = await secure.listen();
     try {
       const res = await fetch(
@@ -217,7 +217,7 @@ describe('permissions', () => {
 
 describe('login throttling', () => {
   it('allows 5 attempts a minute by default, then answers 429 with Retry-After', async () => {
-    const strict = await createApiApp({ ...env({ API_PORT: '39044' }), LOGIN_ATTEMPTS_PER_MINUTE: '5' });
+    const strict = await createApiApp({ ...env({ API_PORT: '0' }), LOGIN_ATTEMPTS_PER_MINUTE: '5' });
     const url = await strict.listen();
     try {
       const attempt = (email: string, password = 'guess guess guess') =>

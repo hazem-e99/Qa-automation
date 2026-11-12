@@ -19,6 +19,15 @@ export const QUEUES = {
     ...defaults,
     deadLetter: 'platform.dead-letter',
   },
+  /** One sync per (binding, stream) queued or running at a time: singletonKey = bindingId:stream. */
+  integrationsSync: {
+    name: 'integrations.sync',
+    policy: 'stately',
+    ...defaults,
+    retryLimit: 3,
+    expireInSeconds: 30 * 60,
+    deadLetter: 'platform.dead-letter',
+  },
 } as const satisfies Record<string, QueueDefinition>;
 
 export const ALL_QUEUES: readonly QueueDefinition[] = Object.values(QUEUES);

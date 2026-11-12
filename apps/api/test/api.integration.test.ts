@@ -16,7 +16,7 @@ beforeAll(async () => {
     DATABASE_URL: t.url,
     NODE_ENV: 'test',
     LOG_LEVEL: 'silent',
-    API_PORT: '39001',
+    API_PORT: '0',
     ...AUTH_ENV,
   });
   base = await api.listen();
@@ -130,7 +130,7 @@ describe('graceful shutdown', () => {
       DATABASE_URL: t.url,
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
-      API_PORT: '39002',
+      API_PORT: '0',
     });
     const url = await other.listen();
     expect((await fetch(`${url}/healthz`)).status).toBe(200);

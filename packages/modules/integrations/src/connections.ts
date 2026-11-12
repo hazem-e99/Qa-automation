@@ -192,7 +192,7 @@ export async function listConnections(db: Db, actor: Actor): Promise<ConnectionV
   return rows.map(view);
 }
 
-function contextFor(deps: IntegrationDeps, row: Row): ConnectionContext {
+export function contextFor(deps: IntegrationDeps, row: Row): ConnectionContext {
   return {
     connectionId: row.id,
     baseUrl: row.baseUrl,

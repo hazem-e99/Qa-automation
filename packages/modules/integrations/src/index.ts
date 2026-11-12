@@ -3,3 +3,4 @@ export * from './registry.js';
 export * from './connections.js';
 export * from './external-refs.js';
 export * from './webhooks.js';
+export * from './sync.js';

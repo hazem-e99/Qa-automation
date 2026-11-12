@@ -42,7 +42,7 @@ beforeAll(async () => {
       DATABASE_URL: t.url,
       NODE_ENV: 'test',
       LOG_LEVEL: 'debug',
-      API_PORT: '39071',
+      API_PORT: '0',
       RATE_LIMIT_BURST: '5000',
       RATE_LIMIT_RPS: '5000',
       QOS_MASTER_KEY_FILE: keyFile,

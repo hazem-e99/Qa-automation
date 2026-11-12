@@ -105,6 +105,9 @@ services:
       <<: *app-env
       WORKER_HEALTH_HOST: 0.0.0.0
       WORKER_HEALTH_PORT: 3002
+      QOS_MASTER_KEY_FILE: /run/secrets/master_key
+      QOS_DEMO_MODE: ${QOS_DEMO_MODE:-true}
+    secrets: [master_key]
     read_only: true
     tmpfs: [/tmp]
     healthcheck:

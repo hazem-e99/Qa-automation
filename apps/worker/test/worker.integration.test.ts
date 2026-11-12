@@ -14,7 +14,7 @@ beforeAll(async () => {
     DATABASE_URL: t.url,
     NODE_ENV: 'test',
     LOG_LEVEL: 'silent',
-    WORKER_HEALTH_PORT: '39011',
+    WORKER_HEALTH_PORT: '0',
     JOB_POLL_SECONDS: '0.5',
   });
 }, 180_000);
@@ -63,7 +63,7 @@ describe('worker', () => {
       DATABASE_URL: other.url,
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
-      WORKER_HEALTH_PORT: '39012',
+      WORKER_HEALTH_PORT: '0',
     });
     try {
       await other.pool.end();

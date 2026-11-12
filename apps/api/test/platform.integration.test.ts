@@ -19,7 +19,7 @@ const env = (extra: Record<string, string>) => ({
 
 beforeAll(async () => {
   t = await startTestDatabase();
-  api = await createApiApp(env({ API_PORT: '39021', RATE_LIMIT_BURST: '1000', RATE_LIMIT_RPS: '1000' }));
+  api = await createApiApp(env({ API_PORT: '0', RATE_LIMIT_BURST: '1000', RATE_LIMIT_RPS: '1000' }));
   base = await api.listen();
   s = await setupAndSignIn(base);
 }, 180_000);
@@ -149,9 +149,7 @@ describe('operations', () => {
 
 describe('rate limiting', () => {
   it('returns 429 with Retry-After once the burst is used; health is exempt', async () => {
-    const limited = await createApiApp(
-      env({ API_PORT: '39022', RATE_LIMIT_BURST: '3', RATE_LIMIT_RPS: '0.5' }),
-    );
+    const limited = await createApiApp(env({ API_PORT: '0', RATE_LIMIT_BURST: '3', RATE_LIMIT_RPS: '0.5' }));
     const url = await limited.listen();
     try {
       const probe = '/api/v1/operations/0190a5e0-7c1a-7000-8000-000000000001';

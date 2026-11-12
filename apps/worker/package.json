@@ -23,7 +23,12 @@
     "@qos/probe": "workspace:*",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "zod": "~4.6.7"
+    "zod": "~4.6.7",
+    "@qos/integrations": "workspace:*",
+    "@qos/platform": "workspace:*",
+    "@qos/db": "workspace:*",
+    "@qos/adapters-mock": "workspace:*",
+    "@qos/adapters-secrets-db": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*",

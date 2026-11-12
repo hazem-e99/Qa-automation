@@ -45,7 +45,7 @@ beforeAll(async () => {
       DATABASE_URL: t.url,
       NODE_ENV: 'test',
       LOG_LEVEL: 'debug',
-      API_PORT: '39181',
+      API_PORT: '0',
       RATE_LIMIT_BURST: '5000',
       RATE_LIMIT_RPS: '5000',
       QOS_MASTER_KEY_FILE: path.join(dir, 'master.key'),
@@ -297,5 +297,45 @@ describe('settings (BR-M02-6, M02-AC-08)', () => {
       ).status,
     ).toBe(409);
     expect((await admin.fetch(O('/settings/quality'))).status).toBe(200);
+  });
+});
+
+describe('sync routes', () => {
+  it('queues a sync for a binding once, and lists runs', async () => {
+    const repo = await connection('mock_repository', 'Sync repo', 'mock-token-full');
+    const bound = BindingResponse.parse(
+      await (
+        await admin.fetch(
+          P('/bindings'),
+          send('POST', { role: 'repository', connectionId: repo, config: { repoId: '1001' } }),
+        )
+      ).json(),
+    );
+    const first = await admin.fetch(P(`/sync/${bound.id}/run`), send('POST'));
+    expect(first.status).toBe(202);
+    expect(await first.json()).toEqual({ queued: ['repository.commits'], pending: [] });
+    // The stately queue keeps one queued job per binding and stream.
+    expect(await (await admin.fetch(P(`/sync/${bound.id}/run`), send('POST'))).json()).toEqual({
+      queued: [],
+      pending: ['repository.commits'],
+    });
+    const jobs = await t.pool.query(
+      "select count(*)::int c from pgboss.job where name = 'integrations.sync'",
+    );
+    expect(jobs.rows[0].c).toBe(1);
+    expect((await admin.fetch(P(`/sync/${bound.id}/run?mode=sideways`), send('POST'))).status).toBe(422);
+    expect(
+      (await admin.fetch(P('/sync/0190a5e0-7c1a-7000-8000-000000000001/run'), send('POST'))).status,
+    ).toBe(404);
+    expect(await (await admin.fetch(P('/sync'))).json()).toEqual([]); // no worker in this test
+  });
+
+  it('roles without sync streams are refused', async () => {
+    const tracker = BindingResponse.array()
+      .parse(await (await admin.fetch(P('/bindings'))).json())
+      .find((b) => b.role === 'issue_tracker')!;
+    const res = await admin.fetch(P(`/sync/${tracker.id}/run`), send('POST'));
+    expect(res.status).toBe(422);
+    expect((await code(res)).code).toBe('sync.no_streams');
   });
 });

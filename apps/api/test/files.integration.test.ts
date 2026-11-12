@@ -20,7 +20,7 @@ beforeAll(async () => {
     NODE_ENV: 'test',
     LOG_LEVEL: 'silent',
     WEBHOOK_PORT: '0',
-    API_PORT: '39031',
+    API_PORT: '0',
     STORAGE_DIR: dir,
     FILE_URL_SECRET: SECRET,
   });
@@ -90,7 +90,7 @@ describe('signed file links', () => {
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
       WEBHOOK_PORT: '0',
-      API_PORT: '39032',
+      API_PORT: '0',
     });
     const url = await plain.listen();
     try {

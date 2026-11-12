@@ -9,7 +9,8 @@ export const BaseConfig = z.object({
 });
 export type BaseConfig = z.infer<typeof BaseConfig>;
 
-export const port = (def: number) => z.coerce.number().int().min(1).max(65535).default(def);
+/** A TCP port; 0 lets the OS pick a free one (used by tests). */
+export const port = (def: number) => z.coerce.number().int().min(0).max(65535).default(def);
 
 export class ConfigError extends Error {
   constructor(readonly issues: readonly string[]) {

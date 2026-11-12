@@ -139,7 +139,12 @@ const page = <T>(all: readonly T[], cursor?: string): Page<T> => {
     throw new ProviderError('validation', 'invalid cursor', { field: 'cursor' });
   }
   const end = start + PAGE;
-  return { items: all.slice(start, end), ...(end < all.length ? { nextCursor: String(end) } : {}) };
+  const stop = Math.min(end, all.length);
+  return {
+    items: all.slice(start, end),
+    ...(end < all.length ? { nextCursor: String(end) } : {}),
+    resumeCursor: String(stop),
+  };
 };
 
 export class MockRepositoryProvider extends MockAdapter implements RepositoryProvider {
@@ -246,6 +251,21 @@ export class MockRepositoryProvider extends MockAdapter implements RepositoryPro
       expiresAt: new Date(Date.now() + Math.min(ttlSeconds, 3600) * 1000).toISOString(),
       readOnly: true,
     };
+  }
+
+  /** Test control: appends commits to a repository's default branch (simulates new pushes). */
+  addCommits(repoId: string, count: number): void {
+    const repo = this.repo(repoId);
+    const commits = repo.commits as CanonicalCommit[];
+    for (let i = 0; i < count; i++) {
+      const n = commits.length;
+      commits.push({
+        sha: sha(`${repoId}-${n}`),
+        message: `Change ${n + 1}`,
+        author: 'demo.dev@example.test',
+        timestamp: new Date(Date.UTC(2026, 0, 2, 0, n)).toISOString(),
+      });
+    }
   }
 
   private repo(id: string): MockRepo {

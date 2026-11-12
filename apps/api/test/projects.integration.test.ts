@@ -39,7 +39,7 @@ beforeAll(async () => {
     DATABASE_URL: t.url,
     NODE_ENV: 'test',
     LOG_LEVEL: 'silent',
-    API_PORT: '39051',
+    API_PORT: '0',
     RATE_LIMIT_BURST: '5000',
     RATE_LIMIT_RPS: '5000',
     ...AUTH_ENV,

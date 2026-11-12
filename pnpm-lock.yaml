@@ -373,9 +373,21 @@ importers:
       '@nestjs/core':
         specifier: ~12.4.2
         version: 12.4.2(@nestjs/common@12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@qos/adapters-mock':
+        specifier: workspace:*
+        version: link:../../packages/adapters-mock
+      '@qos/adapters-secrets-db':
+        specifier: workspace:*
+        version: link:../../packages/adapters-secrets-db
       '@qos/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@qos/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@qos/integrations':
+        specifier: workspace:*
+        version: link:../../packages/modules/integrations
       '@qos/jobs':
         specifier: workspace:*
         version: link:../../packages/modules/jobs
@@ -388,6 +400,9 @@ importers:
       '@qos/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@qos/platform':
+        specifier: workspace:*
+        version: link:../../packages/modules/platform
       '@qos/ports':
         specifier: workspace:*
         version: link:../../packages/ports
@@ -407,9 +422,6 @@ importers:
       '@qos/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@qos/db':
-        specifier: workspace:*
-        version: link:../../packages/db
 
   packages/adapters-mock:
     dependencies:

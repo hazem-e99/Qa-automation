@@ -1,5 +1,6 @@
 import {
   boolean,
+  integer,
   index,
   jsonb,
   pgSchema,
@@ -9,6 +10,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 /** `integrations` schema (doc 10 §integrations). drizzle-kit source: keep it free of relative imports. */
 export const integrationsSchema = pgSchema('integrations');
@@ -110,4 +112,62 @@ export const webhookEndpoints = integrationsSchema.table(
     lastDeliveryAt: timestamp('last_delivery_at', { withTimezone: true }),
   },
   (t) => [uniqueIndex('webhook_endpoints_connection_ux').on(t.connectionId)],
+);
+
+/** Where each sync stream of a binding stopped. Written in the same transaction as the page it covers. */
+export const syncCursors = integrationsSchema.table(
+  'sync_cursors',
+  {
+    bindingId: uuid('binding_id').notNull(),
+    stream: text('stream').notNull(),
+    cursor: text('cursor'),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.bindingId, t.stream] })],
+);
+
+export const syncRuns = integrationsSchema.table(
+  'sync_runs',
+  {
+    id: uuid('id').primaryKey(),
+    bindingId: uuid('binding_id').notNull(),
+    connectionId: uuid('connection_id').notNull(),
+    stream: text('stream').notNull(),
+    mode: text('mode').notNull(), // incremental | full
+    status: text('status').notNull(), // running | succeeded | partial | failed | deferred
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull(),
+    finishedAt: timestamp('finished_at', { withTimezone: true }),
+    pages: integer('pages').notNull().default(0),
+    itemsSeen: integer('items_seen').notNull().default(0),
+    itemsChanged: integer('items_changed').notNull().default(0),
+    /** Normalized provider error kind, never a raw message. */
+    errorKind: text('error_kind'),
+    retryAfterMs: integer('retry_after_ms'),
+  },
+  (t) => [
+    index('sync_runs_binding_ix').on(t.bindingId, t.startedAt),
+    index('sync_runs_connection_ix').on(t.connectionId, t.startedAt),
+    // At most one running sync per binding and stream, whatever the queue does.
+    uniqueIndex('sync_runs_one_running_ux')
+      .on(t.bindingId, t.stream)
+      .where(sql`${t.status} = 'running'`),
+  ],
+);
+
+export const syncErrors = integrationsSchema.table(
+  'sync_errors',
+  {
+    id: uuid('id').primaryKey(),
+    syncRunId: uuid('sync_run_id')
+      .notNull()
+      .references(() => syncRuns.id, { onDelete: 'cascade' }),
+    externalId: text('external_id'),
+    kind: text('kind').notNull(),
+    /** Sanitized: an error kind and a short fixed text, never provider payloads or credentials. */
+    message: text('message').notNull(),
+    retryCount: integer('retry_count').notNull().default(0),
+    status: text('status').notNull(), // open | resolved
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [index('sync_errors_run_ix').on(t.syncRunId)],
 );

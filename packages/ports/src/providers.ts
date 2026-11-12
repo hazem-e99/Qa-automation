@@ -66,7 +66,10 @@ export interface ExternalRefData {
 
 export interface Page<T> {
   readonly items: readonly T[];
+  /** More pages follow now. */
   readonly nextCursor?: string;
+  /** Where a later incremental run should continue once this traversal is exhausted. */
+  readonly resumeCursor?: string;
 }
 
 export type ProviderErrorKind =

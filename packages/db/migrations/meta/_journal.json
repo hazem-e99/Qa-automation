@@ -71,6 +71,13 @@
       "when": 1794482848006,
       "tag": "0009_webhook_endpoints",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794485941197,
+      "tag": "0010_sync",
+      "breakpoints": true
     }
   ]
 }

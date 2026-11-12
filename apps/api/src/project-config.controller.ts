@@ -9,7 +9,9 @@ import {
   type EnvironmentResponse,
   type SettingsResponse,
 } from '@qos/contracts';
-import type { IntegrationDeps } from '@qos/integrations';
+import { listSyncRuns, streamsForRole, type IntegrationDeps } from '@qos/integrations';
+import { QUEUES } from '@qos/jobs';
+import type { CoreInfra } from '@qos/kernel-infra';
 import { DomainError } from '@qos/kernel-domain';
 import {
   bindConnection,
@@ -27,7 +29,7 @@ import {
   type Project,
 } from '@qos/projects';
 import { Auth, CurrentProject, RequireProjectPermission, type AuthContext } from './access.js';
-import { INTEGRATIONS } from './tokens.js';
+import { INFRA, INTEGRATIONS } from './tokens.js';
 
 const env = (e: Environment): EnvironmentResponse => ({
   ...e,
@@ -48,7 +50,10 @@ const sectionOf = (raw: string) => {
 /** Environments, bindings and settings of one project (M02-FR-03/04, BR-M02-2/3/6). */
 @Controller('api/v1/projects/:key')
 export class ProjectConfigController {
-  constructor(@Inject(INTEGRATIONS) private readonly deps: IntegrationDeps) {}
+  constructor(
+    @Inject(INTEGRATIONS) private readonly deps: IntegrationDeps,
+    @Inject(INFRA) private readonly infra: CoreInfra,
+  ) {}
 
   @Get('environments')
   @RequireProjectPermission('project.read')
@@ -148,5 +153,41 @@ export class ProjectConfigController {
   @RequireProjectPermission('audit.read')
   history(@Param('section') section: string, @CurrentProject() project: Project) {
     return settingsHistory(this.deps.db, project, sectionOf(section));
+  }
+
+  /** Recent sync runs of this project's bindings. */
+  @Get('sync')
+  @RequireProjectPermission('project.read')
+  syncRuns(@CurrentProject() project: Project) {
+    return listSyncRuns(this.deps.db, project.id);
+  }
+
+  /** Queues a sync of every stream of one binding (mode incremental or full). */
+  @Post('sync/:bindingId/run')
+  @RequireProjectPermission('project.settings.manage')
+  @HttpCode(202)
+  async runSync(
+    @Param('bindingId') bindingId: string,
+    @Query('mode') mode: string | undefined,
+    @CurrentProject() project: Project,
+  ) {
+    if (mode !== undefined && mode !== 'incremental' && mode !== 'full')
+      throw new DomainError('sync.mode_invalid');
+    const id = Uuid.parse(bindingId);
+    const binding = (await listBindings(this.deps.db, project)).find((b) => b.id === id);
+    if (!binding) throw new DomainError('binding.not_found');
+    const streams = streamsForRole(binding.role);
+    if (streams.length === 0) throw new DomainError('sync.no_streams', { role: binding.role });
+    const queued: string[] = [];
+    for (const s of streams) {
+      const jobId = await this.infra.jobs.send(
+        QUEUES.integrationsSync.name,
+        { bindingId: id, stream: s.name, mode: mode ?? 'incremental' },
+        { singletonKey: `${id}:${s.name}` },
+      );
+      if (jobId) queued.push(s.name);
+    }
+    // A stream already queued is not queued twice (stately queue); it is still reported as pending.
+    return { queued, pending: streams.map((s) => s.name).filter((n) => !queued.includes(n)) };
   }
 }
