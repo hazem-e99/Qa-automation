@@ -47,7 +47,8 @@ import {
   RequireProjectPermission,
   type AuthContext,
 } from './access.js';
-import { INFRA } from './tokens.js';
+import type { ApiConfig } from './config.js';
+import { CONFIG, INFRA } from './tokens.js';
 
 const view = (p: Project): ProjectResponse => ({
   id: p.id,
@@ -56,19 +57,25 @@ const view = (p: Project): ProjectResponse => ({
   description: p.description,
   tags: [...p.tags],
   status: p.status as ProjectResponse['status'],
+  isDemo: p.isDemo,
   createdAt: p.createdAt.toISOString(),
   updatedAt: p.updatedAt.toISOString(),
 });
 
 @Controller('api/v1/projects')
 export class ProjectsController {
-  constructor(@Inject(INFRA) private readonly infra: CoreInfra) {}
+  constructor(
+    @Inject(INFRA) private readonly infra: CoreInfra,
+    @Inject(CONFIG) private readonly config: ApiConfig,
+  ) {}
 
   @Post()
   @RequirePermission('project.create')
   @HttpCode(201)
   async create(@Body() body: unknown, @Auth() auth: AuthContext): Promise<ProjectResponse> {
-    return view(await createProject(this.infra.db, auth.principal, CreateProjectRequest.parse(body)));
+    const input = CreateProjectRequest.parse(body);
+    if (input.isDemo && !this.config.QOS_DEMO_MODE) throw new DomainError('project.demo_mode_off');
+    return view(await createProject(this.infra.db, auth.principal, input));
   }
 
   /** Only the projects the caller may see. Archived projects are left out unless asked for. */

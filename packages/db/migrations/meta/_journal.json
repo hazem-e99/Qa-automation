@@ -57,6 +57,13 @@
       "when": 1794478928655,
       "tag": "0007_integrations",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794480855106,
+      "tag": "0008_project_config",
+      "breakpoints": true
     }
   ]
 }

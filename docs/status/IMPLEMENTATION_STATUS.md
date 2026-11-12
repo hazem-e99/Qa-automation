@@ -5,7 +5,7 @@
 
 ## Current phase: P2 — Identity, projects, provider framework, governance base (in progress, started 2026-11-10)
 
-Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity core), 2 (secret store, projects, memberships) and 3 (provider framework) are built. Last full run on 2026-11-12: build, typecheck, lint and format clean; 78 unit, 116 integration and 10 browser tests pass locally.
+Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity core), 2 (secret store, projects, memberships), 3 (provider framework) and 4 (environments, bindings, settings) are built. Last full run on 2026-11-12: build, typecheck, lint and format clean; 78 unit, 128 integration and 10 browser tests pass locally.
 
 | Task | Status | Evidence / what is missing |
 | --- | --- | --- |
@@ -23,9 +23,12 @@ Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity c
 | T-P2-23 ExternalRef model + snapshots + status | **verified** | One row per (connection, type, id); snapshots capped at 16 KB. M03-AC-05: retiring a connection destroys its credential and marks its refs `source_retired` with snapshots intact. **Missing:** a UI that renders retired items |
 | T-P2-26 Mock adapters | **implemented** | `packages/adapters-mock`: repository and issue-tracker mocks with capability toggles and fault injection, labelled demo. Registered only when `QOS_DEMO_MODE=true` (the Compose stack sets it). **Missing:** mocks for the other families (requirements, CI, AI, orchestrator), webhook emission |
 | T-P2-34 Contract test harness | **implemented** | `packages/contract-tests`: storage and source-control suites; capability-aware skips name the missing capability; fault-injection tests skip with a reason when the mode has none. Run against the mock in two configurations (19 pass, 3 skipped with reasons). **Missing:** recorded/live fixture modes, the report that generates doc 33 |
-| All other P2 tasks | planned | Including MFA, invitations, service tokens, user administration, environments, bindings, settings, webhook listener, sync framework, mapping editor, approval engine, notifications, the GitHub/Azure DevOps/AI adapters and all P2 screens |
+| T-P2-11 Environments | **verified** | M02-AC-05: the test login secret is stored only in the secret store; tests scan API responses, audit summaries and every API log line for it. Base URL and reset hook hosts must be on the egress allow-list (derived from the base URLs when empty). **Limit:** `is_production` is stored but only enforced once runs exist (P6) |
+| T-P2-12 Bindings + capability check + history | **verified** | M02-AC-02 (with mock adapters): a connection missing required capabilities is refused with the exact missing list; wrong family is flagged. Replacing a binding ends the old row and keeps it in the history; demo connections cannot be bound to real projects. **Missing:** `legacy_sync` mode (switch flow WF-F) and M02-AC-03/04, which need syncing and defects |
+| T-P2-13 Settings sections | **verified** | M02-AC-08: every change writes a history version and an audit event naming the changed fields; stale versions answer 409. Sections `testing_rules`, `execution`, `ai`, `quality`, each with full defaults. **Limit:** BR-M02-6 "AI budget increases need qa_lead or above" is met because only qa_lead and org_admin can change settings at all |
+| All other P2 tasks | planned | Including MFA, invitations, service tokens, user administration, templates, the webhook listener, sync framework, mapping editor, approval engine, notifications, demo seed, the GitHub/Azure DevOps/AI adapters and all P2 screens |
 
-Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, M02-AC-06, M02-AC-07, M03-AC-05. **Met with mock adapters only** M03-AC-01. **Partly** M13-AC-03 (sessions yes; API tokens do not exist yet), M03-AC-06 (connections yes; whole-suite scan later), M03-AC-08 (harness and mock adapters; no real adapters yet). Not started: M02-AC-01…05/08, M03-AC-02/09, M13-AC-05, M14-AC-01/03/04/07.
+Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, M02-AC-05, M02-AC-06, M02-AC-07, M02-AC-08, M03-AC-05. **Met with mock adapters only** M03-AC-01, M02-AC-02. **Partly** M13-AC-03 (sessions yes; API tokens do not exist yet), M03-AC-06 (connections yes; whole-suite scan later), M03-AC-08 (harness and mock adapters; no real adapters yet). Not started: M02-AC-01/03/04, M03-AC-02/09, M13-AC-05, M14-AC-01/03/04/07.
 
 ### Decisions made in P2 so far
 | Item | What | Why |
@@ -42,6 +45,8 @@ Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, 
 | Mock providers behind `QOS_DEMO_MODE` | Registered only when the flag is true; the Compose stack defaults it to true | Doc 11 §8: demo connections must not mix with real data. Production keeps it off |
 | Connection names | Unique per organization | Makes connections unambiguous in pickers and audit |
 | `/connections/{id}/role-check?role=` | Added as a read-only diff endpoint | Lets the project wizard show the capability diff before binding (M02-AC-02 groundwork) |
+| Project `is_demo` flag | Added to projects; demo projects can only be created in demo mode | Doc 11 §8 rule "demo connections never on non-demo projects" needs to know which projects are demo |
+| Settings history readable with `audit.read` | Not `project.read` | History shows who changed what; same audience as the audit log |
 | `argon2` install script denied | The package ships prebuilt binaries | Keeps the deny-by-default rule for install scripts |
 | Probe endpoints | Now need `system.settings` (platform admin) | They were unauthenticated in P1 |
 
@@ -108,4 +113,4 @@ Last full run on 2026-11-10 (Windows 11, Node 24.18, Docker Desktop 4.99):
 
 ### Next
 
-P2 batch 4: environments (T-P2-11), bindings with capability check and history (T-P2-12), settings sections (T-P2-13), then the webhook listener and sync framework (T-P2-24, T-P2-25). Still carried from P1: commitlint git hook and a clean Knip run.
+P2 batch 5: webhook listener with verifiers and inbox writes (T-P2-24), sync framework (T-P2-25), demo seed (T-P2-04). Then the governance base (approval engine, notifications) and the P2 screens. Still carried from P1: commitlint git hook and a clean Knip run.

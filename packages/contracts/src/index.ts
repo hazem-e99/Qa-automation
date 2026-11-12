@@ -6,4 +6,5 @@ export * from './operations.js';
 export * from './identity.js';
 export * from './projects.js';
 export * from './connections.js';
+export * from './project-settings.js';
 export * from './json-schema.js';

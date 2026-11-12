@@ -14,6 +14,8 @@ export interface Project {
   readonly description: string;
   readonly tags: readonly string[];
   readonly status: ProjectStatus;
+  /** Demo projects may bind demo (mock) connections; real projects never can. */
+  readonly isDemo: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -27,6 +29,7 @@ const toProject = (r: Row): Project => ({
   description: r.description,
   tags: r.tags,
   status: r.status as ProjectStatus,
+  isDemo: r.isDemo,
   createdAt: r.createdAt,
   updatedAt: r.updatedAt,
 });
@@ -39,6 +42,7 @@ export interface CreateProjectInput {
   readonly name: string;
   readonly description?: string;
   readonly tags?: readonly string[];
+  readonly isDemo?: boolean;
 }
 
 /**
@@ -72,6 +76,7 @@ export async function createProject(
         description: (input.description ?? '').trim().slice(0, 2000),
         tags: cleanTags(input.tags),
         status: 'active',
+        isDemo: input.isDemo === true,
         createdBy: actor.userId,
         createdAt: now,
         updatedAt: now,

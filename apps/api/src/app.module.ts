@@ -10,6 +10,7 @@ import { HealthController } from './health.controller.js';
 import type { OperationEvents } from './operation-events.js';
 import { OperationsController } from './operations.controller.js';
 import { ProbeController } from './probe.controller.js';
+import { ProjectConfigController } from './project-config.controller.js';
 import { ProjectsController } from './projects.controller.js';
 import { CONFIG, INFRA, INTEGRATIONS, OPERATION_EVENTS, STORAGE } from './tokens.js';
 
@@ -31,6 +32,7 @@ export class AppModule {
         ProbeController,
         ProjectsController,
         ConnectionsController,
+        ProjectConfigController,
         OperationsController,
         FilesController,
       ],

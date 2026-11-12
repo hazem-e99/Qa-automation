@@ -21,7 +21,10 @@
     "@qos/kernel-domain": "workspace:*",
     "@qos/db": "workspace:*",
     "@qos/identity": "workspace:*",
-    "@qos/jobs": "workspace:*"
+    "@qos/jobs": "workspace:*",
+    "@qos/contracts": "workspace:*",
+    "@qos/integrations": "workspace:*",
+    "@qos/ports": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*"

@@ -664,18 +664,27 @@ importers:
 
   packages/modules/projects:
     dependencies:
+      '@qos/contracts':
+        specifier: workspace:*
+        version: link:../../contracts
       '@qos/db':
         specifier: workspace:*
         version: link:../../db
       '@qos/identity':
         specifier: workspace:*
         version: link:../identity
+      '@qos/integrations':
+        specifier: workspace:*
+        version: link:../integrations
       '@qos/jobs':
         specifier: workspace:*
         version: link:../jobs
       '@qos/kernel-domain':
         specifier: workspace:*
         version: link:../../kernel-domain
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../../ports
     devDependencies:
       '@qos/config':
         specifier: workspace:*

@@ -8,6 +8,8 @@ export const CreateProjectRequest = z.object({
   name: z.string().trim().min(2).max(120),
   description: z.string().max(2000).optional(),
   tags: Tags.optional(),
+  /** Demo project: may use the mock connections. Only offered when demo mode is on. */
+  isDemo: z.boolean().optional(),
 });
 export type CreateProjectRequest = z.infer<typeof CreateProjectRequest>;
 
@@ -27,6 +29,7 @@ export const ProjectResponse = z.object({
   description: z.string(),
   tags: z.array(z.string()),
   status: z.enum(['draft', 'active', 'archived']),
+  isDemo: z.boolean(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
