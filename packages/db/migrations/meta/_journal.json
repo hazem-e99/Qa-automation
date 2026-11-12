@@ -50,6 +50,13 @@
       "when": 1794393760917,
       "tag": "0006_secrets",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794478928655,
+      "tag": "0007_integrations",
+      "breakpoints": true
     }
   ]
 }

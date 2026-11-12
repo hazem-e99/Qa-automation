@@ -12,6 +12,11 @@ export const ApiConfig = BaseConfig.extend({
   STORAGE_DIR: z.string().min(1).default('./var/storage'),
   /** Secret for signed file links. When unset, the /files endpoint answers 404. */
   FILE_URL_SECRET: z.string().min(32, 'must be at least 32 characters').optional(),
+  /** Registers the mock providers (labelled Demo). Never enable on an installation with real data. */
+  QOS_DEMO_MODE: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
   /** File holding the 32-byte master key of the secret store. Required in production. */
   QOS_MASTER_KEY_FILE: z.string().min(1).optional(),
   /** Token for the one-time first-run setup endpoint. When unset, setup answers 404. */

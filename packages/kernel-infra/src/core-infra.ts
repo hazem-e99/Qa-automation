@@ -17,11 +17,17 @@ export interface CoreInfraOptions {
   /** True only for the worker: it owns queue maintenance. */
   readonly superviseJobs: boolean;
   readonly jobPollingIntervalSeconds?: number;
+  /** Where log lines go. Defaults to stdout; tests pass a capture stream for log scans. */
+  readonly logDestination?: { write(line: string): void };
 }
 
 /** Builds the shared infrastructure of a backend process: logger, database pool and job queue. */
 export async function createCoreInfra(config: BaseConfig, opts: CoreInfraOptions): Promise<CoreInfra> {
-  const logger = createLogger({ service: opts.service, level: config.LOG_LEVEL });
+  const logger = createLogger({
+    service: opts.service,
+    level: config.LOG_LEVEL,
+    ...(opts.logDestination ? { destination: opts.logDestination } : {}),
+  });
   const pool = createPool({ connectionString: config.DATABASE_URL, applicationName: `qos-${opts.service}` });
   pool.on('error', (err) => logger.error({ err }, 'database pool error'));
   const jobs = new PgBossJobQueue({

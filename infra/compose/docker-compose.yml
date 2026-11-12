@@ -69,6 +69,8 @@ services:
       SETUP_TOKEN: ${SETUP_TOKEN:?run "pnpm qos init" to add it to infra/compose/.env}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
       QOS_MASTER_KEY_FILE: /run/secrets/master_key
+      # Local pilot only: registers the mock providers labelled "Demo".
+      QOS_DEMO_MODE: ${QOS_DEMO_MODE:-true}
     secrets: [master_key]
     ports:
       - '127.0.0.1:${API_PORT:-3001}:3001'

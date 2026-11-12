@@ -1,15 +1,18 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import { MockIssueTracker, MockRepositoryProvider } from '@qos/adapters-mock';
 import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
 import { LocalFsObjectStorage } from '@qos/adapters-storage-localfs';
 import type { ApiError } from '@qos/contracts';
 import type { Tx } from '@qos/db';
 import { syncRbacCatalog } from '@qos/identity';
+import { ProviderRegistry, type IntegrationDeps } from '@qos/integrations';
 import {
   ConfigError,
   createCoreInfra,
   loadConfig,
+  SafeHttpClient,
   TokenBucketLimiter,
   type CoreInfra,
 } from '@qos/kernel-infra';
@@ -36,24 +39,46 @@ export interface ApiApp {
 
 const UNLIMITED_PATHS = new Set(['/healthz', '/readyz']);
 
-export async function createApiApp(env: NodeJS.ProcessEnv = process.env): Promise<ApiApp> {
+export interface ApiAppOptions {
+  /** Capture stream for log lines (tests scan them for secrets). Defaults to stdout. */
+  readonly logDestination?: { write(line: string): void };
+}
+
+export async function createApiApp(
+  env: NodeJS.ProcessEnv = process.env,
+  options: ApiAppOptions = {},
+): Promise<ApiApp> {
   const config = loadConfig(ApiConfig, env);
   // No plaintext fallback: production refuses to start without a readable master key (M14).
   if (!config.QOS_MASTER_KEY_FILE && config.NODE_ENV === 'production') {
     throw new ConfigError(['QOS_MASTER_KEY_FILE: required in production']);
   }
   const masterKey = config.QOS_MASTER_KEY_FILE ? loadMasterKeyFile(config.QOS_MASTER_KEY_FILE) : null;
-  const infra = await createCoreInfra(config, { service: 'api', superviseJobs: false });
+  const infra = await createCoreInfra(config, {
+    service: 'api',
+    superviseJobs: false,
+    ...(options.logDestination ? { logDestination: options.logDestination } : {}),
+  });
   const operationEvents = new OperationEvents(config.DATABASE_URL, infra.logger);
   // Composition root: the only place that names a concrete storage adapter.
   const storage: ObjectStorage = new LocalFsObjectStorage(config.STORAGE_DIR);
   const secrets = masterKey ? new DbEnvelopeSecretStore(infra.db, masterKey) : null;
+  // Composition root: the only place that names concrete provider adapters.
+  const registry = new ProviderRegistry();
+  if (config.QOS_DEMO_MODE) registry.register(new MockRepositoryProvider()).register(new MockIssueTracker());
+  const integrations: IntegrationDeps = {
+    db: infra.db,
+    registry,
+    secrets,
+    http: new SafeHttpClient({ timeoutMs: 15_000, retries: 2 }),
+    logger: infra.logger,
+  };
   try {
     await syncRbacCatalog(infra.db);
     await operationEvents.start();
     const adapter = new FastifyAdapter({ bodyLimit: 1_048_576, requestTimeout: 30_000 });
     const app = await NestFactory.create<NestFastifyApplication>(
-      AppModule.register(config, infra, operationEvents, storage),
+      AppModule.register(config, infra, operationEvents, storage, integrations),
       adapter,
       { logger: false },
     );

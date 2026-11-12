@@ -214,6 +214,9 @@ importers:
       '@nestjs/platform-fastify':
         specifier: ~12.4.2
         version: 12.4.2(@nestjs/common@12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.4.2(@nestjs/common@12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@qos/adapters-mock':
+        specifier: workspace:*
+        version: link:../../packages/adapters-mock
       '@qos/adapters-storage-localfs':
         specifier: workspace:*
         version: link:../../packages/adapters-storage-localfs
@@ -223,6 +226,9 @@ importers:
       '@qos/identity':
         specifier: workspace:*
         version: link:../../packages/modules/identity
+      '@qos/integrations':
+        specifier: workspace:*
+        version: link:../../packages/modules/integrations
       '@qos/jobs':
         specifier: workspace:*
         version: link:../../packages/modules/jobs
@@ -405,6 +411,19 @@ importers:
         specifier: workspace:*
         version: link:../../packages/db
 
+  packages/adapters-mock:
+    dependencies:
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../config
+      '@qos/contract-tests':
+        specifier: workspace:*
+        version: link:../contract-tests
+
   packages/adapters-secrets-db:
     dependencies:
       '@qos/db':
@@ -539,6 +558,31 @@ importers:
         specifier: ~0.45.2
         version: 0.45.2
     devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../../config
+
+  packages/modules/integrations:
+    dependencies:
+      '@qos/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@qos/kernel-domain':
+        specifier: workspace:*
+        version: link:../../kernel-domain
+      '@qos/observability':
+        specifier: workspace:*
+        version: link:../../observability
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../../ports
+    devDependencies:
+      '@qos/adapters-mock':
+        specifier: workspace:*
+        version: link:../../adapters-mock
+      '@qos/adapters-secrets-db':
+        specifier: workspace:*
+        version: link:../../adapters-secrets-db
       '@qos/config':
         specifier: workspace:*
         version: link:../../config

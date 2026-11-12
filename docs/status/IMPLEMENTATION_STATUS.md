@@ -5,7 +5,7 @@
 
 ## Current phase: P2 — Identity, projects, provider framework, governance base (in progress, started 2026-11-10)
 
-Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity core) and 2 (secret store, projects, memberships) are built. Last full run on 2026-11-11: build, typecheck, lint and format clean; 59 unit, 100 integration and 10 browser tests pass locally; `pnpm stack:up` healthy and exercised by hand (setup, login, CSRF, create project).
+Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity core), 2 (secret store, projects, memberships) and 3 (provider framework) are built. Last full run on 2026-11-12: build, typecheck, lint and format clean; 78 unit, 116 integration and 10 browser tests pass locally.
 
 | Task | Status | Evidence / what is missing |
 | --- | --- | --- |
@@ -17,9 +17,15 @@ Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity c
 | T-P2-10 Projects aggregate, key sequences, lifecycle | **verified** | M02-AC-06: a PATCH changing the key answers 422. M02-AC-07: archived project answers 409 `project_archived` on writes and leaves default lists. Sequences are unique and gap-free under 20 concurrent callers. **Limits:** `draft` status and templates are unused; no project-owned resources exist yet, so "all write endpoints" means the 4 that exist |
 | T-P2-18 Archive / restore / delete | **implemented** | Expected-state transitions with audit and outbox events; deleted keys stay reserved. **Missing:** the "no active runs" precondition (no runs exist yet) and the 30-day purge job |
 | T-P2-42 Project memberships | **implemented** | API only. M13-AC-02: for every project route, a member of project A gets the same 404 for project B as for a project that does not exist. M13-AC-04: a lead cannot change their own role or assign org roles. The last lead cannot be removed. **Missing:** the members UI; BR-M13-4 (last `org_admin`) needs user administration (T-P2-44) |
-| All other P2 tasks | planned | Including MFA, invitations, service tokens, user administration, environments, bindings, settings, provider registry and connections, approval engine, notifications, mock adapters, the provider adapters and all P2 screens |
+| T-P2-20 Provider registry + manifests + capability catalog | **verified** | `packages/ports` (catalog of doc 12 §2, role requirements of §3, `capabilityDiff`), `packages/modules/integrations` (`ProviderRegistry`). The registry refuses capabilities outside the catalog or of another family, and `require()` throws `CapabilityMissingError` |
+| T-P2-21 Connections + SecretStore (write-only credentials) | **verified** | M03-AC-06 (for connections): the credential is stored only in the secret store; tests scan connection rows, audit rows, API responses and every API log line for it. **Limit:** the end-to-end log scan of M14-AC-07 needs the E2E suite |
+| T-P2-22 Connection test + effective capabilities | **verified** | M03-AC-01 with the mock tracker: a credential without write scope yields effective capabilities without `issues.create@1`, and the role check for `issue_tracker` fails with the missing list. Rejected credential → `auth_failed`; outage → `degraded`; an untested connection never qualifies. **Limit:** proven with mock adapters only; the GitHub variant needs T-P2-27 |
+| T-P2-23 ExternalRef model + snapshots + status | **verified** | One row per (connection, type, id); snapshots capped at 16 KB. M03-AC-05: retiring a connection destroys its credential and marks its refs `source_retired` with snapshots intact. **Missing:** a UI that renders retired items |
+| T-P2-26 Mock adapters | **implemented** | `packages/adapters-mock`: repository and issue-tracker mocks with capability toggles and fault injection, labelled demo. Registered only when `QOS_DEMO_MODE=true` (the Compose stack sets it). **Missing:** mocks for the other families (requirements, CI, AI, orchestrator), webhook emission |
+| T-P2-34 Contract test harness | **implemented** | `packages/contract-tests`: storage and source-control suites; capability-aware skips name the missing capability; fault-injection tests skip with a reason when the mode has none. Run against the mock in two configurations (19 pass, 3 skipped with reasons). **Missing:** recorded/live fixture modes, the report that generates doc 33 |
+| All other P2 tasks | planned | Including MFA, invitations, service tokens, user administration, environments, bindings, settings, webhook listener, sync framework, mapping editor, approval engine, notifications, the GitHub/Azure DevOps/AI adapters and all P2 screens |
 
-Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, M02-AC-06, M02-AC-07. **Partly** M13-AC-03 (sessions yes; API tokens do not exist yet). Not started: M02-AC-01…05/08, M03-*, M13-AC-05, M14-AC-01/03/04/07.
+Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, M02-AC-06, M02-AC-07, M03-AC-05. **Met with mock adapters only** M03-AC-01. **Partly** M13-AC-03 (sessions yes; API tokens do not exist yet), M03-AC-06 (connections yes; whole-suite scan later), M03-AC-08 (harness and mock adapters; no real adapters yet). Not started: M02-AC-01…05/08, M03-AC-02/09, M13-AC-05, M14-AC-01/03/04/07.
 
 ### Decisions made in P2 so far
 | Item | What | Why |
@@ -33,6 +39,9 @@ Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, 
 | Project deletion permission | Uses `project.settings.manage` | The matrix has no separate delete permission |
 | Master key outside production | Optional in `development` and `test`; the secret store is then absent, never a plaintext fallback | Lets tests and local host runs start without key material |
 | `/me/permissions?projectKey=` | Implemented as `/projects/{key}/permissions` | Goes through the same project guard, so it cannot leak project existence |
+| Mock providers behind `QOS_DEMO_MODE` | Registered only when the flag is true; the Compose stack defaults it to true | Doc 11 §8: demo connections must not mix with real data. Production keeps it off |
+| Connection names | Unique per organization | Makes connections unambiguous in pickers and audit |
+| `/connections/{id}/role-check?role=` | Added as a read-only diff endpoint | Lets the project wizard show the capability diff before binding (M02-AC-02 groundwork) |
 | `argon2` install script denied | The package ships prebuilt binaries | Keeps the deny-by-default rule for install scripts |
 | Probe endpoints | Now need `system.settings` (platform admin) | They were unauthenticated in P1 |
 
@@ -99,4 +108,4 @@ Last full run on 2026-11-10 (Windows 11, Node 24.18, Docker Desktop 4.99):
 
 ### Next
 
-P2 batch 3: provider registry and capability catalog (T-P2-20), connections with write-only credentials (T-P2-21…23), mock adapters (T-P2-26) and the contract harness (T-P2-34). Then environments, bindings and settings, then the P2 screens. Still carried from P1: commitlint git hook and a clean Knip run.
+P2 batch 4: environments (T-P2-11), bindings with capability check and history (T-P2-12), settings sections (T-P2-13), then the webhook listener and sync framework (T-P2-24, T-P2-25). Still carried from P1: commitlint git hook and a clean Knip run.
