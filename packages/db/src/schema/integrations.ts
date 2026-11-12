@@ -91,3 +91,23 @@ export const externalRefs = integrationsSchema.table(
     index('external_refs_project_type_ix').on(t.projectId, t.externalType),
   ],
 );
+
+/** One inbound webhook endpoint per connection. Path token and signing secret are never stored in clear. */
+export const webhookEndpoints = integrationsSchema.table(
+  'webhook_endpoints',
+  {
+    id: uuid('id').primaryKey(),
+    connectionId: uuid('connection_id')
+      .notNull()
+      .references(() => connections.id, { onDelete: 'cascade' }),
+    /** SHA-256 of the random token in the endpoint URL. */
+    pathSecretHash: text('path_secret_hash').notNull(),
+    verification: text('verification').notNull(),
+    /** SecretStore reference of the signing secret (HMAC key, shared token or basic-auth password). */
+    secretRef: text('secret_ref').notNull(),
+    enabled: boolean('enabled').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+    lastDeliveryAt: timestamp('last_delivery_at', { withTimezone: true }),
+  },
+  (t) => [uniqueIndex('webhook_endpoints_connection_ux').on(t.connectionId)],
+);

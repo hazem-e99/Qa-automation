@@ -37,7 +37,12 @@ export interface CapabilityManifest {
   readonly authStrategies: readonly AuthStrategy[];
   readonly webhook?: {
     readonly verification: 'hmac_sha256' | 'shared_token' | 'basic_auth' | 'none';
+    /** Header carrying the delivery id, used as the dedupe key. */
     readonly deliveryIdHeader?: string;
+    /** Header carrying the HMAC signature (`sha256=<hex>` or bare hex) or the shared token. */
+    readonly signatureHeader?: string;
+    /** Header naming the event type. */
+    readonly eventTypeHeader?: string;
   };
   /** Demo/mock adapters: their connections can only be bound to demo projects (doc 11 §8). */
   readonly demoOnly?: boolean;

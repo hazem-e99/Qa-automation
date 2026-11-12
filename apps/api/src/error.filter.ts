@@ -15,6 +15,7 @@ const DOMAIN_STATUS: Readonly<Record<string, number>> = {
   'setup.already_done': 409,
   project_archived: 409,
   'connection.not_found': 404,
+  'webhook.not_found': 404,
   'environment.not_found': 404,
   'environment.name_taken': 409,
   'binding.not_found': 404,

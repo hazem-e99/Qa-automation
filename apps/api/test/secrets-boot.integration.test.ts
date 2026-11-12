@@ -8,7 +8,12 @@ import { createApiApp } from '../dist/bootstrap.js';
 
 let t: TestDatabase;
 let dir: string;
-const env = (extra: Record<string, string>) => ({ DATABASE_URL: t.url, LOG_LEVEL: 'silent', ...extra });
+const env = (extra: Record<string, string>) => ({
+  DATABASE_URL: t.url,
+  LOG_LEVEL: 'silent',
+  WEBHOOK_PORT: '0',
+  ...extra,
+});
 
 beforeAll(async () => {
   t = await startTestDatabase();

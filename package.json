@@ -14,7 +14,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "turbo run test",
-    "test:integration": "turbo run test:integration",
+    "test:integration": "turbo run test:integration --concurrency=3",
     "knip": "knip",
     "db:generate": "pnpm --filter @qos/db run generate",
     "db:migrate": "pnpm --filter @qos/db run migrate",

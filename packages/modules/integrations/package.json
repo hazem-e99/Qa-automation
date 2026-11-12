@@ -22,11 +22,13 @@
     "@qos/kernel-domain": "workspace:*",
     "@qos/db": "workspace:*",
     "@qos/observability": "workspace:*",
-    "@qos/ports": "workspace:*"
+    "@qos/ports": "workspace:*",
+    "@qos/platform": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*",
     "@qos/adapters-mock": "workspace:*",
-    "@qos/adapters-secrets-db": "workspace:*"
+    "@qos/adapters-secrets-db": "workspace:*",
+    "@qos/adapters-storage-localfs": "workspace:*"
   }
 }

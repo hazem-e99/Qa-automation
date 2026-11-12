@@ -51,6 +51,38 @@ export async function receiveInboxMessage(
   return inserted.length === 1 ? { id, duplicate: false } : { id: null, duplicate: true };
 }
 
+/**
+ * Records a delivery that is not processed: a redelivery (`duplicate`) or one that failed
+ * verification (`failed`, verification `rejected`). Each gets its own row so counts stay visible
+ * (M03-AC-02), with a unique marker key so it never collides with the real message.
+ */
+export async function recordInboxMarker(
+  db: Db | Tx,
+  msg: {
+    connectionId: string;
+    dedupeKey: string;
+    eventType: string;
+    kind: 'duplicate' | 'rejected';
+    headers: InboundMessage['headers'];
+    reason?: string;
+  },
+): Promise<string> {
+  const id = uuidv7();
+  await db.insert(inboxMessages).values({
+    id,
+    connectionId: msg.connectionId,
+    dedupeKey: `${msg.dedupeKey.slice(0, 300)}#${msg.kind}-${id}`,
+    eventType: msg.eventType.slice(0, 100),
+    receivedAt: new Date(),
+    verification: msg.kind === 'rejected' ? 'rejected' : 'ok',
+    headers: allowlistedHeaders(msg.headers),
+    status: msg.kind === 'rejected' ? 'failed' : 'duplicate',
+    processedAt: new Date(),
+    error: msg.reason?.slice(0, 100) ?? null,
+  });
+  return id;
+}
+
 export type InboxOutcome = 'processed' | 'stale' | 'ignored_out_of_scope';
 export interface InboxRecord {
   readonly id: string;

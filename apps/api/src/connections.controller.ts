@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Param, Post, Query, Res } from '@nestjs/common';
+import type { FastifyReply } from 'fastify';
 import {
   CreateConnectionRequest,
   RotateCredentialRequest,
@@ -17,6 +18,8 @@ import {
   retireConnection,
   rotateCredential,
   testConnection,
+  createWebhookEndpoint,
+  getWebhookEndpoint,
   type IntegrationDeps,
 } from '@qos/integrations';
 import { DomainError } from '@qos/kernel-domain';
@@ -101,6 +104,28 @@ export class ConnectionsController {
   ): Promise<ConnectionResponse> {
     const { credential } = RotateCredentialRequest.parse(body);
     return rotateCredential(this.deps, actorOf(auth), Uuid.parse(id), credential);
+  }
+
+  /** Webhook endpoint of a connection, without its secrets (they are shown only once). */
+  @Get('connections/:id/webhook')
+  @RequirePermission('connection.manage')
+  async webhook(@Param('id') id: string, @Auth() auth: AuthContext) {
+    const endpoint = await getWebhookEndpoint(this.deps.db, actorOf(auth), Uuid.parse(id));
+    if (!endpoint) throw new DomainError('webhook.not_found');
+    return endpoint;
+  }
+
+  /** Creates or rotates the endpoint. The answer holds the path and signing secret, once. */
+  @Post('connections/:id/webhook')
+  @RequirePermission('connection.secret.rotate')
+  @HttpCode(201)
+  createWebhook(
+    @Param('id') id: string,
+    @Auth() auth: AuthContext,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    reply.header('cache-control', 'no-store');
+    return createWebhookEndpoint(this.deps, actorOf(auth), Uuid.parse(id));
   }
 
   @Get('connections/:id/impact')

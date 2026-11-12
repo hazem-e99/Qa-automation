@@ -64,6 +64,8 @@ services:
       <<: *app-env
       API_HOST: 0.0.0.0
       API_PORT: 3001
+      WEBHOOK_HOST: 0.0.0.0
+      WEBHOOK_PORT: 3004
       STORAGE_DIR: /data/storage
       FILE_URL_SECRET: ${FILE_URL_SECRET:?run "pnpm qos init" to create infra/compose/.env}
       SETUP_TOKEN: ${SETUP_TOKEN:?run "pnpm qos init" to add it to infra/compose/.env}
@@ -74,6 +76,8 @@ services:
     secrets: [master_key]
     ports:
       - '127.0.0.1:${API_PORT:-3001}:3001'
+      # Webhook ingress only. Tunnel this port (not 3001) if a provider must reach you.
+      - '127.0.0.1:${WEBHOOK_PORT:-3004}:3004'
     volumes:
       - storage:/data/storage
     read_only: true

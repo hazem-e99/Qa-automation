@@ -23,6 +23,7 @@ import { ApiConfig } from './config.js';
 import { ApiErrorFilter } from './error.filter.js';
 import { OperationEvents } from './operation-events.js';
 import { PolicyGuard } from './policy.guard.js';
+import { createWebhookListener } from './webhook-listener.js';
 
 export interface ApiApp {
   readonly app: NestFastifyApplication;
@@ -31,6 +32,8 @@ export interface ApiApp {
   readonly storage: ObjectStorage;
   /** Null only outside production, when no master key file is configured. */
   readonly secrets: SecretStore<Tx> | null;
+  /** Base URL of the webhook listener once `listen()` has run. */
+  readonly webhookUrl: string | null;
   /** Starts listening and returns the base URL. */
   listen(): Promise<string>;
   /** Graceful shutdown: stop accepting requests, then close the job queue and the pool. */
@@ -128,15 +131,21 @@ export async function createApiApp(
       }),
     );
     await app.init();
+    const webhooks = createWebhookListener({ ...integrations, storage });
     let closed = false;
+    let webhookUrl: string | null = null;
     return {
       app,
       config,
       infra,
       storage,
       secrets,
+      get webhookUrl() {
+        return webhookUrl;
+      },
       listen: async () => {
         await app.listen(config.API_PORT, config.API_HOST);
+        webhookUrl = await webhooks.listen({ port: config.WEBHOOK_PORT, host: config.WEBHOOK_HOST });
         return app.getUrl();
       },
       close: async () => {
@@ -144,6 +153,7 @@ export async function createApiApp(
         closed = true;
         await operationEvents.stop(); // ends open SSE streams' subscriptions
         fastify.server.closeAllConnections(); // open SSE responses would otherwise block close()
+        await webhooks.close();
         await app.close();
         await infra.close();
       },

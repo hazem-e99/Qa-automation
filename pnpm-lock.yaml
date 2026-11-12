@@ -573,6 +573,9 @@ importers:
       '@qos/observability':
         specifier: workspace:*
         version: link:../../observability
+      '@qos/platform':
+        specifier: workspace:*
+        version: link:../platform
       '@qos/ports':
         specifier: workspace:*
         version: link:../../ports
@@ -583,6 +586,9 @@ importers:
       '@qos/adapters-secrets-db':
         specifier: workspace:*
         version: link:../../adapters-secrets-db
+      '@qos/adapters-storage-localfs':
+        specifier: workspace:*
+        version: link:../../adapters-storage-localfs
       '@qos/config':
         specifier: workspace:*
         version: link:../../config

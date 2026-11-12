@@ -154,7 +154,12 @@ export class MockRepositoryProvider extends MockAdapter implements RepositoryPro
     capabilities: ['repo.read@1', 'repo.commits.list@1', 'repo.branch.create@1', 'repo.clone_token.issue@1'],
     limits: { maxPageSize: PAGE },
     authStrategies: ['pat'],
-    webhook: { verification: 'hmac_sha256', deliveryIdHeader: 'x-mock-delivery' },
+    webhook: {
+      verification: 'hmac_sha256',
+      deliveryIdHeader: 'x-mock-delivery',
+      signatureHeader: 'x-mock-signature',
+      eventTypeHeader: 'x-mock-event',
+    },
     demoOnly: true,
   };
   protected readonly scopeFor = {

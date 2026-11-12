@@ -5,7 +5,7 @@
 
 ## Current phase: P2 — Identity, projects, provider framework, governance base (in progress, started 2026-11-10)
 
-Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity core), 2 (secret store, projects, memberships), 3 (provider framework) and 4 (environments, bindings, settings) are built. Last full run on 2026-11-12: build, typecheck, lint and format clean; 78 unit, 128 integration and 10 browser tests pass locally.
+Owner go-ahead for P2: 2026-11-10 (chat). P2 has 44 tasks in doc 26; 18 have code after batch 5 (webhook ingress). Last full run on 2026-11-12: build, typecheck, lint and format clean; 81 unit, 137 integration and 10 browser tests pass locally.
 
 | Task | Status | Evidence / what is missing |
 | --- | --- | --- |
@@ -26,9 +26,10 @@ Owner go-ahead for P2: 2026-11-10 (chat). P2 has 49 tasks; batches 1 (identity c
 | T-P2-11 Environments | **verified** | M02-AC-05: the test login secret is stored only in the secret store; tests scan API responses, audit summaries and every API log line for it. Base URL and reset hook hosts must be on the egress allow-list (derived from the base URLs when empty). **Limit:** `is_production` is stored but only enforced once runs exist (P6) |
 | T-P2-12 Bindings + capability check + history | **verified** | M02-AC-02 (with mock adapters): a connection missing required capabilities is refused with the exact missing list; wrong family is flagged. Replacing a binding ends the old row and keeps it in the history; demo connections cannot be bound to real projects. **Missing:** `legacy_sync` mode (switch flow WF-F) and M02-AC-03/04, which need syncing and defects |
 | T-P2-13 Settings sections | **verified** | M02-AC-08: every change writes a history version and an audit event naming the changed fields; stale versions answer 409. Sections `testing_rules`, `execution`, `ai`, `quality`, each with full defaults. **Limit:** BR-M02-6 "AI budget increases need qa_lead or above" is met because only qa_lead and org_admin can change settings at all |
-| All other P2 tasks | planned | Including MFA, invitations, service tokens, user administration, templates, the webhook listener, sync framework, mapping editor, approval engine, notifications, demo seed, the GitHub/Azure DevOps/AI adapters and all P2 screens |
+| T-P2-24 Webhook listener + verifiers + inbox writes | **verified** | M03-AC-02 with the mock repository: a redelivery of the same delivery id gives one inbox message and one `duplicate`. HMAC-SHA256, shared-token and Basic-auth verifiers (constant-time); unknown connection and wrong path token answer the same 404; bad signatures are recorded as `rejected` without a body; bodies over 1 MiB get 413; bodies are kept in object storage. The listener runs on its own port (3004) with no other routes; path token and signing secret are shown once and stored only as hash / in the secret store. **Missing:** the inbox processor that re-fetches items (needs real adapters and sync, T-P2-25) and alerting on repeated auth failures |
+| All other P2 tasks | planned | Including MFA, invitations, service tokens, user administration, templates, the sync framework, mapping editor, approval engine, notifications, demo seed, the GitHub/Azure DevOps/AI adapters and all P2 screens |
 
-Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, M02-AC-05, M02-AC-06, M02-AC-07, M02-AC-08, M03-AC-05. **Met with mock adapters only** M03-AC-01, M02-AC-02. **Partly** M13-AC-03 (sessions yes; API tokens do not exist yet), M03-AC-06 (connections yes; whole-suite scan later), M03-AC-08 (harness and mock adapters; no real adapters yet). Not started: M02-AC-01/03/04, M03-AC-02/09, M13-AC-05, M14-AC-01/03/04/07.
+Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, M02-AC-05, M02-AC-06, M02-AC-07, M02-AC-08, M03-AC-05. **Met with mock adapters only** M03-AC-01, M02-AC-02, M03-AC-02. **Partly** M13-AC-03 (sessions yes; API tokens do not exist yet), M03-AC-06 (connections yes; whole-suite scan later), M03-AC-08 (harness and mock adapters; no real adapters yet). Not started: M02-AC-01/03/04, M03-AC-09, M13-AC-05, M14-AC-01/03/04/07.
 
 ### Decisions made in P2 so far
 | Item | What | Why |
@@ -47,6 +48,8 @@ Acceptance criteria so far: **met** M13-AC-01, M13-AC-02, M13-AC-04, M13-AC-06, 
 | `/connections/{id}/role-check?role=` | Added as a read-only diff endpoint | Lets the project wizard show the capability diff before binding (M02-AC-02 groundwork) |
 | Project `is_demo` flag | Added to projects; demo projects can only be created in demo mode | Doc 11 §8 rule "demo connections never on non-demo projects" needs to know which projects are demo |
 | Settings history readable with `audit.read` | Not `project.read` | History shows who changed what; same audience as the audit log |
+| Duplicate and rejected deliveries get their own inbox rows | Marker rows with a unique suffix on the dedupe key | M03-AC-02 asks to see one `processed` and one `duplicate`; the unique key still guarantees one real message |
+| Local integration tests capped at 3 suites in parallel | `pnpm test:integration` uses `--concurrency=3` | On this Windows host, many parallel Postgres containers occasionally hit `connect EACCES` on Docker-published ports. Two following full runs passed 137/137; CI on Linux has never shown it |
 | `argon2` install script denied | The package ships prebuilt binaries | Keeps the deny-by-default rule for install scripts |
 | Probe endpoints | Now need `system.settings` (platform admin) | They were unauthenticated in P1 |
 
@@ -113,4 +116,4 @@ Last full run on 2026-11-10 (Windows 11, Node 24.18, Docker Desktop 4.99):
 
 ### Next
 
-P2 batch 5: webhook listener with verifiers and inbox writes (T-P2-24), sync framework (T-P2-25), demo seed (T-P2-04). Then the governance base (approval engine, notifications) and the P2 screens. Still carried from P1: commitlint git hook and a clean Knip run.
+P2 batch 6: sync framework with cursors, runs and errors (T-P2-25) and the inbox processor that re-fetches through adapters; demo seed (T-P2-04). Then the governance base (approval engine, notifications), the GitHub adapter, and the P2 screens. Still carried from P1: commitlint git hook and a clean Knip run.

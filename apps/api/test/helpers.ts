@@ -8,7 +8,13 @@ export const ADMIN = {
 };
 
 /** Extra environment for an API under test: setup enabled, cookies usable over plain HTTP. */
-export const AUTH_ENV = { SETUP_TOKEN, COOKIE_SECURE: 'false', LOGIN_ATTEMPTS_PER_MINUTE: '1000' };
+export const AUTH_ENV = {
+  SETUP_TOKEN,
+  COOKIE_SECURE: 'false',
+  LOGIN_ATTEMPTS_PER_MINUTE: '1000',
+  // Several apps run at once in some tests: let each webhook listener take a free port.
+  WEBHOOK_PORT: '0',
+};
 
 export interface Session {
   readonly cookie: string;

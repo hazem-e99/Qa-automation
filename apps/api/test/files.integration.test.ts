@@ -19,6 +19,7 @@ beforeAll(async () => {
     DATABASE_URL: t.url,
     NODE_ENV: 'test',
     LOG_LEVEL: 'silent',
+    WEBHOOK_PORT: '0',
     API_PORT: '39031',
     STORAGE_DIR: dir,
     FILE_URL_SECRET: SECRET,
@@ -88,6 +89,7 @@ describe('signed file links', () => {
       DATABASE_URL: t.url,
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
+      WEBHOOK_PORT: '0',
       API_PORT: '39032',
     });
     const url = await plain.listen();
