@@ -5,6 +5,7 @@ import { NestFactory } from '@nestjs/core';
 import { MockIssueTracker, MockRepositoryProvider } from '@qos/adapters-mock';
 import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
 import { PROBE_CREATED_EVENT } from '@qos/contracts';
+import { checkCredentialExpiry } from '@qos/governance';
 import { ProviderRegistry, type IntegrationDeps } from '@qos/integrations';
 import { OutboxDispatcher, QUEUES } from '@qos/jobs';
 import {
@@ -29,6 +30,8 @@ export const WorkerConfig = BaseConfig.extend({
   /** Sync poll interval. Doc 13: commits 2 min; one interval for all streams in the pilot. */
   SYNC_POLL_SECONDS: z.coerce.number().int().min(1).max(3600).default(120),
   INBOX_POLL_SECONDS: z.coerce.number().int().min(1).max(300).default(5),
+  /** How often credential expiry is checked (M03-FR-05). Warnings are deduplicated per day. */
+  EXPIRY_CHECK_SECONDS: z.coerce.number().int().min(10).max(86_400).default(3600),
   QOS_MASTER_KEY_FILE: z.string().min(1).optional(),
   QOS_DEMO_MODE: z
     .enum(['true', 'false'])
@@ -115,11 +118,23 @@ export async function createWorkerApp(env: NodeJS.ProcessEnv = process.env): Pro
     pollSeconds: config.SYNC_POLL_SECONDS,
     inboxSeconds: config.INBOX_POLL_SECONDS,
   });
+  const expiryCheck = async () => {
+    try {
+      const { warned } = await checkCredentialExpiry(infra.db);
+      if (warned) infra.logger.info({ warned }, 'credential expiry warnings sent');
+    } catch (err) {
+      infra.logger.error({ err }, 'credential expiry check failed');
+    }
+  };
+  let expiryTimer: NodeJS.Timeout | null = null;
   let health: Server | null = null;
   try {
     const ctx = await NestFactory.createApplicationContext(WorkerModule.register(infra, dispatcher, sync), {
       logger: false,
     });
+    void expiryCheck();
+    expiryTimer = setInterval(() => void expiryCheck(), config.EXPIRY_CHECK_SECONDS * 1000);
+    expiryTimer.unref();
     health = await startHealthServer(
       config.WORKER_HEALTH_PORT,
       { service: 'worker', version: config.APP_VERSION, checks: infra.checks },
@@ -138,6 +153,7 @@ export async function createWorkerApp(env: NodeJS.ProcessEnv = process.env): Pro
         closed = true;
         if (health) await closeServer(health);
         sync.stop();
+        if (expiryTimer) clearInterval(expiryTimer);
         await dispatcher.stop();
         await ctx.close();
         await infra.close(); // pg-boss stops gracefully: in-flight jobs finish or are redelivered later

@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller.js';
 import { ConnectionsController } from './connections.controller.js';
 import type { ApiConfig } from './config.js';
 import { FilesController } from './files.controller.js';
+import { GovernanceController } from './governance.controller.js';
 import { HealthController } from './health.controller.js';
 import type { OperationEvents } from './operation-events.js';
 import { OperationsController } from './operations.controller.js';
@@ -33,6 +34,7 @@ export class AppModule {
         ProjectsController,
         ConnectionsController,
         ProjectConfigController,
+        GovernanceController,
         OperationsController,
         FilesController,
       ],

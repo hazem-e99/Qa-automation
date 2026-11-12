@@ -138,3 +138,14 @@ export async function listProjectMembers(db: Db, projectId: string): Promise<Pro
     .orderBy(users.email);
   return rows.filter((r): r is ProjectMember => isRoleKey(r.role));
 }
+
+/** Active users holding `org_admin` in an organization. */
+export async function listOrgAdmins(db: Db | Tx, orgId: string): Promise<string[]> {
+  const rows = await db.execute<{ user_id: string }>(
+    sql`select u.id as user_id from identity.org_memberships om
+        join identity.roles r on r.id = om.role_id
+        join identity.users u on u.id = om.user_id
+        where om.org_id = ${orgId} and r.key = 'org_admin' and u.status = 'active'`,
+  );
+  return rows.rows.map((r) => r.user_id);
+}

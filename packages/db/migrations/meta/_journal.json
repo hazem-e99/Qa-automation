@@ -78,6 +78,13 @@
       "when": 1794485941197,
       "tag": "0010_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794488194183,
+      "tag": "0011_approvals_notifications",
+      "breakpoints": true
     }
   ]
 }

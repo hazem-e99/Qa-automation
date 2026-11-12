@@ -275,6 +275,9 @@ importers:
       '@qos/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@qos/governance':
+        specifier: workspace:*
+        version: link:../../packages/modules/governance
       '@qos/projects':
         specifier: workspace:*
         version: link:../../packages/modules/projects
@@ -385,6 +388,9 @@ importers:
       '@qos/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@qos/governance':
+        specifier: workspace:*
+        version: link:../../packages/modules/governance
       '@qos/integrations':
         specifier: workspace:*
         version: link:../../packages/modules/integrations
@@ -554,6 +560,37 @@ importers:
       '@qos/config':
         specifier: workspace:*
         version: link:../config
+
+  packages/modules/governance:
+    dependencies:
+      '@qos/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@qos/identity':
+        specifier: workspace:*
+        version: link:../identity
+      '@qos/integrations':
+        specifier: workspace:*
+        version: link:../integrations
+      '@qos/jobs':
+        specifier: workspace:*
+        version: link:../jobs
+      '@qos/kernel-domain':
+        specifier: workspace:*
+        version: link:../../kernel-domain
+    devDependencies:
+      '@qos/adapters-mock':
+        specifier: workspace:*
+        version: link:../../adapters-mock
+      '@qos/adapters-secrets-db':
+        specifier: workspace:*
+        version: link:../../adapters-secrets-db
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../../config
+      '@qos/observability':
+        specifier: workspace:*
+        version: link:../../observability
 
   packages/modules/identity:
     dependencies:

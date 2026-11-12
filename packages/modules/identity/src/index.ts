@@ -18,6 +18,7 @@ export {
 export { authorize, orgPermissionsOf, projectPermissionsOf, type Decision } from './application/authorize.js';
 export {
   addInitialProjectMember,
+  listOrgAdmins,
   listProjectMembers,
   projectRoleOf,
   removeProjectMember,

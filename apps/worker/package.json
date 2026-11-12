@@ -28,7 +28,8 @@
     "@qos/platform": "workspace:*",
     "@qos/db": "workspace:*",
     "@qos/adapters-mock": "workspace:*",
-    "@qos/adapters-secrets-db": "workspace:*"
+    "@qos/adapters-secrets-db": "workspace:*",
+    "@qos/governance": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*",

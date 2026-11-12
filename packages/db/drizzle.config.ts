@@ -9,6 +9,7 @@ export default defineConfig({
     './src/schema/identity.ts',
     './src/schema/projects.ts',
     './src/schema/integrations.ts',
+    './src/schema/approvals.ts',
   ],
   out: './migrations',
 });

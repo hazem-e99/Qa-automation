@@ -414,3 +414,19 @@ export async function connectionImpact(db: Db, actor: Actor, id: string) {
   );
   return { externalRefs: Object.fromEntries(res.rows.map((r) => [r.external_type, r.n])) };
 }
+
+/** Connections whose credential expires within `withinDays` (or already has). Retired ones are ignored. */
+export async function expiringConnections(db: Db, now: Date = new Date(), withinDays = 14) {
+  const limit = new Date(now.getTime() + withinDays * 86_400_000);
+  const rows = await db
+    .select()
+    .from(connections)
+    .where(
+      and(
+        sql`${connections.status} <> 'retired'`,
+        sql`${connections.credentialExpiresAt} is not null`,
+        sql`${connections.credentialExpiresAt} <= ${limit}`,
+      ),
+    );
+  return rows.map((r) => ({ ...view(r), orgId: r.orgId, credentialExpiresAt: r.credentialExpiresAt! }));
+}

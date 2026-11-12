@@ -81,11 +81,15 @@ abstract class MockAdapter implements ProviderAdapter {
 
   async testConnection(ctx: ConnectionContext): Promise<ConnectionTestResult> {
     this.controls.enter();
-    const scopes = scopesOf(await ctx.secret());
+    const secret = await ctx.secret();
+    const scopes = scopesOf(secret);
     ctx.log.info({ scopes: scopes.length }, 'mock connection test');
+    // `expires=YYYY-MM-DD` in a mock credential simulates a token with an expiry date.
+    const expires = /expires=(\d{4}-\d{2}-\d{2})/.exec(secret)?.[1];
     return {
       identity: 'mock-user',
       scopesDiscovered: scopes,
+      ...(expires ? { expiresAt: new Date(`${expires}T00:00:00Z`).toISOString() } : {}),
       permissionChecks: this.manifest().capabilities.map((capability) => {
         const scope = this.scopeFor[capability];
         const ok = !scope || scopes.includes(scope);
