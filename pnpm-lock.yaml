@@ -214,6 +214,15 @@ importers:
       '@nestjs/platform-fastify':
         specifier: ~12.4.2
         version: 12.4.2(@nestjs/common@12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.4.2(@nestjs/common@12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@qos/adapters-ai-gemini':
+        specifier: workspace:*
+        version: link:../../packages/adapters-ai-gemini
+      '@qos/adapters-azure-devops':
+        specifier: workspace:*
+        version: link:../../packages/adapters-azure-devops
+      '@qos/adapters-github':
+        specifier: workspace:*
+        version: link:../../packages/adapters-github
       '@qos/adapters-mock':
         specifier: workspace:*
         version: link:../../packages/adapters-mock
@@ -376,6 +385,15 @@ importers:
       '@nestjs/core':
         specifier: ~12.4.2
         version: 12.4.2(@nestjs/common@12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@qos/adapters-ai-gemini':
+        specifier: workspace:*
+        version: link:../../packages/adapters-ai-gemini
+      '@qos/adapters-azure-devops':
+        specifier: workspace:*
+        version: link:../../packages/adapters-azure-devops
+      '@qos/adapters-github':
+        specifier: workspace:*
+        version: link:../../packages/adapters-github
       '@qos/adapters-mock':
         specifier: workspace:*
         version: link:../../packages/adapters-mock
@@ -428,6 +446,48 @@ importers:
       '@qos/config':
         specifier: workspace:*
         version: link:../../packages/config
+
+  packages/adapters-ai-gemini:
+    dependencies:
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../config
+      '@qos/contract-tests':
+        specifier: workspace:*
+        version: link:../contract-tests
+      '@qos/kernel-infra':
+        specifier: workspace:*
+        version: link:../kernel-infra
+
+  packages/adapters-azure-devops:
+    dependencies:
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../config
+      '@qos/contract-tests':
+        specifier: workspace:*
+        version: link:../contract-tests
+
+  packages/adapters-github:
+    dependencies:
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../config
+      '@qos/contract-tests':
+        specifier: workspace:*
+        version: link:../contract-tests
 
   packages/adapters-mock:
     dependencies:

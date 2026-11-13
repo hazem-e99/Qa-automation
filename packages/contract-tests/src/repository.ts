@@ -18,6 +18,8 @@ export interface RepositoryHarness {
   /** A repository the credential can read, with at least two pages of commits. */
   readonly repoId: string;
   readonly baseUrl?: string;
+  /** Recorded mode: serves recorded provider responses instead of the network. */
+  readonly http?: ConnectionContext['http'];
   /** Optional fault injection. Suites that need it are skipped with a reason when absent. */
   readonly injectFault?: (kind: ProviderErrorKind, retryAfterMs?: number) => void;
   /** Restore the adapter's initial state between tests. */
@@ -25,7 +27,11 @@ export interface RepositoryHarness {
 }
 
 /** A logger spy: every line the adapter logs is kept for the redaction check. */
-export function spyContext(secret: string, baseUrl?: string): { ctx: ConnectionContext; lines: string[] } {
+export function spyContext(
+  secret: string,
+  baseUrl?: string,
+  http?: ConnectionContext['http'],
+): { ctx: ConnectionContext; lines: string[] } {
   const lines: string[] = [];
   const log = (level: string) => (obj: object, msg?: string) =>
     lines.push(`${level} ${JSON.stringify(obj)} ${msg ?? ''}`);
@@ -34,7 +40,7 @@ export function spyContext(secret: string, baseUrl?: string): { ctx: ConnectionC
     ctx: {
       connectionId: 'contract-test',
       baseUrl: baseUrl ?? null,
-      http: {
+      http: http ?? {
         request: async () => {
           throw new Error('no HTTP in mock mode');
         },
@@ -61,7 +67,7 @@ export function repositoryContract(name: string, create: () => RepositoryHarness
     let lines: string[];
     beforeEach(() => {
       h.reset?.();
-      ({ ctx, lines } = spyContext(h.secret, h.baseUrl));
+      ({ ctx, lines } = spyContext(h.secret, h.baseUrl, h.http));
     });
 
     it('declares only catalog capabilities of its family and a known auth strategy', () => {

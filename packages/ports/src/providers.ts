@@ -158,6 +158,19 @@ export interface CloneCredential {
   readonly readOnly: true;
 }
 
+export interface ChangedFile {
+  readonly path: string;
+  readonly status: 'added' | 'modified' | 'removed' | 'renamed';
+}
+export interface CanonicalPullRequest {
+  readonly number: number;
+  readonly state: 'open' | 'merged' | 'closed';
+  readonly head: string;
+  readonly base: string;
+  readonly url: string;
+  readonly mergeSha?: string;
+}
+
 export interface RepositoryProvider extends ProviderAdapter {
   listResources(ctx: ConnectionContext, q: { search?: string; cursor?: string }): Promise<Page<RepoSummary>>;
   getRepo(ctx: ConnectionContext, repoId: string): Promise<RepoInfo>;
@@ -175,6 +188,24 @@ export interface RepositoryProvider extends ProviderAdapter {
     fromRef: string,
   ): Promise<ExternalRefData>;
   issueCloneCredential(ctx: ConnectionContext, repoId: string, ttlSeconds: number): Promise<CloneCredential>;
+  diff?(
+    ctx: ConnectionContext,
+    repoId: string,
+    baseRef: string,
+    headRef: string,
+  ): Promise<readonly ChangedFile[]>;
+  /** Returns the existing PR for the same head branch instead of creating a second one. */
+  createPullRequest?(
+    ctx: ConnectionContext,
+    repoId: string,
+    req: { head: string; base: string; title: string; body: string; draft: boolean },
+  ): Promise<ExternalRefData>;
+  getPullRequest?(ctx: ConnectionContext, repoId: string, prNumber: number): Promise<CanonicalPullRequest>;
+  getBranchProtection?(
+    ctx: ConnectionContext,
+    repoId: string,
+    branch: string,
+  ): Promise<{ protected: boolean; rules?: readonly string[] }>;
 }
 
 /** Branches QualityOS may create or push to (doc 12 §4.1). */

@@ -29,7 +29,10 @@
     "@qos/db": "workspace:*",
     "@qos/adapters-mock": "workspace:*",
     "@qos/adapters-secrets-db": "workspace:*",
-    "@qos/governance": "workspace:*"
+    "@qos/governance": "workspace:*",
+    "@qos/adapters-github": "workspace:*",
+    "@qos/adapters-azure-devops": "workspace:*",
+    "@qos/adapters-ai-gemini": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*",

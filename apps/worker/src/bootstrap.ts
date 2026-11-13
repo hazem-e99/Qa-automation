@@ -2,6 +2,9 @@ import 'reflect-metadata';
 import type { Server } from 'node:http';
 import { Inject, Injectable, Module, type DynamicModule, type OnApplicationBootstrap } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { GeminiConnection } from '@qos/adapters-ai-gemini';
+import { AzureDevOpsConnection } from '@qos/adapters-azure-devops';
+import { GitHubRepositoryProvider } from '@qos/adapters-github';
 import { MockIssueTracker, MockRepositoryProvider } from '@qos/adapters-mock';
 import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
 import { PROBE_CREATED_EVENT } from '@qos/contracts';
@@ -105,7 +108,10 @@ export async function createWorkerApp(env: NodeJS.ProcessEnv = process.env): Pro
     logger: infra.logger,
   });
   // Composition root: the only place in the worker that names concrete adapters.
-  const registry = new ProviderRegistry();
+  const registry = new ProviderRegistry()
+    .register(new GitHubRepositoryProvider())
+    .register(new AzureDevOpsConnection())
+    .register(new GeminiConnection());
   if (config.QOS_DEMO_MODE) registry.register(new MockRepositoryProvider()).register(new MockIssueTracker());
   const integrations: IntegrationDeps = {
     db: infra.db,

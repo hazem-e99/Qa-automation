@@ -67,8 +67,18 @@ describe('connections API', () => {
     const providers = ProviderResponse.array().parse(
       await (await admin.fetch(`${base}/api/v1/providers`)).json(),
     );
-    expect(providers.map((p) => p.providerType)).toEqual(['mock_issue_tracker', 'mock_repository']);
-    expect(providers.every((p) => p.demoOnly)).toBe(true);
+    expect(providers.map((p) => p.providerType)).toEqual([
+      'azure_devops',
+      'gemini',
+      'github',
+      'mock_issue_tracker',
+      'mock_repository',
+    ]);
+    // Only the mock providers are demo-only; they are registered because QOS_DEMO_MODE=true here.
+    expect(providers.filter((p) => p.demoOnly).map((p) => p.providerType)).toEqual([
+      'mock_issue_tracker',
+      'mock_repository',
+    ]);
   });
 
   it('creates a connection; the credential is write-only and never echoed', async () => {

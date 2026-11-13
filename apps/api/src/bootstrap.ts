@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import { GeminiConnection } from '@qos/adapters-ai-gemini';
+import { AzureDevOpsConnection } from '@qos/adapters-azure-devops';
+import { GitHubRepositoryProvider } from '@qos/adapters-github';
 import { MockIssueTracker, MockRepositoryProvider } from '@qos/adapters-mock';
 import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
 import { LocalFsObjectStorage } from '@qos/adapters-storage-localfs';
@@ -67,7 +70,10 @@ export async function createApiApp(
   const storage: ObjectStorage = new LocalFsObjectStorage(config.STORAGE_DIR);
   const secrets = masterKey ? new DbEnvelopeSecretStore(infra.db, masterKey) : null;
   // Composition root: the only place that names concrete provider adapters.
-  const registry = new ProviderRegistry();
+  const registry = new ProviderRegistry()
+    .register(new GitHubRepositoryProvider())
+    .register(new AzureDevOpsConnection())
+    .register(new GeminiConnection());
   if (config.QOS_DEMO_MODE) registry.register(new MockRepositoryProvider()).register(new MockIssueTracker());
   const integrations: IntegrationDeps = {
     db: infra.db,
