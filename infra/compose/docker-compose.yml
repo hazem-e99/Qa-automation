@@ -24,7 +24,8 @@ x-app-env: &app-env
   NODE_ENV: production
   LOG_LEVEL: ${LOG_LEVEL:-info}
   APP_VERSION: ${APP_VERSION:-0.0.0-dev}
-  DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-qualityos}
+  # Services log in as a member of qos_app: DML only, append-only audit log (doc 10 §2).
+  DATABASE_URL: postgres://${QOS_APP_DB_USER:-qos_app_login}:${QOS_APP_DB_PASSWORD:?run "pnpm qos init" to add it to infra/compose/.env}@postgres:5432/${POSTGRES_DB:-qualityos}
 
 services:
   postgres:
@@ -50,8 +51,13 @@ services:
     <<: *app
     profiles: [core]
     restart: 'no'
-    command: ['node', 'packages/db/dist/migrate-cli.js']
-    environment: *app-env
+    # Owner connection: migrations, job schema, and the services' login role.
+    command: ['node', 'apps/worker/dist/migrate.js']
+    environment:
+      <<: *app-env
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-qualityos}
+      QOS_APP_DB_USER: ${QOS_APP_DB_USER:-qos_app_login}
+      QOS_APP_DB_PASSWORD: ${QOS_APP_DB_PASSWORD:?run "pnpm qos init" to add it to infra/compose/.env}
     read_only: true
     depends_on:
       postgres: { condition: service_healthy }
@@ -70,6 +76,9 @@ services:
       FILE_URL_SECRET: ${FILE_URL_SECRET:?run "pnpm qos init" to create infra/compose/.env}
       SETUP_TOKEN: ${SETUP_TOKEN:?run "pnpm qos init" to add it to infra/compose/.env}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      # The web app's BFF forwards client addresses from the private Compose network.
+      TRUST_PROXY: uniquelocal
+      PUBLIC_WEB_URL: http://localhost:${WEB_PORT:-3000}
       QOS_MASTER_KEY_FILE: /run/secrets/master_key
       # Local pilot only: registers the mock providers labelled "Demo".
       QOS_DEMO_MODE: ${QOS_DEMO_MODE:-true}

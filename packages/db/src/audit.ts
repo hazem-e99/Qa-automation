@@ -8,7 +8,7 @@ import { auditEvents } from './schema/governance.js';
 export interface AuditInput {
   readonly orgId?: string | null;
   readonly projectId?: string | null;
-  readonly actorType: 'user' | 'system' | 'automation';
+  readonly actorType: 'user' | 'system' | 'automation' | 'service_account';
   readonly actorId: string;
   readonly action: string;
   readonly targetType: string;

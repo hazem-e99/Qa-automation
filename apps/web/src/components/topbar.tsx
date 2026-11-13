@@ -3,6 +3,8 @@
 import { LOCALES, THEMES, type Theme } from '@qos/ui';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { UserMenu } from './user-menu';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const THEME_LABEL = { system: 'themeSystem', light: 'themeLight', dark: 'themeDark' } as const;
@@ -13,6 +15,7 @@ export function Topbar({ locale, theme: initialTheme }: { locale: string; theme:
   const p = useTranslations('palette');
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const dialog = useRef<HTMLDialogElement>(null);
+  const pathname = usePathname();
 
   const applyTheme = useCallback((next: Theme) => {
     setTheme(next);
@@ -72,7 +75,7 @@ export function Topbar({ locale, theme: initialTheme }: { locale: string; theme:
         {LOCALES.map((l) => (
           <Link
             key={l}
-            href={`/${l}`}
+            href={pathname.replace(/^\/(en|ar)(?=\/|$)/, `/${l}`)}
             lang={l}
             hrefLang={l}
             aria-current={l === locale ? 'true' : undefined}
@@ -86,6 +89,8 @@ export function Topbar({ locale, theme: initialTheme }: { locale: string; theme:
           </Link>
         ))}
       </nav>
+
+      <UserMenu />
 
       <dialog
         ref={dialog}

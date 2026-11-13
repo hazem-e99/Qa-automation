@@ -18,6 +18,13 @@ import {
   type RoleKey,
 } from '../src/index.js';
 
+/** Password login that must yield a session (these accounts have no MFA). */
+async function loginSession(...args: Parameters<typeof login>) {
+  const r = await login(...args);
+  if (r.kind !== 'session') throw new Error('unexpected MFA challenge');
+  return r;
+}
+
 const ADMIN = {
   orgName: 'Pilot Org',
   email: 'admin@example.test',
@@ -60,7 +67,7 @@ const addProjectMember = async (projectId: string, userId: string, role: RoleKey
     [projectId, userId, role],
   );
 const principalOf = async (email: string, password = 'another long password'): Promise<Principal> => {
-  const { token } = await login(t.db, { email, password });
+  const { token } = await loginSession(t.db, { email, password });
   return (await resolveSession(t.db, token))!;
 };
 
@@ -122,7 +129,7 @@ describe('first-run setup', () => {
 
 describe('login and sessions', () => {
   it('logs in with the right password and resolves the session to a principal', async () => {
-    const result = await login(
+    const result = await loginSession(
       t.db,
       { email: 'ADMIN@example.test', password: ADMIN.password },
       { ip: '127.0.0.1' },
@@ -146,7 +153,9 @@ describe('login and sessions', () => {
       ['inactive@example.test', 'another long password'],
       ['not-an-email', ADMIN.password],
     ] as const) {
-      await expect(login(t.db, { email, password }), email).rejects.toThrow('auth.invalid_credentials');
+      await expect(loginSession(t.db, { email, password }), email).rejects.toThrow(
+        'auth.invalid_credentials',
+      );
     }
     const failures = await t.pool.query(
       "select count(*)::int c from governance.audit_events where action = 'identity.login.failed'",
@@ -155,8 +164,8 @@ describe('login and sessions', () => {
   });
 
   it('issues a different token on every login and logout ends only that session', async () => {
-    const a = await login(t.db, { email: ADMIN.email, password: ADMIN.password });
-    const b = await login(t.db, { email: ADMIN.email, password: ADMIN.password });
+    const a = await loginSession(t.db, { email: ADMIN.email, password: ADMIN.password });
+    const b = await loginSession(t.db, { email: ADMIN.email, password: ADMIN.password });
     expect(a.token).not.toBe(b.token);
     await logout(t.db, (await resolveSession(t.db, a.token))!);
     expect(await resolveSession(t.db, a.token)).toBeNull();
@@ -165,12 +174,12 @@ describe('login and sessions', () => {
 
   it('expires sessions on the idle and the absolute timeout', async () => {
     const policy = { idleMinutes: 30, absoluteDays: 1 };
-    const idle = await login(t.db, { email: ADMIN.email, password: ADMIN.password }, {}, policy);
+    const idle = await loginSession(t.db, { email: ADMIN.email, password: ADMIN.password }, {}, policy);
     const later = new Date(Date.now() + 31 * 60_000);
     expect(await resolveSession(t.db, idle.token, policy, later)).toBeNull();
     expect(await resolveSession(t.db, idle.token, policy)).toBeNull(); // deleted, not just hidden
 
-    const abs = await login(t.db, { email: ADMIN.email, password: ADMIN.password }, {}, policy);
+    const abs = await loginSession(t.db, { email: ADMIN.email, password: ADMIN.password }, {}, policy);
     // Kept active by regular use, but past the absolute limit.
     await t.pool.query("update identity.sessions set last_seen_at = now() + interval '25 hours'");
     expect(await resolveSession(t.db, abs.token, policy, new Date(Date.now() + 25 * 3_600_000))).toBeNull();
@@ -181,14 +190,17 @@ describe('login and sessions', () => {
       expect(await resolveSession(t.db, bad)).toBeNull();
     }
     const id = await addUser('leaver@example.test');
-    const { token } = await login(t.db, { email: 'leaver@example.test', password: 'another long password' });
+    const { token } = await loginSession(t.db, {
+      email: 'leaver@example.test',
+      password: 'another long password',
+    });
     expect(await resolveSession(t.db, token)).not.toBeNull();
     await t.pool.query("update identity.users set status = 'deactivated' where id = $1", [id]);
     expect(await resolveSession(t.db, token)).toBeNull();
   });
 
   it('purges expired sessions', async () => {
-    await login(t.db, { email: ADMIN.email, password: ADMIN.password });
+    await loginSession(t.db, { email: ADMIN.email, password: ADMIN.password });
     await t.pool.query("update identity.sessions set expires_at = now() - interval '1 minute'");
     expect(await purgeExpiredSessions(t.db)).toBeGreaterThan(0);
     expect((await t.pool.query('select count(*)::int c from identity.sessions')).rows[0].c).toBe(0);

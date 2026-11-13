@@ -4,6 +4,7 @@ export {
   csrfTokenMatches,
   DEFAULT_SESSION_POLICY,
   hashPassword,
+  issueSession,
   login,
   logout,
   purgeExpiredSessions,
@@ -11,6 +12,8 @@ export {
   setupFirstAdmin,
   type ClientInfo,
   type LoginResult,
+  type MfaRequired,
+  type SessionIssued,
   type Principal,
   type SessionPolicy,
   type SetupInput,
@@ -42,3 +45,49 @@ export {
   type Grant,
   type RoleKey,
 } from './domain/rbac.js';
+export {
+  beginMfaEnrollment,
+  confirmMfaEnrollment,
+  disableOwnMfa,
+  mfaStatus,
+  resetUserMfa,
+  verifyMfaLogin,
+  type MfaStatus,
+} from './application/mfa.js';
+export {
+  changeOwnPassword,
+  completePasswordReset,
+  createPasswordReset,
+  deactivateUser,
+  getUser,
+  listUsers,
+  reactivateUser,
+  updateOwnProfile,
+  updateUser,
+  USER_LOCALES,
+  type UserSummary,
+} from './application/users.js';
+export {
+  acceptInvitation,
+  createInvitation,
+  INVITATION_HOURS,
+  listInvitations,
+  lookupInvitation,
+  resendInvitation,
+  revokeInvitation,
+  type InvitationView,
+} from './application/invitations.js';
+export {
+  createApiToken,
+  createServiceAccount,
+  getServiceAccount,
+  listApiTokens,
+  listServiceAccounts,
+  resolveApiToken,
+  revokeApiToken,
+  updateServiceAccount,
+  type ApiTokenView,
+  type ServiceAccountView,
+  type TokenPrincipal,
+} from './application/api-tokens.js';
+export { isTokenScope, TOKEN_MAX_DAYS, TOKEN_SCOPES, type TokenScope } from './domain/api-token.js';

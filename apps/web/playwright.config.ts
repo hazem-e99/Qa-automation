@@ -5,6 +5,8 @@ const PORT = 3100;
 /** Shell tests run against the production build (`next build` first). */
 export default defineConfig({
   testDir: './e2e',
+  // Journeys need a backend; they have their own config (playwright.journeys.config.ts).
+  testIgnore: ['journeys/**'],
   outputDir: './test-results',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

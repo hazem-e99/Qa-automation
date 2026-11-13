@@ -361,9 +361,18 @@ importers:
       '@playwright/test':
         specifier: 1.65.0
         version: 1.65.0
+      '@qos/adapters-secrets-db':
+        specifier: workspace:*
+        version: link:../../packages/adapters-secrets-db
+      '@qos/api':
+        specifier: workspace:*
+        version: link:../api
       '@qos/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@qos/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@tailwindcss/postcss':
         specifier: ^4.3.5
         version: 4.3.5
@@ -446,6 +455,12 @@ importers:
       '@qos/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      pg:
+        specifier: ~8.23.1
+        version: 8.23.1
 
   packages/adapters-ai-gemini:
     dependencies:
@@ -638,6 +653,9 @@ importers:
       '@qos/kernel-domain':
         specifier: workspace:*
         version: link:../../kernel-domain
+      '@qos/projects':
+        specifier: workspace:*
+        version: link:../projects
     devDependencies:
       '@qos/adapters-mock':
         specifier: workspace:*
@@ -657,12 +675,18 @@ importers:
       '@qos/db':
         specifier: workspace:*
         version: link:../../db
+      '@qos/jobs':
+        specifier: workspace:*
+        version: link:../jobs
       '@qos/kernel-domain':
         specifier: workspace:*
         version: link:../../kernel-domain
       '@qos/observability':
         specifier: workspace:*
         version: link:../../observability
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../../ports
       argon2:
         specifier: ~0.45.2
         version: 0.45.2

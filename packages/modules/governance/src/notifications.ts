@@ -17,6 +17,7 @@ export const NOTIFICATION_TYPES = [
   'approval.requested',
   'approval.decided',
   'connection.credential.expiring',
+  'binding.unhealthy',
   'project.member.added',
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

@@ -139,3 +139,21 @@ export const projectSettingsHistory = projectsSchema.table(
   },
   (t) => [index('project_settings_history_ix').on(t.projectId, t.section, t.changedAt)],
 );
+
+/**
+ * Organization project templates (M02-FR-02): settings sections and environments (never secrets)
+ * captured from a project. Built-in templates live in code, not here.
+ */
+export const projectTemplates = projectsSchema.table(
+  'project_templates',
+  {
+    id: uuid('id').primaryKey(),
+    orgId: uuid('org_id').notNull(),
+    name: text('name').notNull(),
+    description: text('description').notNull().default(''),
+    data: jsonb('data').notNull(),
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [uniqueIndex('project_templates_org_name_ux').on(t.orgId, t.name)],
+);

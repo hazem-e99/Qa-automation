@@ -33,6 +33,17 @@ export const ApiConfig = BaseConfig.extend({
   LOGIN_ATTEMPTS_PER_MINUTE: z.coerce.number().int().min(1).max(10_000).default(5),
   SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(1440).default(480),
   SESSION_ABSOLUTE_DAYS: z.coerce.number().int().min(1).max(30).default(7),
+  /**
+   * Proxies whose X-Forwarded-For is trusted (Fastify trustProxy: addresses, CIDRs, or presets
+   * such as `loopback` and `uniquelocal`). Off by default; the web app's BFF sits in front of the
+   * API, so without it every request would share the web server's address for rate limiting.
+   */
+  TRUST_PROXY: z
+    .string()
+    .regex(/^(false|[a-z0-9.:/,\s]+)$/i)
+    .default('false'),
+  /** Base URL of the web app, used to build invitation and password reset links. */
+  PUBLIC_WEB_URL: z.url().default('http://localhost:3000'),
   /** Upper bound on concurrently open SSE streams in this process. */
   SSE_MAX_STREAMS: z.coerce.number().int().min(1).max(10_000).default(200),
 });

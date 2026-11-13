@@ -50,6 +50,10 @@ describe('route inventory (M13-AC-01)', () => {
       'GET /healthz',
       'GET /readyz',
       'POST /api/v1/auth/login',
+      'POST /api/v1/auth/mfa/verify',
+      'POST /api/v1/auth/password/reset',
+      'POST /api/v1/invitations/accept',
+      'POST /api/v1/invitations/lookup',
       'POST /api/v1/setup',
     ]);
   });
@@ -90,6 +94,7 @@ describe('first-run setup', () => {
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
       API_PORT: '0',
+      WEBHOOK_PORT: '0',
     });
     const url = await plain.listen();
     try {

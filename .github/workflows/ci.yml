@@ -70,6 +70,8 @@ jobs:
       # Screenshot baselines are per platform. Only Windows baselines are committed so far, so the
       # first Linux run creates its own and uploads them for review instead of failing.
       - run: pnpm --filter @qos/web exec playwright test --update-snapshots=missing
+      # Journeys in demo mode: real API and PostgreSQL (Testcontainers) behind the web build.
+      - run: pnpm --filter @qos/web e2e:journeys
       - uses: actions/upload-artifact@v4
         if: always()
         with:

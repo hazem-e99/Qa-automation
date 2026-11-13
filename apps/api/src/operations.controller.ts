@@ -2,9 +2,11 @@ import { Controller, Get, Inject, NotFoundException, Param, Req, Res } from '@ne
 import { Uuid, type OperationResponse } from '@qos/contracts';
 import { DomainError } from '@qos/kernel-domain';
 import type { CoreInfra } from '@qos/kernel-infra';
-import { getOperation, isTerminal } from '@qos/platform';
+import { authorize } from '@qos/identity';
+import { getOperation, isTerminal, operationOwner } from '@qos/platform';
+import { findProjectById } from '@qos/projects';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { Authenticated } from './access.js';
+import { Auth, Authenticated, type AuthContext } from './access.js';
 import type { ApiConfig } from './config.js';
 import type { OperationEvents } from './operation-events.js';
 import { CONFIG, INFRA, OPERATION_EVENTS } from './tokens.js';
@@ -23,10 +25,28 @@ export class OperationsController {
     @Inject(OPERATION_EVENTS) private readonly events: OperationEvents,
   ) {}
 
+  /**
+   * An operation is visible to its creator and to readers of its project. Anything else looks
+   * like an unknown id (no existence leak across projects or organizations).
+   */
+  private async assertVisible(auth: AuthContext, id: string): Promise<void> {
+    const owner = await operationOwner(this.infra.db, id);
+    if (!owner) throw new NotFoundException();
+    if (owner.createdBy === auth.principal.userId) return;
+    const project = owner.projectId
+      ? await findProjectById(this.infra.db, auth.principal.orgId, owner.projectId)
+      : null;
+    if (project && (await authorize(this.infra.db, auth.principal, 'project.read', project.id)).allowed)
+      return;
+    throw new NotFoundException();
+  }
+
   @Get(':id')
   @Authenticated()
-  async get(@Param('id') id: string): Promise<OperationResponse> {
-    const op = await getOperation(this.infra.db, Uuid.parse(id));
+  async get(@Param('id') rawId: string, @Auth() auth: AuthContext): Promise<OperationResponse> {
+    const id = Uuid.parse(rawId);
+    await this.assertVisible(auth, id);
+    const op = await getOperation(this.infra.db, id);
     if (!op) throw new NotFoundException();
     return op;
   }
@@ -40,10 +60,12 @@ export class OperationsController {
   @Authenticated()
   async stream(
     @Param('id') rawId: string,
+    @Auth() auth: AuthContext,
     @Req() req: FastifyRequest,
     @Res() reply: FastifyReply,
   ): Promise<void> {
     const id = Uuid.parse(rawId);
+    await this.assertVisible(auth, id);
     const first = await getOperation(this.infra.db, id);
     if (!first) throw new NotFoundException();
     if (this.openStreams >= this.config.SSE_MAX_STREAMS) throw new DomainError('operations.too_many_streams');

@@ -116,6 +116,16 @@ export async function findProjectByKey(db: Db | Tx, orgId: string, key: string):
   return row && row.status !== 'deleted' ? toProject(row) : null;
 }
 
+/** Looks a project up by id inside one organization; another organization's project is null. */
+export async function findProjectById(db: Db | Tx, orgId: string, id: string): Promise<Project | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const [row] = await db
+    .select()
+    .from(projects)
+    .where(and(eq(projects.orgId, orgId), eq(projects.id, id)));
+  return row && row.status !== 'deleted' ? toProject(row) : null;
+}
+
 /**
  * Projects the principal may see: every project of the organization for roles that the matrix
  * grants `project.read` org-wide, otherwise only the projects they are a member of.

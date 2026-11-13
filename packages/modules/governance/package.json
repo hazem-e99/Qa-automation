@@ -23,7 +23,8 @@
     "@qos/db": "workspace:*",
     "@qos/identity": "workspace:*",
     "@qos/jobs": "workspace:*",
-    "@qos/integrations": "workspace:*"
+    "@qos/integrations": "workspace:*",
+    "@qos/projects": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*",

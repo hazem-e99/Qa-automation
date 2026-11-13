@@ -31,3 +31,30 @@ export async function runMigrations(pool: Pool, now: Date = new Date()): Promise
     client.release();
   }
 }
+
+/**
+ * Creates or updates the login role the services connect with, as a member of `qos_app`
+ * (doc 10 §2). Run by the migrate step with the owner's connection; the password comes from
+ * configuration and is applied on every run, so rotating it is just a restart of `migrate`.
+ */
+export async function provisionAppLogin(
+  pool: Pool,
+  login: { user: string; password: string },
+): Promise<void> {
+  if (!/^[a-z_][a-z0-9_]{2,62}$/.test(login.user)) throw new Error('invalid app database user name');
+  if (login.password.length < 16) throw new Error('app database password must have at least 16 characters');
+  const client = await pool.connect();
+  try {
+    const user = client.escapeIdentifier(login.user);
+    const password = client.escapeLiteral(login.password);
+    const exists = await client.query('select 1 from pg_roles where rolname = $1', [login.user]);
+    await client.query(
+      exists.rowCount
+        ? `alter role ${user} with login nosuperuser nocreatedb nocreaterole noreplication password ${password}`
+        : `create role ${user} with login nosuperuser nocreatedb nocreaterole noreplication password ${password}`,
+    );
+    await client.query(`grant qos_app to ${user}`);
+  } finally {
+    client.release();
+  }
+}

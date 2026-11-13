@@ -73,3 +73,15 @@ export async function getOperation(db: DbOrTx, id: string): Promise<OperationVie
     updatedAt: row.updatedAt.toISOString(),
   };
 }
+
+/** Who may see an operation: its creator, or readers of its project. For access checks only. */
+export async function operationOwner(
+  db: DbOrTx,
+  id: string,
+): Promise<{ projectId: string | null; createdBy: string } | null> {
+  const [row] = await db
+    .select({ projectId: operations.projectId, createdBy: operations.createdBy })
+    .from(operations)
+    .where(eq(operations.id, id));
+  return row ?? null;
+}

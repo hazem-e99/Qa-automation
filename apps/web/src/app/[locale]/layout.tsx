@@ -5,8 +5,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { Sidebar } from '@/components/sidebar';
-import { Topbar } from '@/components/topbar';
 import { routing } from '@/i18n/routing';
 import '../globals.css';
 
@@ -40,15 +38,7 @@ export default async function LocaleLayout({
           >
             {t('skipToContent')}
           </a>
-          <div className="flex h-full">
-            <Sidebar />
-            <div className="flex min-w-0 flex-1 flex-col">
-              <Topbar locale={locale} theme={theme} />
-              <main id="main" className="min-h-0 flex-1 overflow-auto p-6">
-                {children}
-              </main>
-            </div>
-          </div>
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>

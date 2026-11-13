@@ -16,7 +16,7 @@ import type { CoreInfra } from '@qos/kernel-infra';
 import { withIdempotency } from '@qos/platform';
 import { createProbe, getProbe } from '@qos/probe';
 import type { FastifyReply } from 'fastify';
-import { RequirePermission } from './access.js';
+import { Auth, RequirePermission, type AuthContext } from './access.js';
 import type { ApiConfig } from './config.js';
 import { CONFIG, INFRA } from './tokens.js';
 
@@ -37,13 +37,14 @@ export class ProbeController {
   async create(
     @Body() body: unknown,
     @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Auth() auth: AuthContext,
     @Res({ passthrough: true }) reply: FastifyReply,
   ): Promise<ProbeResponse> {
     this.assertEnabled();
     const input = CreateProbeRequest.parse(body);
     const deps = { db: this.infra.db, jobs: this.infra.jobs };
     if (idempotencyKey === undefined) {
-      const { id, operationId } = await createProbe(deps, input, 'anonymous');
+      const { id, operationId } = await createProbe(deps, input, auth.principal.userId);
       return { id, label: input.label, processedAt: null, operationId };
     }
     // The key record and the command share one transaction (doc 22 §4).
@@ -51,7 +52,7 @@ export class ProbeController {
       this.infra.db,
       { scope: 'platform.probe.create', key: idempotencyKey, request: input },
       async (tx) => {
-        const { id, operationId } = await createProbe(deps, input, 'anonymous', tx);
+        const { id, operationId } = await createProbe(deps, input, auth.principal.userId, tx);
         const response: ProbeResponse = { id, label: input.label, processedAt: null, operationId };
         return { status: 201, body: response };
       },

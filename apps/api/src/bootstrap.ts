@@ -85,7 +85,11 @@ export async function createApiApp(
   try {
     await syncRbacCatalog(infra.db);
     await operationEvents.start();
-    const adapter = new FastifyAdapter({ bodyLimit: 1_048_576, requestTimeout: 30_000 });
+    const adapter = new FastifyAdapter({
+      bodyLimit: 1_048_576,
+      requestTimeout: 30_000,
+      ...(config.TRUST_PROXY === 'false' ? {} : { trustProxy: config.TRUST_PROXY }),
+    });
     const app = await NestFactory.create<NestFastifyApplication>(
       AppModule.register(config, infra, operationEvents, storage, integrations),
       adapter,
@@ -131,10 +135,14 @@ export async function createApiApp(
     app.useGlobalFilters(new ApiErrorFilter(infra.logger));
     // Deny by default: every route must declare its access (BR-M13-1).
     app.useGlobalGuards(
-      new PolicyGuard(infra, {
-        idleMinutes: config.SESSION_IDLE_MINUTES,
-        absoluteDays: config.SESSION_ABSOLUTE_DAYS,
-      }),
+      new PolicyGuard(
+        infra,
+        {
+          idleMinutes: config.SESSION_IDLE_MINUTES,
+          absoluteDays: config.SESSION_ABSOLUTE_DAYS,
+        },
+        secrets,
+      ),
     );
     await app.init();
     const webhooks = createWebhookListener({ ...integrations, storage });

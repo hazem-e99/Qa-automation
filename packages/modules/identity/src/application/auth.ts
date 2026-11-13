@@ -3,6 +3,7 @@ import {
   and,
   appendAudit,
   eq,
+  mfaChallenges,
   organizations,
   orgMemberships,
   roles,
@@ -121,12 +122,60 @@ export async function setupFirstAdmin(db: Db, input: SetupInput): Promise<{ orgI
   });
 }
 
-export interface LoginResult {
+export interface SessionIssued {
+  readonly kind: 'session';
   /** Opaque session token for the cookie. Only its hash is stored. */
   readonly token: string;
   readonly csrfToken: string;
   readonly expiresAt: Date;
   readonly userId: string;
+}
+/** The password was right and the account has MFA: the client must send a code next. */
+export interface MfaRequired {
+  readonly kind: 'mfa_required';
+  /** Single-use challenge for `verifyMfaLogin`; only its hash is stored. Valid 5 minutes. */
+  readonly challengeToken: string;
+  readonly expiresAt: Date;
+}
+export type LoginResult = SessionIssued | MfaRequired;
+
+export const MFA_CHALLENGE_MINUTES = 5;
+export const hashOpaque = (token: string): string => createHash('sha256').update(token).digest('hex');
+
+/** Creates a session row in the caller's transaction. The token itself never touches the database. */
+export async function issueSession(
+  tx: Tx,
+  user: { id: string; orgId: string },
+  client: ClientInfo,
+  policy: SessionPolicy,
+  via: 'password' | 'mfa',
+): Promise<SessionIssued> {
+  // A new token on every login (no session fixation).
+  const token = randomBytes(32).toString('base64url');
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + policy.absoluteDays * 86_400_000);
+  await tx.insert(sessions).values({
+    id: sessionIdOf(token),
+    userId: user.id,
+    createdAt: now,
+    expiresAt,
+    lastSeenAt: now,
+    ip: client.ip ?? null,
+    ua: client.ua?.slice(0, 300) ?? null,
+  });
+  await tx.update(users).set({ lastLoginAt: now }).where(eq(users.id, user.id));
+  await appendAudit(tx, {
+    orgId: user.orgId,
+    actorType: 'user',
+    actorId: user.id,
+    action: 'identity.login',
+    targetType: 'user',
+    targetId: user.id,
+    summary: { via },
+    source: 'api',
+    ip: client.ip ?? null,
+  });
+  return { kind: 'session', token, csrfToken: csrfTokenFor(token), expiresAt, userId: user.id };
 }
 
 /**
@@ -169,34 +218,20 @@ export async function login(
     throw failed;
   }
 
-  // A new token on every login (no session fixation). The token never touches the database.
-  const token = randomBytes(32).toString('base64url');
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + policy.absoluteDays * 86_400_000);
-  await db.transaction(async (tx) => {
-    await tx.insert(sessions).values({
-      id: sessionIdOf(token),
+  if (user.mfaEnabledAt) {
+    // Second step needed. No session yet; the challenge is useless without a valid code.
+    const challengeToken = randomBytes(32).toString('base64url');
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + MFA_CHALLENGE_MINUTES * 60_000);
+    await db.insert(mfaChallenges).values({
+      id: hashOpaque(challengeToken),
       userId: user.id,
-      createdAt: now,
       expiresAt,
-      lastSeenAt: now,
-      ip: client.ip ?? null,
-      ua: client.ua?.slice(0, 300) ?? null,
+      createdAt: now,
     });
-    await tx.update(users).set({ lastLoginAt: now }).where(eq(users.id, user.id));
-    await appendAudit(tx, {
-      orgId: user.orgId,
-      actorType: 'user',
-      actorId: user.id,
-      action: 'identity.login',
-      targetType: 'user',
-      targetId: user.id,
-      summary: {},
-      source: 'api',
-      ip: client.ip ?? null,
-    });
-  });
-  return { token, csrfToken: csrfTokenFor(token), expiresAt, userId: user.id };
+    return { kind: 'mfa_required', challengeToken, expiresAt };
+  }
+  return db.transaction((tx) => issueSession(tx, user, client, policy, 'password'));
 }
 
 /**
@@ -271,5 +306,6 @@ export async function purgeExpiredSessions(
     sql`delete from identity.sessions
         where expires_at <= now() or last_seen_at < now() - make_interval(mins => ${policy.idleMinutes})`,
   );
+  await db.execute(sql`delete from identity.mfa_challenges where expires_at <= now()`);
   return res.rowCount ?? 0;
 }

@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./bootstrap": {
+      "types": "./dist/bootstrap.d.ts",
+      "default": "./dist/bootstrap.js"
+    }
+  },
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

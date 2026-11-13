@@ -63,7 +63,9 @@ afterAll(async () => {
 
 /** Opens a request as the author, the way a module action will once test cases exist (P4). */
 async function openRequest(content: string) {
-  const { token } = await login(t.db, { email: 'author@example.test', password: PW });
+  const result = await login(t.db, { email: 'author@example.test', password: PW });
+  if (result.kind !== 'session') throw new Error('unexpected MFA challenge');
+  const { token } = result;
   const principal = (await resolveSession(t.db, token))!;
   const projectId = (await t.pool.query("select id from projects.projects where key = 'GOV'")).rows[0].id;
   return t.db.transaction((tx) =>

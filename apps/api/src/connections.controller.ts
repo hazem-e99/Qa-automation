@@ -23,6 +23,7 @@ import {
   type IntegrationDeps,
 } from '@qos/integrations';
 import { DomainError } from '@qos/kernel-domain';
+import { bindingsUsingConnection } from '@qos/projects';
 import { ROLE_REQUIREMENTS, type BindingRole } from '@qos/ports';
 import { Auth, Authenticated, RequirePermission, type AuthContext } from './access.js';
 import { INTEGRATIONS } from './tokens.js';
@@ -130,8 +131,14 @@ export class ConnectionsController {
 
   @Get('connections/:id/impact')
   @RequirePermission('connection.retire')
-  impact(@Param('id') id: string, @Auth() auth: AuthContext) {
-    return connectionImpact(this.deps.db, actorOf(auth), Uuid.parse(id));
+  async impact(@Param('id') id: string, @Auth() auth: AuthContext) {
+    const connectionId = Uuid.parse(id);
+    const refs = await connectionImpact(this.deps.db, actorOf(auth), connectionId);
+    // Projects that would lose this binding: shown before retiring (T-P2-33).
+    return {
+      ...refs,
+      bindings: await bindingsUsingConnection(this.deps.db, auth.principal.orgId, connectionId),
+    };
   }
 
   @Post('connections/:id/retire')

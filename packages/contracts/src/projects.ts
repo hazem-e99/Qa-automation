@@ -10,6 +10,8 @@ export const CreateProjectRequest = z.object({
   tags: Tags.optional(),
   /** Demo project: may use the mock connections. Only offered when demo mode is on. */
   isDemo: z.boolean().optional(),
+  /** Built-in template id (`builtin-…`) or an organization template id (M02-FR-02). */
+  templateId: z.string().min(1).max(60).optional(),
 });
 export type CreateProjectRequest = z.infer<typeof CreateProjectRequest>;
 
@@ -51,3 +53,20 @@ export const ProjectPermissionsResponse = z.object({
   project: z.array(z.string()),
 });
 export type ProjectPermissionsResponse = z.infer<typeof ProjectPermissionsResponse>;
+
+export const ProjectTemplateResponse = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  builtin: z.boolean(),
+  settingsSections: z.array(z.string()),
+  environments: z.array(z.string()),
+  createdAt: z.iso.datetime().nullable(),
+});
+export type ProjectTemplateResponse = z.infer<typeof ProjectTemplateResponse>;
+export const SaveTemplateRequest = z
+  .object({ name: z.string().trim().min(2).max(80), description: z.string().max(500).optional() })
+  .strict();
+export const CloneProjectRequest = z
+  .object({ key: z.string().regex(/^[A-Z][A-Z0-9]{1,9}$/), name: z.string().trim().min(2).max(120) })
+  .strict();

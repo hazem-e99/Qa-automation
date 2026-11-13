@@ -1,4 +1,4 @@
-import { and, appendAudit, desc, eq, isNull, projectBindings, type Db } from '@qos/db';
+import { and, appendAudit, desc, eq, isNull, projectBindings, sql, type Db } from '@qos/db';
 import type { Principal } from '@qos/identity';
 import { checkConnectionForRole, getConnection } from '@qos/integrations';
 import { appendOutbox } from '@qos/jobs';
@@ -184,4 +184,81 @@ export async function listBindings(
     )
     .orderBy(projectBindings.role, desc(projectBindings.startedAt));
   return rows.map((r) => view(r));
+}
+
+export interface BindingHealth {
+  readonly bindingId: string;
+  readonly role: string;
+  readonly connectionId: string;
+  readonly connectionName: string;
+  readonly connectionStatus: string;
+  readonly lastTestedAt: string | null;
+  /** True when the last connection test confirms every required capability of the role. */
+  readonly ok: boolean;
+  readonly missingRequired: readonly string[];
+  readonly missingOptional: readonly string[];
+  readonly familyMismatch: boolean;
+}
+
+/**
+ * Health of each active binding (T-P2-17): does the connection, as last tested, still serve the
+ * role? Read-only; the scheduled check re-tests stale connections before computing this.
+ */
+export async function bindingHealth(db: Db, project: Project): Promise<BindingHealth[]> {
+  const orgActor = { orgId: project.orgId, userId: 'bindings.health' };
+  const out: BindingHealth[] = [];
+  for (const b of await listBindings(db, project)) {
+    const connection = await getConnection(db, orgActor, b.connectionId);
+    const diff = await checkConnectionForRole(db, orgActor, b.connectionId, b.role as BindingRole);
+    out.push({
+      bindingId: b.id,
+      role: b.role,
+      connectionId: b.connectionId,
+      connectionName: connection.displayName,
+      connectionStatus: connection.status,
+      lastTestedAt: connection.lastTestedAt,
+      ok: diff.ok,
+      missingRequired: [...diff.missingRequired, ...diff.missingAnyOf.map((g) => g.join('|'))],
+      missingOptional: [...diff.missingOptional],
+      familyMismatch: diff.familyMismatch,
+    });
+  }
+  return out;
+}
+
+/** Active bindings of every live project, for the scheduled health check. */
+export async function activeBindingsForHealthCheck(
+  db: Db,
+): Promise<{ projectId: string; orgId: string; projectKey: string; connectionId: string }[]> {
+  const res = await db.execute<{
+    project_id: string;
+    org_id: string;
+    key: string;
+    connection_id: string;
+  }>(sql`
+    select b.project_id, p.org_id, p.key, b.connection_id
+    from projects.project_bindings b
+    join projects.projects p on p.id = b.project_id and p.status in ('draft', 'active')
+    where b.ended_at is null`);
+  return res.rows.map((r) => ({
+    projectId: r.project_id,
+    orgId: r.org_id,
+    projectKey: r.key,
+    connectionId: r.connection_id,
+  }));
+}
+
+/** Active bindings that use a connection, for the retire impact view (T-P2-33). */
+export async function bindingsUsingConnection(
+  db: Db,
+  orgId: string,
+  connectionId: string,
+): Promise<{ projectKey: string; projectName: string; role: string }[]> {
+  const res = await db.execute<{ key: string; name: string; role: string }>(sql`
+    select p.key, p.name, b.role
+    from projects.project_bindings b
+    join projects.projects p on p.id = b.project_id and p.org_id = ${orgId} and p.status <> 'deleted'
+    where b.connection_id = ${connectionId} and b.ended_at is null
+    order by p.key, b.role`);
+  return res.rows.map((r) => ({ projectKey: r.key, projectName: r.name, role: r.role }));
 }

@@ -27,6 +27,8 @@ import {
   type Binding,
   type Environment,
   type Project,
+  bindingHealth,
+  type BindingHealth,
 } from '@qos/projects';
 import { Auth, CurrentProject, RequireProjectPermission, type AuthContext } from './access.js';
 import { INFRA, INTEGRATIONS } from './tokens.js';
@@ -93,6 +95,13 @@ export class ProjectConfigController {
     @CurrentProject() project: Project,
   ): Promise<void> {
     await deleteEnvironment(this.deps, auth.principal, project, Uuid.parse(envId));
+  }
+
+  /** Health of each active binding, from the last connection test (T-P2-17). */
+  @Get('bindings/health')
+  @RequireProjectPermission('project.read')
+  bindingsHealth(@CurrentProject() project: Project): Promise<BindingHealth[]> {
+    return bindingHealth(this.deps.db, project);
   }
 
   @Get('bindings')

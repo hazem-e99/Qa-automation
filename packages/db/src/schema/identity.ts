@@ -1,5 +1,7 @@
 import {
+  bigint,
   boolean,
+  integer,
   customType,
   index,
   jsonb,
@@ -43,6 +45,10 @@ export const users = identity.table(
     displayName: text('display_name').notNull(),
     passwordHash: text('password_hash'),
     mfaSecretRef: text('mfa_secret_ref'),
+    /** Set once the user confirmed a TOTP code; MFA is required at login from then on. */
+    mfaEnabledAt: timestamp('mfa_enabled_at', { withTimezone: true }),
+    /** Last accepted TOTP time step: a code is never accepted twice (replay). */
+    mfaLastStep: bigint('mfa_last_step', { mode: 'number' }),
     locale: text('locale').notNull().default('en'),
     timezone: text('timezone').notNull().default('UTC'),
     status: text('status').notNull(), // invited | active | deactivated
@@ -134,5 +140,128 @@ export const projectMemberships = identity.table(
   (t) => [
     primaryKey({ columns: [t.projectId, t.userId] }),
     index('project_memberships_user_ix').on(t.userId),
+  ],
+);
+
+/** One-time recovery codes for MFA, stored as SHA-256 hashes. */
+export const mfaRecoveryCodes = identity.table(
+  'mfa_recovery_codes',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    codeHash: text('code_hash').notNull(),
+    usedAt: timestamp('used_at', { withTimezone: true }),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.codeHash] })],
+);
+
+/**
+ * Second step of a login with MFA. The primary key is the SHA-256 of the challenge token handed
+ * to the client after a correct password; a challenge allows a few attempts and lives 5 minutes.
+ */
+export const mfaChallenges = identity.table(
+  'mfa_challenges',
+  {
+    id: text('id').primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    attempts: integer('attempts').notNull().default(0),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [index('mfa_challenges_user_ix').on(t.userId)],
+);
+
+/** Invitations (M13-FR-01): the token is shown once; only its hash is stored. */
+export const invitations = identity.table(
+  'invitations',
+  {
+    id: uuid('id').primaryKey(),
+    orgId: uuid('org_id')
+      .notNull()
+      .references(() => organizations.id),
+    /** The invited account (status `invited` until accepted). */
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    email: citext('email').notNull(),
+    orgRole: text('org_role'),
+    projectId: uuid('project_id'),
+    projectRole: text('project_role'),
+    tokenHash: text('token_hash').notNull(),
+    invitedBy: uuid('invited_by').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    acceptedAt: timestamp('accepted_at', { withTimezone: true }),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [uniqueIndex('invitations_token_ux').on(t.tokenHash), index('invitations_user_ix').on(t.userId)],
+);
+
+/** Admin-generated password reset links (M13 §13). Only the token hash is stored. */
+export const passwordResets = identity.table(
+  'password_resets',
+  {
+    id: uuid('id').primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    tokenHash: text('token_hash').notNull(),
+    createdBy: uuid('created_by').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    usedAt: timestamp('used_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [uniqueIndex('password_resets_token_ux').on(t.tokenHash)],
+);
+
+export const serviceAccounts = identity.table(
+  'service_accounts',
+  {
+    id: uuid('id').primaryKey(),
+    orgId: uuid('org_id')
+      .notNull()
+      .references(() => organizations.id),
+    name: text('name').notNull(),
+    description: text('description').notNull().default(''),
+    ownerUserId: uuid('owner_user_id')
+      .notNull()
+      .references(() => users.id),
+    status: text('status').notNull(), // active | disabled
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [uniqueIndex('service_accounts_org_name_ux').on(t.orgId, t.name)],
+);
+
+/**
+ * API tokens (M13-FR-04). The token is shown once. `prefix` identifies it; `token_hash` is an
+ * HMAC-SHA256 of the whole token with a pepper kept in the secret store.
+ */
+export const apiTokens = identity.table(
+  'api_tokens',
+  {
+    id: uuid('id').primaryKey(),
+    orgId: uuid('org_id')
+      .notNull()
+      .references(() => organizations.id),
+    ownerType: text('owner_type').notNull(), // service_account
+    ownerId: uuid('owner_id').notNull(),
+    name: text('name').notNull(),
+    prefix: text('prefix').notNull(),
+    tokenHash: text('token_hash').notNull(),
+    scopes: text('scopes').array().notNull(),
+    /** Null: every project of the organization. */
+    projectIds: uuid('project_ids').array(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    uniqueIndex('api_tokens_prefix_ux').on(t.prefix),
+    index('api_tokens_owner_ix').on(t.ownerType, t.ownerId),
   ],
 );

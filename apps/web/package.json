@@ -9,7 +9,8 @@
     "start": "next start --port 3000 --hostname 127.0.0.1",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:journeys": "playwright test --config playwright.journeys.config.ts"
   },
   "dependencies": {
     "@qos/contracts": "workspace:*",
@@ -21,7 +22,10 @@
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",
+    "@qos/adapters-secrets-db": "workspace:*",
+    "@qos/api": "workspace:*",
     "@qos/config": "workspace:*",
+    "@qos/db": "workspace:*",
     "@tailwindcss/postcss": "^4.3.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

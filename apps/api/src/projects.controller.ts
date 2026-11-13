@@ -12,7 +12,10 @@ import {
   Query,
 } from '@nestjs/common';
 import {
+  CloneProjectRequest,
   CreateProjectRequest,
+  SaveTemplateRequest,
+  type ProjectTemplateResponse,
   SetMemberRequest,
   UpdateProjectRequest,
   Uuid,
@@ -22,6 +25,7 @@ import {
 } from '@qos/contracts';
 import {
   listProjectMembers,
+  listUsers,
   orgPermissionsOf,
   projectPermissionsOf,
   removeProjectMember,
@@ -32,14 +36,20 @@ import type { CoreInfra } from '@qos/kernel-infra';
 import {
   archiveProject,
   assertProjectWritable,
+  cloneProject,
   createProject,
+  createProjectFromTemplate,
   deleteProject,
+  deleteTemplate,
+  listTemplates,
+  saveAsTemplate,
   listProjects,
   restoreProject,
   updateProject,
   type Project,
 } from '@qos/projects';
 import {
+  AllowToken,
   Auth,
   Authenticated,
   CurrentProject,
@@ -75,7 +85,12 @@ export class ProjectsController {
   async create(@Body() body: unknown, @Auth() auth: AuthContext): Promise<ProjectResponse> {
     const input = CreateProjectRequest.parse(body);
     if (input.isDemo && !this.config.QOS_DEMO_MODE) throw new DomainError('project.demo_mode_off');
-    return view(await createProject(this.infra.db, auth.principal, input));
+    const { templateId, ...fields } = input;
+    return view(
+      templateId
+        ? await createProjectFromTemplate(this.infra.db, auth.principal, fields, templateId)
+        : await createProject(this.infra.db, auth.principal, fields),
+    );
   }
 
   /** Only the projects the caller may see. Archived projects are left out unless asked for. */
@@ -93,6 +108,7 @@ export class ProjectsController {
 
   @Get(':key')
   @RequireProjectPermission('project.read')
+  @AllowToken('projects:read')
   get(@CurrentProject() project: Project): ProjectResponse {
     return view(project);
   }
@@ -130,6 +146,32 @@ export class ProjectsController {
     await deleteProject(this.infra.db, auth.principal, project);
   }
 
+  /** Saves this project's settings and environments (never secrets) as an organization template. */
+  @Post(':key/save-as-template')
+  @RequireProjectPermission('project.settings.manage')
+  @HttpCode(201)
+  saveAsTemplate(
+    @Body() body: unknown,
+    @Auth() auth: AuthContext,
+    @CurrentProject() project: Project,
+  ): Promise<ProjectTemplateResponse> {
+    return saveAsTemplate(this.infra.db, auth.principal, project, SaveTemplateRequest.parse(body));
+  }
+
+  /** New project with this project's configuration. Needs settings rights here and project.create. */
+  @Post(':key/clone')
+  @RequireProjectPermission('project.settings.manage')
+  @HttpCode(201)
+  async clone(
+    @Body() body: unknown,
+    @Auth() auth: AuthContext,
+    @CurrentProject() project: Project,
+  ): Promise<{ project: ProjectResponse; skippedBindings: { role: string; reason: string }[] }> {
+    if (!orgPermissionsOf(auth.principal).includes('project.create')) throw new DomainError('forbidden');
+    const r = await cloneProject(this.infra.db, auth.principal, project, CloneProjectRequest.parse(body));
+    return { project: view(r.project), skippedBindings: r.skippedBindings };
+  }
+
   /** The caller's permissions in this project, for UI gating. */
   @Get(':key/permissions')
   @RequireProjectPermission('project.read')
@@ -147,6 +189,17 @@ export class ProjectsController {
   @RequireProjectPermission('project.read')
   members(@CurrentProject() project: Project): Promise<MemberResponse[]> {
     return listProjectMembers(this.infra.db, project.id);
+  }
+
+  /** Active people of the organization who can be added to this project (for member pickers). */
+  @Get(':key/member-candidates')
+  @RequireProjectPermission('members.manage')
+  async memberCandidates(
+    @Auth() auth: AuthContext,
+  ): Promise<{ id: string; displayName: string; email: string }[]> {
+    return (await listUsers(this.infra.db, auth.principal.orgId))
+      .filter((u) => u.status === 'active')
+      .map((u) => ({ id: u.id, displayName: u.displayName, email: u.email }));
   }
 
   @Put(':key/members/:userId')
@@ -172,5 +225,24 @@ export class ProjectsController {
   ): Promise<void> {
     assertProjectWritable(project);
     await removeProjectMember(this.infra.db, auth.principal, project.id, Uuid.parse(userId));
+  }
+}
+
+/** Project templates (M02-FR-02): built-in ones plus those saved from projects. */
+@Controller('api/v1/project-templates')
+export class ProjectTemplatesController {
+  constructor(@Inject(INFRA) private readonly infra: CoreInfra) {}
+
+  @Get()
+  @RequirePermission('project.create')
+  list(@Auth() auth: AuthContext): Promise<ProjectTemplateResponse[]> {
+    return listTemplates(this.infra.db, auth.principal.orgId);
+  }
+
+  @Delete(':templateId')
+  @RequirePermission('project.create')
+  @HttpCode(204)
+  async remove(@Param('templateId') templateId: string, @Auth() auth: AuthContext): Promise<void> {
+    await deleteTemplate(this.infra.db, auth.principal, templateId);
   }
 }

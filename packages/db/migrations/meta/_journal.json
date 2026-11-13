@@ -85,6 +85,27 @@
       "when": 1794488194183,
       "tag": "0011_approvals_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794606404646,
+      "tag": "0012_identity_mfa_invites_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794607583395,
+      "tag": "0013_project_templates",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794608130226,
+      "tag": "0014_db_roles",
+      "breakpoints": true
     }
   ]
 }

@@ -21,6 +21,9 @@ const ENTRIES: readonly (readonly [string, () => string])[] = [
   ['POSTGRES_PASSWORD', () => secret(24)],
   ['POSTGRES_DB', () => 'qualityos'],
   ['POSTGRES_PORT', () => '55432'],
+  // Login of api and worker: a member of qos_app (DML only), provisioned by the migrate step.
+  ['QOS_APP_DB_USER', () => 'qos_app_login'],
+  ['QOS_APP_DB_PASSWORD', () => secret(24)],
   ['FILE_URL_SECRET', () => secret(32)],
   // One-time token for creating the first administrator (POST /api/v1/setup).
   ['SETUP_TOKEN', () => secret(32)],

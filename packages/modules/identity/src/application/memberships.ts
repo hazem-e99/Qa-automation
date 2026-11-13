@@ -128,7 +128,7 @@ export async function removeProjectMember(
   });
 }
 
-export async function listProjectMembers(db: Db, projectId: string): Promise<ProjectMember[]> {
+export async function listProjectMembers(db: Db | Tx, projectId: string): Promise<ProjectMember[]> {
   const rows = await db
     .select({ userId: users.id, email: users.email, displayName: users.displayName, role: roles.key })
     .from(projectMemberships)

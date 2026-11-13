@@ -62,7 +62,10 @@ export interface IntegrationDeps {
 
 export interface Actor {
   readonly orgId: string;
+  /** User id, or the job name when `system` is set. */
   readonly userId: string;
+  /** Set for scheduled jobs (audit actor type `system`, source `worker`). */
+  readonly system?: boolean;
 }
 
 type Row = typeof connections.$inferSelect;
@@ -279,13 +282,13 @@ export async function testConnection(deps: IntegrationDeps, actor: Actor, id: st
       .returning();
     await appendAudit(tx, {
       orgId: actor.orgId,
-      actorType: 'user',
+      actorType: actor.system ? 'system' : 'user',
       actorId: actor.userId,
       action: 'connection.tested',
       targetType: 'connection',
       targetId: id,
       summary: { status, errorKind, okCapabilities: capabilities.filter((c) => c.ok).length },
-      source: 'api',
+      source: actor.system ? 'worker' : 'api',
     });
     return u!;
   });

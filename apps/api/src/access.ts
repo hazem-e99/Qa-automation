@@ -1,5 +1,5 @@
 import { createParamDecorator, SetMetadata, type ExecutionContext } from '@nestjs/common';
-import type { Principal } from '@qos/identity';
+import type { Principal, TokenPrincipal, TokenScope } from '@qos/identity';
 import type { Project } from '@qos/projects';
 import type { FastifyRequest } from 'fastify';
 
@@ -28,12 +28,23 @@ export const RequirePermission = (permission: string) =>
 export const RequireProjectPermission = (permission: string) =>
   SetMetadata(ACCESS_METADATA, { kind: 'permission', permission, scope: 'project' } satisfies Access);
 
+export const TOKEN_SCOPE_METADATA = 'qos:token-scope';
+/**
+ * Also accept an API token (`Authorization: Bearer qos_...`) carrying this scope. Routes without
+ * it refuse tokens (BR-M13-6). A handler that allows tokens must not use `Auth()`.
+ */
+export const AllowToken = (scope: TokenScope) => SetMetadata(TOKEN_SCOPE_METADATA, scope);
+
 export interface AuthContext {
   readonly principal: Principal;
   /** Raw session token of this request, needed to derive the CSRF token. Never logged. */
   readonly sessionToken: string;
 }
-export type AuthedRequest = FastifyRequest & { qosAuth?: AuthContext; qosProject?: Project };
+export type AuthedRequest = FastifyRequest & {
+  qosAuth?: AuthContext;
+  qosToken?: TokenPrincipal;
+  qosProject?: Project;
+};
 
 /** Injects the authentication context that the policy guard attached to the request. */
 export const Auth = createParamDecorator((_data: unknown, ctx: ExecutionContext): AuthContext => {

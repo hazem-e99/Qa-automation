@@ -20,8 +20,10 @@
   },
   "dependencies": {
     "@qos/db": "workspace:*",
+    "@qos/jobs": "workspace:*",
     "@qos/kernel-domain": "workspace:*",
     "@qos/observability": "workspace:*",
+    "@qos/ports": "workspace:*",
     "argon2": "~0.45.2"
   },
   "devDependencies": {

@@ -131,7 +131,7 @@ describe('connections API', () => {
   });
 
   it('retires the connection and keeps it listed as retired', async () => {
-    expect(await (await admin.fetch(C(`/${id}/impact`))).json()).toEqual({ externalRefs: {} });
+    expect(await (await admin.fetch(C(`/${id}/impact`))).json()).toEqual({ externalRefs: {}, bindings: [] });
     const res = await admin.fetch(C(`/${id}/retire`), send('POST'));
     expect(ConnectionResponse.parse(await res.json())).toMatchObject({
       status: 'retired',

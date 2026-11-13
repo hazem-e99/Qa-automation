@@ -74,7 +74,7 @@ function parseUrl(raw: string, field: string): URL {
  * host must be on the egress allow-list, because test runs may only reach allowed hosts. Hosts of
  * the base URLs are added to the allow-list when it is empty.
  */
-function validate(input: EnvironmentInput) {
+export function validateEnvironment(input: EnvironmentInput) {
   const name = input.name.trim();
   if (name.length < 1 || name.length > 60) throw new DomainError('environment.name_invalid');
   if (input.baseUrls.length < 1) throw new DomainError('environment.url_invalid', { field: 'baseUrls' });
@@ -158,7 +158,7 @@ export async function createEnvironment(
   input: EnvironmentInput,
 ): Promise<Environment> {
   assertProjectWritable(project);
-  const v = validate(input);
+  const v = validateEnvironment(input);
   if (input.authSecret && !deps.secrets) throw new DomainError('secrets.unavailable');
   return deps.db.transaction(async (tx) => {
     const id = uuidv7();
@@ -203,7 +203,7 @@ export async function updateEnvironment(
   input: EnvironmentInput,
 ): Promise<Environment> {
   assertProjectWritable(project);
-  const v = validate(input);
+  const v = validateEnvironment(input);
   if (input.authSecret && !deps.secrets) throw new DomainError('secrets.unavailable');
   return deps.db.transaction(async (tx) => {
     const [current] = await tx

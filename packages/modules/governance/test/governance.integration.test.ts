@@ -25,6 +25,13 @@ import {
   setPreferences,
 } from '../src/index.js';
 
+/** Password login that must yield a session (these accounts have no MFA). */
+async function loginSession(...args: Parameters<typeof login>) {
+  const r = await login(...args);
+  if (r.kind !== 'session') throw new Error('unexpected MFA challenge');
+  return r;
+}
+
 const PW = 'a long enough password';
 let t: TestDatabase;
 let orgId: string;
@@ -39,7 +46,7 @@ async function user(email: string): Promise<Principal> {
      values ($1, $2, $3, $4, $5, 'active', now())`,
     [id, orgId, email, email, await hashPassword(PW)],
   );
-  const { token } = await login(t.db, { email, password: PW });
+  const { token } = await loginSession(t.db, { email, password: PW });
   return (await resolveSession(t.db, token))!;
 }
 async function project(members: [Principal, RoleKey][]): Promise<string> {
@@ -77,7 +84,7 @@ beforeAll(async () => {
     displayName: 'A',
     password: PW,
   }));
-  const { token } = await login(t.db, { email: 'admin@example.test', password: PW });
+  const { token } = await loginSession(t.db, { email: 'admin@example.test', password: PW });
   admin = (await resolveSession(t.db, token))!;
 }, 180_000);
 afterAll(async () => {
