@@ -40,7 +40,8 @@
     "zod": "~4.6.7",
     "@qos/adapters-github": "workspace:*",
     "@qos/adapters-azure-devops": "workspace:*",
-    "@qos/adapters-ai-gemini": "workspace:*"
+    "@qos/adapters-ai-gemini": "workspace:*",
+    "@qos/adapters-local-git": "workspace:*"
   },
   "devDependencies": {
     "@qos/adapters-secrets-db": "workspace:*",

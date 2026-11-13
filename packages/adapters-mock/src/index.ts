@@ -7,6 +7,9 @@ import {
   type CapabilityId,
   type CapabilityManifest,
   type CloneCredential,
+  type IssueTracker,
+  type TrackerMetadata,
+  type TrackerStateCategory,
   type ConnectionContext,
   type ConnectionTestResult,
   type ExternalRefData,
@@ -280,7 +283,7 @@ export class MockRepositoryProvider extends MockAdapter implements RepositoryPro
 }
 
 /** Issue tracker mock. Only the connection test is used before P8. */
-export class MockIssueTracker extends MockAdapter {
+export class MockIssueTracker extends MockAdapter implements IssueTracker {
   static readonly TYPE = 'mock_issue_tracker';
   protected readonly base: CapabilityManifest = {
     providerType: MockIssueTracker.TYPE,
@@ -309,4 +312,38 @@ export class MockIssueTracker extends MockAdapter {
     'issues.update@1': 'issues:write',
     'issues.comment@1': 'issues:write',
   } as const;
+
+  /**
+   * Metadata of an Agile-like process. `states=A|B|C` in the credential replaces the state list
+   * (simulates a tracker whose process gained or lost states).
+   */
+  async getMetadata(ctx: ConnectionContext): Promise<TrackerMetadata> {
+    this.controls.enter();
+    this.require('issues.metadata.read@1');
+    const custom = /states=([A-Za-z|]+)/.exec(await ctx.secret())?.[1];
+    const category = (name: string): TrackerStateCategory =>
+      (({
+        New: 'proposed',
+        Active: 'in_progress',
+        Resolved: 'resolved',
+        Closed: 'completed',
+        Removed: 'removed',
+      })[name] as TrackerStateCategory | undefined) ?? 'in_progress';
+    const states = (custom ? custom.split('|') : ['New', 'Active', 'Resolved', 'Closed', 'Removed']).map(
+      (name) => ({
+        name,
+        category: category(name),
+      }),
+    );
+    return {
+      types: ['Bug', 'Task', 'User Story'],
+      states,
+      priorities: ['1', '2', '3', '4'],
+      severities: ['1 - Critical', '2 - High', '3 - Medium', '4 - Low'],
+      fields: [
+        { name: 'System.Title', required: true },
+        { name: 'Microsoft.VSTS.TCM.ReproSteps', required: false },
+      ],
+    };
+  }
 }

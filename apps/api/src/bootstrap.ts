@@ -4,6 +4,7 @@ import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fa
 import { GeminiConnection } from '@qos/adapters-ai-gemini';
 import { AzureDevOpsConnection } from '@qos/adapters-azure-devops';
 import { GitHubRepositoryProvider } from '@qos/adapters-github';
+import { LocalGitRepositoryProvider } from '@qos/adapters-local-git';
 import { MockIssueTracker, MockRepositoryProvider } from '@qos/adapters-mock';
 import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
 import { LocalFsObjectStorage } from '@qos/adapters-storage-localfs';
@@ -74,6 +75,8 @@ export async function createApiApp(
     .register(new GitHubRepositoryProvider())
     .register(new AzureDevOpsConnection())
     .register(new GeminiConnection());
+  if (config.QOS_LOCAL_GIT_ROOTS.length)
+    registry.register(new LocalGitRepositoryProvider({ roots: config.QOS_LOCAL_GIT_ROOTS }));
   if (config.QOS_DEMO_MODE) registry.register(new MockRepositoryProvider()).register(new MockIssueTracker());
   const integrations: IntegrationDeps = {
     db: infra.db,

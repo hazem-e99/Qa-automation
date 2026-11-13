@@ -223,6 +223,9 @@ importers:
       '@qos/adapters-github':
         specifier: workspace:*
         version: link:../../packages/adapters-github
+      '@qos/adapters-local-git':
+        specifier: workspace:*
+        version: link:../../packages/adapters-local-git
       '@qos/adapters-mock':
         specifier: workspace:*
         version: link:../../packages/adapters-mock
@@ -403,6 +406,9 @@ importers:
       '@qos/adapters-github':
         specifier: workspace:*
         version: link:../../packages/adapters-github
+      '@qos/adapters-local-git':
+        specifier: workspace:*
+        version: link:../../packages/adapters-local-git
       '@qos/adapters-mock':
         specifier: workspace:*
         version: link:../../packages/adapters-mock
@@ -492,6 +498,19 @@ importers:
         version: link:../contract-tests
 
   packages/adapters-github:
+    dependencies:
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../config
+      '@qos/contract-tests':
+        specifier: workspace:*
+        version: link:../contract-tests
+
+  packages/adapters-local-git:
     dependencies:
       '@qos/ports':
         specifier: workspace:*

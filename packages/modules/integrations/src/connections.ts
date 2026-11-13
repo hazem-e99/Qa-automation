@@ -114,6 +114,17 @@ function checkBaseUrl(raw: string | null | undefined): string | null {
   return url.origin + url.pathname.replace(/\/+$/, '');
 }
 
+/** A folder for local providers: absolute, no traversal. The adapter enforces its allow-list. */
+function checkLocalPath(raw: string | null | undefined): string {
+  const p = (raw ?? '').trim();
+  const absolute = p.startsWith('/') || /^[A-Za-z]:[\\/]/.test(p);
+  const traversal = /(^|[\\/])\.\.([\\/]|$)/.test(p);
+  if (!absolute || traversal || p.length > 500 || p.includes('\u0000')) {
+    throw new DomainError('connection.base_url_invalid');
+  }
+  return p.replace(/[\\/]+$/, '') || p;
+}
+
 export async function createConnection(
   deps: IntegrationDeps,
   actor: Actor,
@@ -128,7 +139,8 @@ export async function createConnection(
   const needsCredential = input.authStrategy !== 'none';
   if (needsCredential && !input.credential) throw new DomainError('connection.credential_required');
   if (needsCredential && !deps.secrets) throw new DomainError('secrets.unavailable');
-  const baseUrl = checkBaseUrl(input.baseUrl);
+  const baseUrl =
+    manifest.locator === 'local_path' ? checkLocalPath(input.baseUrl) : checkBaseUrl(input.baseUrl);
 
   return deps.db.transaction(async (tx) => {
     const taken = await tx

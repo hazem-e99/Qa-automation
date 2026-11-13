@@ -171,3 +171,28 @@ export const syncErrors = integrationsSchema.table(
   },
   (t) => [index('sync_errors_run_ix').on(t.syncRunId)],
 );
+
+/**
+ * Value mappings of a tracker binding (M03-FR-07, doc 10 `status_mappings`/`field_mappings`/
+ * `type_mappings` folded into one versioned row per binding and kind). `discovered` holds the
+ * external values the provider reported at the last discovery, which the lint checks against.
+ */
+export const valueMappings = integrationsSchema.table(
+  'value_mappings',
+  {
+    id: uuid('id').primaryKey(),
+    projectId: uuid('project_id').notNull(),
+    bindingId: uuid('binding_id').notNull(),
+    kind: text('kind').notNull(), // status | severity | priority | type
+    entries: jsonb('entries').notNull(), // [{ external, canonical }]
+    discovered: jsonb('discovered'), // string[] | null
+    discoveredAt: timestamp('discovered_at', { withTimezone: true }),
+    version: integer('version').notNull().default(0),
+    updatedBy: uuid('updated_by'),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    uniqueIndex('value_mappings_binding_kind_ux').on(t.bindingId, t.kind),
+    index('value_mappings_project_ix').on(t.projectId),
+  ],
+);

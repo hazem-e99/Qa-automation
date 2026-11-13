@@ -171,6 +171,19 @@ test('the integration hub shows the demo connections and the retire impact', asy
   for (const key of ['SHOP', 'API', 'WS']) await expect(impact).toContainText(key);
 });
 
+test('the mapping editor discovers tracker values, then defect sync can be activated (M03-AC-09)', async () => {
+  await page.goto('/en/projects/SHOP/settings?tab=mappings');
+  await expect(page.getByTestId('toggle-defect-sync')).toHaveText('Activate');
+  await page.getByTestId('toggle-defect-sync').click();
+  await expect(page.getByTestId('mapping-message')).toContainText('Discover');
+  await page.getByTestId('discover').click();
+  const status = page.getByTestId('mapping-status');
+  await expect(status.locator('tr[data-external="Active"]')).toBeVisible();
+  await expect(status).toContainText('Valid');
+  await page.getByTestId('toggle-defect-sync').click();
+  await expect(page.getByTestId('mapping-message')).toHaveText('Defect sync is on.');
+});
+
 test('Arabic pages render right-to-left with translated text', async () => {
   await page.goto('/ar/projects/WS');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');

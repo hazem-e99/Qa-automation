@@ -5,6 +5,7 @@ import { NestFactory } from '@nestjs/core';
 import { GeminiConnection } from '@qos/adapters-ai-gemini';
 import { AzureDevOpsConnection } from '@qos/adapters-azure-devops';
 import { GitHubRepositoryProvider } from '@qos/adapters-github';
+import { LocalGitRepositoryProvider } from '@qos/adapters-local-git';
 import { MockIssueTracker, MockRepositoryProvider } from '@qos/adapters-mock';
 import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
 import { PROBE_CREATED_EVENT } from '@qos/contracts';
@@ -39,6 +40,19 @@ export const WorkerConfig = BaseConfig.extend({
   BINDINGS_HEALTH_SECONDS: z.coerce.number().int().min(10).max(86_400).default(3600),
   BINDINGS_STALE_HOURS: z.coerce.number().min(0).max(168).default(6),
   QOS_MASTER_KEY_FILE: z.string().min(1).optional(),
+  /**
+   * Folders the Local Git adapter may read (doc 13 §7), comma-separated absolute paths. Mount them
+   * read-only. Empty: the adapter is not registered.
+   */
+  QOS_LOCAL_GIT_ROOTS: z
+    .string()
+    .default('')
+    .transform((v) =>
+      v
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
   QOS_DEMO_MODE: z
     .enum(['true', 'false'])
     .default('false')
@@ -115,6 +129,8 @@ export async function createWorkerApp(env: NodeJS.ProcessEnv = process.env): Pro
     .register(new GitHubRepositoryProvider())
     .register(new AzureDevOpsConnection())
     .register(new GeminiConnection());
+  if (config.QOS_LOCAL_GIT_ROOTS.length)
+    registry.register(new LocalGitRepositoryProvider({ roots: config.QOS_LOCAL_GIT_ROOTS }));
   if (config.QOS_DEMO_MODE) registry.register(new MockRepositoryProvider()).register(new MockIssueTracker());
   const integrations: IntegrationDeps = {
     db: infra.db,

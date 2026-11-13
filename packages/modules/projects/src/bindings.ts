@@ -262,3 +262,55 @@ export async function bindingsUsingConnection(
     order by p.key, b.role`);
   return res.rows.map((r) => ({ projectKey: r.key, projectName: r.name, role: r.role }));
 }
+
+/** One active binding of the project, or a 404-style error. */
+export async function getActiveBinding(db: Db, project: Project, bindingId: string): Promise<Binding> {
+  if (!/^[0-9a-f-]{36}$/i.test(bindingId)) throw new DomainError('binding.not_found');
+  const [row] = await db
+    .select()
+    .from(projectBindings)
+    .where(
+      and(
+        eq(projectBindings.id, bindingId),
+        eq(projectBindings.projectId, project.id),
+        isNull(projectBindings.endedAt),
+      ),
+    );
+  if (!row) throw new DomainError('binding.not_found');
+  return view(row);
+}
+
+/**
+ * Turns defect sync on or off for an issue-tracker binding (`config.defectSync`). The caller
+ * checks the preconditions (complete status mapping, BR-M03-6) before enabling. Audited.
+ */
+export async function setDefectSync(
+  db: Db,
+  actor: Principal,
+  project: Project,
+  bindingId: string,
+  enabled: boolean,
+): Promise<Binding> {
+  assertProjectWritable(project);
+  const current = await getActiveBinding(db, project, bindingId);
+  if (current.role !== 'issue_tracker') throw new DomainError('binding.role_invalid', { role: current.role });
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .update(projectBindings)
+      .set({ config: { ...current.config, defectSync: enabled } })
+      .where(eq(projectBindings.id, bindingId))
+      .returning();
+    await appendAudit(tx, {
+      orgId: actor.orgId,
+      projectId: project.id,
+      actorType: 'user',
+      actorId: actor.userId,
+      action: enabled ? 'binding.defect_sync.enabled' : 'binding.defect_sync.disabled',
+      targetType: 'binding',
+      targetId: bindingId,
+      summary: { role: current.role },
+      source: 'api',
+    });
+    return view(row!);
+  });
+}

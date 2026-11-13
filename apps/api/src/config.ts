@@ -15,6 +15,19 @@ export const ApiConfig = BaseConfig.extend({
   STORAGE_DIR: z.string().min(1).default('./var/storage'),
   /** Secret for signed file links. When unset, the /files endpoint answers 404. */
   FILE_URL_SECRET: z.string().min(32, 'must be at least 32 characters').optional(),
+  /**
+   * Folders the Local Git adapter may read (doc 13 §7), comma-separated absolute paths. Mount them
+   * read-only. Empty: the adapter is not registered.
+   */
+  QOS_LOCAL_GIT_ROOTS: z
+    .string()
+    .default('')
+    .transform((v) =>
+      v
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
   /** Registers the mock providers (labelled Demo). Never enable on an installation with real data. */
   QOS_DEMO_MODE: z
     .enum(['true', 'false'])

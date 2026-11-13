@@ -6,6 +6,7 @@ import { ApprovalsTab } from './approvals-tab';
 import { BindingsTab } from './bindings-tab';
 import { EnvironmentsTab } from './environments-tab';
 import { GeneralTab } from './general-tab';
+import { MappingsTab } from './mappings-tab';
 import { MembersTab } from './members-tab';
 import { RulesTab } from './rules-tab';
 
@@ -36,6 +37,7 @@ export default async function ProjectSettings({
       {tab === 'general' ? <GeneralTab {...props} /> : null}
       {tab === 'environments' ? <EnvironmentsTab {...props} /> : null}
       {tab === 'bindings' ? <BindingsTab {...props} /> : null}
+      {tab === 'mappings' ? <MappingsTab {...props} /> : null}
       {tab === 'rules' ? <RulesTab {...props} /> : null}
       {tab === 'members' ? <MembersTab {...props} /> : null}
       {tab === 'approvals' ? <ApprovalsTab {...props} /> : null}

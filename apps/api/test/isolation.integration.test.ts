@@ -65,6 +65,9 @@ const BODIES: Record<string, unknown> = {
   'PUT /api/v1/projects/:key/environments/:envId': { name: 'hijacked', baseUrls: ['https://x.example.test'] },
   'PUT /api/v1/projects/:key/settings/:section': { expectedVersion: 0, data: {} },
   'PUT /api/v1/projects/:key/approval-policies/:action': { rules: { minApprovals: 1 } },
+  'PUT /api/v1/projects/:key/mappings/:kind': { expectedVersion: 0, entries: [] },
+  'POST /api/v1/projects/:key/mappings/:kind/validate': { entries: [] },
+  'POST /api/v1/projects/:key/defect-sync': { enabled: false },
   'POST /api/v1/connections/:id/rotate-secret': { credential: 'mock-hijack-credential' },
   'POST /api/v1/connections/:id/webhook': {},
   'POST /api/v1/approvals/:id/approve': {},
@@ -98,6 +101,7 @@ function foreignPaths(route: { method: string; path: string }): string[] {
       .replace(':templateId', foreignOrg.template)
       .replace(':section', 'quality')
       .replace(':action', 'testcase.approve')
+      .replace(':kind', 'status')
       .replace(':id', id ?? ':id');
   const out = [fill('TWO', { env: foreignOrg.env, binding: foreignOrg.binding, user: foreignOrg.user })];
   // Own project key, sub-resource of another project (same org) or another org.

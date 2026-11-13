@@ -17,7 +17,6 @@ beforeAll(async () => {
     NODE_ENV: 'test',
     LOG_LEVEL: 'silent',
     API_PORT: '0',
-    WEBHOOK_PORT: '0',
     ...AUTH_ENV,
   });
   base = await api.listen();

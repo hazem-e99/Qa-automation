@@ -46,6 +46,11 @@ export interface CapabilityManifest {
   };
   /** Demo/mock adapters: their connections can only be bound to demo projects (doc 11 §8). */
   readonly demoOnly?: boolean;
+  /**
+   * What the connection's base URL holds. Default: an https URL (SSRF-checked). `local_path`: an
+   * absolute folder on the server, which the adapter checks against its own allow-list.
+   */
+  readonly locator?: 'https' | 'local_path';
 }
 
 export interface ConnectionTestResult {
@@ -210,3 +215,18 @@ export interface RepositoryProvider extends ProviderAdapter {
 
 /** Branches QualityOS may create or push to (doc 12 §4.1). */
 export const QOS_BRANCH_PREFIX = 'qos/';
+
+// ---- issue tracking (doc 12 §4.3, the subset used up to P2) ----
+export type TrackerStateCategory = 'proposed' | 'in_progress' | 'resolved' | 'completed' | 'removed';
+/** What the tracker accepts, used to build and lint mappings (M03-FR-07/13). */
+export interface TrackerMetadata {
+  readonly types: readonly string[];
+  readonly states: readonly { readonly name: string; readonly category: TrackerStateCategory }[];
+  readonly priorities: readonly string[];
+  readonly severities: readonly string[];
+  readonly fields: readonly { readonly name: string; readonly required: boolean }[];
+}
+/** Issue creation, sync and transitions arrive with P8; P2 needs the metadata for mappings. */
+export interface IssueTracker extends ProviderAdapter {
+  getMetadata(ctx: ConnectionContext, scope: { readonly project?: string }): Promise<TrackerMetadata>;
+}

@@ -74,6 +74,13 @@ const DOMAIN_STATUS: Readonly<Record<string, number>> = {
   'template.name_taken': 409,
   'template.builtin': 409,
   'audit.cursor_invalid': 400,
+  'mapping.no_tracker': 404,
+  'mapping.kind_unknown': 404,
+  'mapping.version_conflict': 409,
+  'mapping.incomplete': 409,
+  'mapping.not_discovered': 409,
+  'mapping.discovery_failed': 502,
+  'binding.role_invalid': 422,
 };
 
 /**

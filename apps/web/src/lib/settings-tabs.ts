@@ -3,6 +3,7 @@ export const SETTINGS_TABS = [
   'general',
   'environments',
   'bindings',
+  'mappings',
   'rules',
   'members',
   'approvals',
