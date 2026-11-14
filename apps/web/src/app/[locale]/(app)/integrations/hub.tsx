@@ -170,13 +170,13 @@ export function IntegrationHub() {
               </Select>
             </Field>
             <Field label={t('baseUrl')} hint={t('baseUrlHint')}>
-              <Input name="baseUrl" dir="ltr" placeholder="https://" />
+              <Input name="baseUrl" dir="ltr" placeholder="https://" autoComplete="off" />
             </Field>
             <Field label={t('credential')} hint={t('credentialHint')}>
               <Input
                 name="credential"
                 type="password"
-                autoComplete="off"
+                autoComplete="new-password"
                 dir="ltr"
                 data-testid="connection-credential"
               />

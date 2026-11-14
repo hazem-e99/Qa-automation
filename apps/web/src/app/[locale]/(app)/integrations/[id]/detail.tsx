@@ -203,7 +203,7 @@ export function ConnectionDetail({ id }: { id: string }) {
                   name="credential"
                   type="password"
                   required
-                  autoComplete="off"
+                  autoComplete="new-password"
                   dir="ltr"
                   data-testid="rotate-credential"
                 />

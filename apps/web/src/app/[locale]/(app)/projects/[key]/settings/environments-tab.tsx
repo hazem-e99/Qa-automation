@@ -183,7 +183,7 @@ export function EnvironmentsTab({ project, permissions }: TabProps) {
               label={t('authSecret')}
               hint={current?.hasAuthSecret ? t('authSecretKeep') : t('authSecretHint')}
             >
-              <Input name="authSecret" type="password" autoComplete="off" dir="ltr" />
+              <Input name="authSecret" type="password" autoComplete="new-password" dir="ltr" />
             </Field>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" name="isProduction" defaultChecked={current?.isProduction ?? false} />{' '}

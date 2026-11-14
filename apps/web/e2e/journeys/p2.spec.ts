@@ -1,4 +1,6 @@
 import { createHmac } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
@@ -11,6 +13,8 @@ const SETUP_TOKEN = 'journey-test-setup-token-0123456789abcdef';
 const ADMIN = { email: 'lead@example.test', password: 'journey admin password 1' };
 let page: Page;
 let mfaSecret = '';
+/** Every secret the journey handles; none may reach a log line (M14-AC-07). */
+const secrets: string[] = [SETUP_TOKEN, ADMIN.password, 'quinn long password 9'];
 
 /** RFC 6238 TOTP, independent of the code under test. */
 function totp(secretB32: string, at = Date.now()): string {
@@ -112,6 +116,7 @@ test('an invited person accepts the link and lands in the project', async ({ bro
   await page.getByTestId('invite-role').selectOption('qa_engineer');
   await page.getByTestId('send-invite').click();
   const link = (await page.getByTestId('secret-value').textContent())!.trim();
+  secrets.push(link.split('#')[1]!);
   expect(link).toMatch(/\/invite#[A-Za-z0-9_-]{43}$/);
 
   const other = await browser.newPage();
@@ -138,6 +143,7 @@ test('MFA: enroll, sign out, and sign in with a code', async () => {
   await page.goto('/en/me');
   await page.getByTestId('mfa-enroll').click();
   mfaSecret = (await page.getByTestId('mfa-secret').textContent())!.trim();
+  secrets.push(mfaSecret);
   await page.getByTestId('mfa-confirm-code').fill(totp(mfaSecret));
   await page.getByTestId('mfa-confirm').click();
   await expect(page.getByTestId('recovery-codes')).toBeVisible();
@@ -190,4 +196,12 @@ test('Arabic pages render right-to-left with translated text', async () => {
   await expect(page.getByRole('link', { name: 'الإعدادات' })).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test('no secret used in the journeys appears in any API log line (M14-AC-07)', () => {
+  const log = readFileSync(path.resolve('test-results/journeys/api.log'), 'utf8');
+  expect(log.split('\n').length).toBeGreaterThan(50);
+  expect(secrets.length).toBeGreaterThanOrEqual(5);
+  for (const s of secrets)
+    expect(log.includes(s), `a secret of length ${s.length} is in the log`).toBe(false);
 });
