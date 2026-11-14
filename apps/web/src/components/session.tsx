@@ -40,6 +40,8 @@ export interface ApiOptions {
   readonly body?: unknown;
   /** Extra request headers, e.g. the setup token of the first-run page. */
   readonly headers?: Record<string, string>;
+  /** A raw body (file upload) sent as `application/octet-stream` instead of JSON. */
+  readonly raw?: Blob;
 }
 
 /** Calls the API through the web origin's proxy. State-changing calls carry the CSRF token. */
@@ -49,12 +51,13 @@ export async function callApi<T>(
 ): Promise<T> {
   const method = opts.method ?? 'GET';
   const headers: Record<string, string> = { accept: 'application/json', ...opts.headers };
-  if (opts.body !== undefined) headers['content-type'] = 'application/json';
+  if (opts.raw) headers['content-type'] = 'application/octet-stream';
+  else if (opts.body !== undefined) headers['content-type'] = 'application/json';
   if (method !== 'GET' && opts.csrfToken) headers['x-csrf-token'] = opts.csrfToken;
   const res = await fetch(`/api/v1${path}`, {
     method,
     headers,
-    body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
+    body: opts.raw ?? (opts.body === undefined ? undefined : JSON.stringify(opts.body)),
     credentials: 'same-origin',
     cache: 'no-store',
   });

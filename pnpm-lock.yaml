@@ -382,6 +382,9 @@ importers:
       '@qos/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@qos/requirements':
+        specifier: workspace:*
+        version: link:../../packages/modules/requirements
       '@tailwindcss/postcss':
         specifier: ^4.3.5
         version: 4.3.5

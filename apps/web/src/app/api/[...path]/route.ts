@@ -18,6 +18,8 @@ const REQUEST_HEADERS = [
 ];
 const RESPONSE_HEADERS = [
   'content-type',
+  'content-disposition',
+  'x-content-type-options',
   'cache-control',
   'retry-after',
   'x-correlation-id',

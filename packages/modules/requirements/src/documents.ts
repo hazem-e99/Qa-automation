@@ -917,6 +917,15 @@ async function parsedOf(deps: Pick<DocumentDeps, 'db' | 'storage'>, project: Pro
   return { doc, sourceId: row.sourceId };
 }
 
+/** The parser output of a snapshot, for the source viewer (M04 §7 `/snapshots/{id}/parsed`). */
+export async function getParsedDocument(
+  deps: Pick<DocumentDeps, 'db' | 'storage'>,
+  project: Project,
+  snapshotId: string,
+): Promise<ParsedDocument> {
+  return (await parsedOf(deps, project, snapshotId)).doc;
+}
+
 export interface MappingPreview {
   readonly tables: { table: string; rows: number; header: string[]; suggested: ColumnMapping }[];
   readonly mapping: ColumnMapping | null;

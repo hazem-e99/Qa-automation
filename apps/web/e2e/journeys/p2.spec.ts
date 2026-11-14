@@ -4,8 +4,9 @@ import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * P2 journeys in demo mode, one ordered story on one fresh backend:
- * first-run setup → demo seed → project wizard (M02-AC-01) → settings → invitation → MFA → audit.
+ * P2 and P3 journeys in demo mode, one ordered story on one fresh backend:
+ * first-run setup → demo seed → project wizard (M02-AC-01) → settings → invitation → MFA → audit
+ * → requirements: manual entry, search, upload, side-by-side review, trace link, export.
  */
 test.describe.configure({ mode: 'serial' });
 
@@ -194,6 +195,116 @@ test('Arabic pages render right-to-left with translated text', async () => {
   await page.goto('/ar/projects/WS');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await expect(page.getByRole('link', { name: 'الإعدادات' })).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+// ---- P3: requirements (J2 without AI) ----
+
+const CORPUS = path.resolve('../../spikes/parser/corpus/files');
+
+test('P3: a requirement written by hand is found by a search without diacritics (M04-AC-06)', async () => {
+  await page.goto('/en/projects/WS/requirements');
+  await expect(page.getByTestId('empty-state')).toBeVisible();
+  await page.getByTestId('new-requirement').click();
+  await page.getByTestId('req-title').fill('يجب أن يتمكن المستخدمُ من تسجيل الدُّخول');
+  await page
+    .getByTestId('req-ac')
+    .fill('Valid credentials open the dashboard\nFive failures lock the account');
+  await page.getByTestId('req-save').click();
+  await expect(page).toHaveURL(/\/requirements\/WS-R-1$/);
+  await expect(page.getByTestId('requirement-state')).toHaveText('Draft');
+  await expect(page.getByTestId('version-1')).toContainText('Five failures lock the account');
+  await expect(page.getByTestId('requirement-title').locator('bdi')).toHaveText(
+    'يجب أن يتمكن المستخدمُ من تسجيل الدُّخول',
+  );
+
+  await page.goto('/en/projects/WS/requirements');
+  await page.getByTestId('requirement-search').fill('الدخول');
+  await expect(page.getByTestId('requirements-table').locator('[data-requirement="WS-R-1"]')).toBeVisible();
+  await page.getByTestId('requirement-search').fill('nothing like this at all');
+  await expect(page.getByTestId('empty-state')).toBeVisible();
+});
+
+test('P3: editing makes a new version; submit and withdraw move it through review', async () => {
+  await page.goto('/en/projects/WS/requirements/WS-R-1');
+  await page.getByTestId('edit').click();
+  await page
+    .getByTestId('edit-ac')
+    .fill('Valid credentials open the dashboard\nFive failures lock the account for 15 minutes');
+  await page.getByTestId('edit-save').click();
+  await expect(page.getByTestId('requirement-message')).toHaveText('A new draft version was saved.');
+  await expect(page.getByTestId('version-2')).toContainText('15 minutes');
+  await page.getByTestId('submit').click();
+  await expect(page.getByTestId('requirement-state')).toHaveText('In review');
+  await page.getByTestId('withdraw').click();
+  await expect(page.getByTestId('requirement-state')).toHaveText('Draft');
+});
+
+test('P3: an uploaded document is read, reviewed side by side and accepted (J2)', async () => {
+  await page.goto('/en/projects/WS/requirements/sources');
+  await page.getByTestId('source-name').fill('Specs');
+  await page.getByTestId('create-source').click();
+  await expect(page.getByTestId('sources-message')).toHaveText('Source added.');
+  const card = page.getByTestId('source-Specs');
+  await card.getByTestId('upload-input').setInputFiles(path.join(CORPUS, 'd03-booking-en-stories.docx'));
+  await expect(page.getByTestId('sources-message')).toContainText('was uploaded');
+  await expect(card.getByTestId('parse-status')).toHaveText('Read', { timeout: 30_000 });
+  await card.getByTestId('review-link').click();
+
+  const candidates = page.getByTestId('candidates');
+  await expect(candidates.locator('[data-status="candidate"]')).toHaveCount(5);
+  // Keyboard flow: J selects the next candidate, and the source shows where it was found.
+  await page.keyboard.press('j');
+  await expect(candidates.locator('[aria-selected="true"]')).toHaveCount(1);
+  await expect(page.getByTestId('source-blocks').locator('[data-hit="true"]').first()).toBeVisible();
+  await page.getByTestId('select-bulk').click();
+  await page.getByTestId('accept-selected').click();
+  await expect(page.getByTestId('review-message')).toHaveText('5 requirements created.');
+  await page.getByTestId('candidate-filter').selectOption('accepted');
+  await expect(candidates.locator('[data-status="accepted"]')).toHaveCount(5);
+});
+
+test('P3: one list for every source; a requirement links back to its place in the document (M04-AC-01)', async () => {
+  await page.goto('/en/projects/WS/requirements');
+  const table = page.getByTestId('requirements-table');
+  await expect(table.locator('tr[data-requirement]')).toHaveCount(6);
+  await expect(table.locator('[data-requirement="WS-R-1"]')).toContainText('Manual');
+  await expect(table.locator('[data-requirement="WS-R-2"]')).toContainText('Documents');
+  await table.locator('[data-requirement="WS-R-2"]').getByRole('link').click();
+  await expect(page.getByTestId('provenance')).toContainText('Specs');
+
+  await page.getByTestId('link-target').fill('WS-R-1');
+  await page.getByTestId('add-link').click();
+  await expect(page.getByTestId('trace-related')).toContainText('WS-R-1');
+  await expect(page.getByTestId('coverage')).toHaveText('Not covered');
+
+  await page.getByTestId('open-source').first().click();
+  await expect(page.getByTestId('review-workspace')).toBeVisible();
+  await expect(page.getByTestId('source-blocks').locator('[data-hit="true"]').first()).toBeVisible();
+});
+
+test('P3: the requirements export downloads as CSV and XLSX (T-P3-16)', async () => {
+  await page.goto('/en/projects/WS/requirements');
+  const [csv] = await Promise.all([page.waitForEvent('download'), page.getByTestId('export-csv').click()]);
+  expect(csv.suggestedFilename()).toMatch(/^WS-requirements-\d{4}-\d{2}-\d{2}\.csv$/);
+  const text = readFileSync(await csv.path(), 'utf8');
+  expect(text).toContain('WS-R-1');
+  expect(text).toContain('تسجيل');
+  const [xlsx] = await Promise.all([page.waitForEvent('download'), page.getByTestId('export-xlsx').click()]);
+  expect(xlsx.suggestedFilename()).toMatch(/\.xlsx$/);
+  expect(
+    readFileSync(await xlsx.path())
+      .subarray(0, 2)
+      .toString('latin1'),
+  ).toBe('PK');
+});
+
+test('P3: the requirement pages render right-to-left in Arabic', async () => {
+  await page.goto('/ar/projects/WS/requirements');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.getByRole('link', { name: 'المصادر والمستندات' })).toBeVisible();
+  await expect(page.getByTestId('requirements-table')).toContainText('مسودة');
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });

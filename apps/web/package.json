@@ -26,6 +26,7 @@
     "@qos/api": "workspace:*",
     "@qos/config": "workspace:*",
     "@qos/db": "workspace:*",
+    "@qos/requirements": "workspace:*",
     "@tailwindcss/postcss": "^4.3.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

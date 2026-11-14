@@ -4,6 +4,7 @@ import type { ObjectStorage } from '@qos/ports';
 import type { Project } from '@qos/projects';
 import {
   acceptCandidates,
+  getParsedDocument,
   getSnapshot,
   listCandidates,
   listDocuments,
@@ -81,6 +82,13 @@ export class DocumentsController {
   @RequireProjectPermission('project.read')
   snapshot(@Param('snapshotId') snapshotId: string, @CurrentProject() project: Project) {
     return getSnapshot(this.deps.db, project, z.uuid().parse(snapshotId));
+  }
+
+  /** Parsed blocks with their locators, for the source viewer next to the candidates. */
+  @Get('snapshots/:snapshotId/parsed')
+  @RequireProjectPermission('project.read')
+  parsed(@Param('snapshotId') snapshotId: string, @CurrentProject() project: Project) {
+    return getParsedDocument(this.deps, project, z.uuid().parse(snapshotId));
   }
 
   @Get('snapshots/:snapshotId/candidates')

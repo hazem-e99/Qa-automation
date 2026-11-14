@@ -13,6 +13,7 @@ export function ProjectTabs({ projectKey, canSettings }: { projectKey: string; c
   const search = useSearchParams();
   const base = `/${locale}/projects/${projectKey}`;
   const onSettings = pathname.startsWith(`${base}/settings`);
+  const onRequirements = pathname.startsWith(`${base}/requirements`);
   const tab = search.get('tab') ?? 'general';
   const link = (href: string, label: string, active: boolean) => (
     <Link
@@ -30,7 +31,8 @@ export function ProjectTabs({ projectKey, canSettings }: { projectKey: string; c
   return (
     <div className="flex flex-col gap-2">
       <nav aria-label={t('sections')} className="flex gap-1 border-b border-line">
-        {link(base, t('overview'), !onSettings)}
+        {link(base, t('overview'), !onSettings && !onRequirements)}
+        {link(`${base}/requirements`, t('requirements'), onRequirements)}
         {canSettings ? link(`${base}/settings`, t('settings'), onSettings) : null}
       </nav>
       {onSettings ? (
