@@ -7,4 +7,5 @@ export * from './schema/projects.js';
 export * from './schema/integrations.js';
 export * from './schema/governance.js';
 export * from './schema/approvals.js';
+export * from './schema/requirements.js';
 export { sql, eq, and, isNull, inArray, asc, desc, type SQL } from 'drizzle-orm';

@@ -24,6 +24,7 @@ import {
   type CoreInfra,
 } from '@qos/kernel-infra';
 import { onProbeCreated, processProbeJob, type ProbeJobData } from '@qos/probe';
+import { onApprovalDecided } from '@qos/requirements';
 import { z } from 'zod';
 import { SyncRuntime } from './sync-runtime.js';
 
@@ -80,6 +81,8 @@ class Registrations implements OnApplicationBootstrap {
       logger.info({ jobId: job.id, probeId: job.data.probeId, changed }, 'probe job handled');
     });
     this.dispatcher.subscribe(PROBE_CREATED_EVENT, 'probe.seen', onProbeCreated);
+    // Approvals decided in the generic inbox reach the requirement they target (idempotent).
+    this.dispatcher.subscribe('approval.decided', 'requirements.apply-approval', onApprovalDecided);
     await this.dispatcher.start();
     await this.sync.start();
   }

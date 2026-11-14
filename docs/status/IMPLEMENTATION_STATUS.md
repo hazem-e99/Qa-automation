@@ -3,7 +3,19 @@
 > Statuses: `planned` → `in_progress` → `implemented` (code and tests exist) → `verified` (the task's Verify criterion in [26](../planning/26-task-breakdown.md) was run and passed; evidence listed).
 > Planning package approved by the owner: **2026-11-09**. Closed gates: [P0](gates/P0.md) (2026-11-10), [P1](gates/P1.md) (2026-11-10), [P2](gates/P2.md) (2026-11-14).
 
-## Current phase: none — P2 closed 2026-11-14; P3 (requirements) waits for the owner's go-ahead
+## Current phase: P3 — Requirements ingestion and governance (in progress, started 2026-11-14)
+
+Owner go-ahead for P3: 2026-11-14 (chat, "كمل طيب" after the overview of the remaining phases). P3 has 16 tasks in doc 26. Last full run on 2026-11-14 after batch 1: build, typecheck, lint and format clean; 142 unit and 225 integration tests pass.
+
+| Task | Status | Evidence / what is missing |
+| --- | --- | --- |
+| T-P3-01 Requirements aggregate, versions, AC, keys | **verified** | `packages/modules/requirements`, schema `requirements` (migrations 0016–0017). Keys `PRJ-R-n` from the project sequence; content in versions, each with acceptance criteria and at least one provenance link (BR-M04-3). Versions and criteria are immutable by trigger (content columns; delete refused) — tested with direct SQL. Workflow `draft → in_review → approved → superseded/obsolete`, plus `rejected`; edits are new versions and the approved one stays effective (M04-FR-11). `apps/api/test/requirements.integration.test.ts` |
+| T-P3-02 Requirement sources CRUD | **implemented** | Kinds `external` (a requirements-family connection through a binding, provider-neutral), `document_set`, `spreadsheet`, `manual`; unique names per project; the manual source is created on first manual entry. **Missing:** UI |
+| T-P3-03 Manual entry | **in_progress** | API: create and edit with structured acceptance criteria, priority, tags; each version gets a manual snapshot recording author and time. **Missing:** the editor UI (TipTap is not in doc 08: owner decision, or a plain Markdown editor) |
+| T-P3-09 Approval workflow + inferred safeguards | **verified** | Submit opens an approval request bound to the version content hash (policy `requirement.approve`); the author cannot approve (separation of duties). Decisions apply at once from the requirements endpoints and, for the generic approvals inbox, through the `approval.decided` outbox event (idempotent, worker subscriber). M04-AC-02: bulk approval with an inferred criterion is refused without `includesInferred`, and the audit records the flag and the items. M04-AC-05: a reported conflict sends requirements in review back to draft and blocks submission until resolved or waived (waive needs `finding.waive`) |
+| T-P3-11 Snapshot diffing | **implemented** | Domain only (`diffSnapshots`): match by source key, then by title similarity; added / removed / changed (title, body, criteria with added and removed lists) / unchanged; diacritics-only edits count as unchanged. **Missing:** applying it to uploaded snapshots (with the upload pipeline) and the impact list (M04-AC-04) |
+| T-P3-13 Arabic normalization + search | **implemented** | `normalizeForSearch`: diacritics, tatweel, alef/ya/ta-marbuta/hamza seats, Arabic-Indic digits, Latin accents. Search matches the normalized title, body, criteria and tags through a trigram index: "الدخول" finds "الدُّخول" (search part of M04-AC-06; the RTL review UI part comes with the parser) |
+| Other P3 tasks | planned | Upload pipeline (04), parser service (05), extraction rules (06), spreadsheet mapping (07), review workspace (08), Azure Boards adapter (10), traceability (12), source viewer (14), list/detail UI (15), export (16) |
 
 ## P2 — Identity, projects, provider framework, governance base (closed 2026-11-14)
 
@@ -96,6 +108,8 @@ Acceptance criteria so far: **met** M02-AC-01 (E2E, demo mode), M13-AC-01, M13-A
 | `GET /projects/{key}/member-candidates` | Active org users, for `members.manage` holders | A QA lead manages members but cannot list users (`user.manage` is org-admin only) |
 | Journey tests | `apps/web/e2e/journeys` with their own Playwright config: Testcontainers PostgreSQL and the compiled API in a helper process, the production web build in front | Doc 24 asks for journeys in demo mode; one ordered story keeps the run under 30 s. CI runs them in the web job |
 | Azure DevOps live check | Deferred to P3 (owner, 2026-11-14) | Creating an Azure DevOps organization now needs an Azure subscription with card verification; the owner keeps the test away from the work organization. P3 builds the Azure Boards adapter and needs a real organization anyway |
+| Requirement source kind `external` | Instead of `azure_boards` (doc 10, M04-FR-01) | Core code must not name providers (lint rule); the provider comes from the binding's connection, so GitHub Issues or Jira later need no new kind |
+| Requirement approvals | Through the approval engine (`requirement.approve` policy); obsolete needs `requirement.approve`, submit and withdraw need `requirement.edit` | The M13 matrix has no `requirement.submit` / `requirement.obsolete` |
 | Mapping routes | `/api/v1/projects/{key}/mappings[/{kind}]`, `/mappings/discover`, `/mappings/{kind}/validate`, `/projects/{key}/defect-sync` | As in M03 §7 (slash instead of `:validate`); a project has at most one issue-tracker binding, so the binding needs no id in the path |
 | Mappings edited with `project.settings.manage` | The M13 matrix has no `mapping.manage` | M03 §2: QA leads edit mappings of their projects; same audience as other project settings |
 | One `value_mappings` row per binding and kind | Instead of a row per value (doc 10) | Versioned as a whole (optimistic concurrency), with the discovered values next to the mapping for the lint |

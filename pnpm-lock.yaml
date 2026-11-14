@@ -262,6 +262,9 @@ importers:
       '@qos/probe':
         specifier: workspace:*
         version: link:../../packages/modules/probe
+      '@qos/requirements':
+        specifier: workspace:*
+        version: link:../../packages/modules/requirements
       fastify:
         specifier: ^5.12.8
         version: 5.12.8
@@ -448,6 +451,9 @@ importers:
       '@qos/probe':
         specifier: workspace:*
         version: link:../../packages/modules/probe
+      '@qos/requirements':
+        specifier: workspace:*
+        version: link:../../packages/modules/requirements
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -843,6 +849,31 @@ importers:
       '@qos/ports':
         specifier: workspace:*
         version: link:../../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../../config
+
+  packages/modules/requirements:
+    dependencies:
+      '@qos/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@qos/governance':
+        specifier: workspace:*
+        version: link:../governance
+      '@qos/identity':
+        specifier: workspace:*
+        version: link:../identity
+      '@qos/jobs':
+        specifier: workspace:*
+        version: link:../jobs
+      '@qos/kernel-domain':
+        specifier: workspace:*
+        version: link:../../kernel-domain
+      '@qos/projects':
+        specifier: workspace:*
+        version: link:../projects
     devDependencies:
       '@qos/config':
         specifier: workspace:*

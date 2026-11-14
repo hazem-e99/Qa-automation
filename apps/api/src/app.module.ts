@@ -7,6 +7,7 @@ import { ConnectionsController } from './connections.controller.js';
 import type { ApiConfig } from './config.js';
 import { DemoController } from './demo.controller.js';
 import { MappingsController } from './mappings.controller.js';
+import { RequirementsController } from './requirements.controller.js';
 import { FilesController } from './files.controller.js';
 import { GovernanceController } from './governance.controller.js';
 import { HealthController } from './health.controller.js';
@@ -44,6 +45,7 @@ export class AppModule {
         UsersController,
         DemoController,
         MappingsController,
+        RequirementsController,
       ],
       providers: [
         { provide: CONFIG, useValue: config },

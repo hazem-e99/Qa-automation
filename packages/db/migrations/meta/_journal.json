@@ -113,6 +113,20 @@
       "when": 1794612537608,
       "tag": "0015_value_mappings",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794673373525,
+      "tag": "0016_requirements",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794673385624,
+      "tag": "0017_requirements_privileges_immutability",
+      "breakpoints": true
     }
   ]
 }

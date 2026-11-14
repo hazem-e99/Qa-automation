@@ -1,0 +1,31 @@
+{
+  "name": "@qos/requirements",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@qos/db": "workspace:*",
+    "@qos/governance": "workspace:*",
+    "@qos/identity": "workspace:*",
+    "@qos/jobs": "workspace:*",
+    "@qos/kernel-domain": "workspace:*",
+    "@qos/projects": "workspace:*"
+  },
+  "devDependencies": {
+    "@qos/config": "workspace:*"
+  }
+}

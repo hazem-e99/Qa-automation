@@ -40,6 +40,8 @@ type Ids = {
   template: string;
   approval: string;
   operation: string;
+  source: string;
+  finding: string;
 };
 let foreignOrg: Ids; // organization B
 let otherProject: { key: string; env: string; binding: string }; // A's second project
@@ -65,6 +67,14 @@ const BODIES: Record<string, unknown> = {
   'PUT /api/v1/projects/:key/environments/:envId': { name: 'hijacked', baseUrls: ['https://x.example.test'] },
   'PUT /api/v1/projects/:key/settings/:section': { expectedVersion: 0, data: {} },
   'PUT /api/v1/projects/:key/approval-policies/:action': { rules: { minApprovals: 1 } },
+  'PUT /api/v1/projects/:key/requirements/:reqKey': { title: 'Hijacked title', expectedLatestVersion: 1 },
+  'PATCH /api/v1/projects/:key/requirement-sources/:sourceId': { name: 'Hijacked' },
+  'POST /api/v1/projects/:key/requirements/:reqKey/decision': { decision: 'approve' },
+  'POST /api/v1/projects/:key/requirements/:reqKey/obsolete': { reason: 'hijacked here' },
+  'POST /api/v1/projects/:key/requirement-findings/:findingId/close': {
+    status: 'resolved',
+    reason: 'hijacked',
+  },
   'PUT /api/v1/projects/:key/mappings/:kind': { expectedVersion: 0, entries: [] },
   'POST /api/v1/projects/:key/mappings/:kind/validate': { entries: [] },
   'POST /api/v1/projects/:key/defect-sync': { enabled: false },
@@ -98,6 +108,9 @@ function foreignPaths(route: { method: string; path: string }): string[] {
       .replace(':envId', sub.env)
       .replace(':bindingId', sub.binding)
       .replace(':userId', sub.user)
+      .replace(':reqKey', 'TWO-R-1')
+      .replace(':sourceId', foreignOrg.source)
+      .replace(':findingId', foreignOrg.finding)
       .replace(':templateId', foreignOrg.template)
       .replace(':section', 'quality')
       .replace(':action', 'testcase.approve')
@@ -105,7 +118,7 @@ function foreignPaths(route: { method: string; path: string }): string[] {
       .replace(':id', id ?? ':id');
   const out = [fill('TWO', { env: foreignOrg.env, binding: foreignOrg.binding, user: foreignOrg.user })];
   // Own project key, sub-resource of another project (same org) or another org.
-  if (/:envId|:bindingId|:userId/.test(route.path)) {
+  if (/:envId|:bindingId|:userId|:reqKey|:sourceId|:findingId/.test(route.path)) {
     out.push(fill('ONE', { env: otherProject.env, binding: otherProject.binding, user: foreignOrg.user }));
     out.push(fill('ONE', { env: foreignOrg.env, binding: foreignOrg.binding, user: foreignOrg.user }));
   }
@@ -118,6 +131,10 @@ async function orgBFingerprint(): Promise<string> {
   const parts = await Promise.all([
     q(`select * from projects.projects where id = $1`),
     q(`select * from projects.project_environments where project_id = $1 order by id`),
+    q(`select * from requirements.requirements where project_id = $1 order by id`),
+    q(`select * from requirements.requirement_versions where project_id = $1 order by id`),
+    q(`select * from requirements.requirement_findings where project_id = $1 order by id`),
+    q(`select * from requirements.requirement_sources where project_id = $1 order by id`),
     q(`select * from projects.project_bindings where project_id = $1 order by id`),
     q(`select * from projects.project_settings where project_id = $1 order by section`),
     q(`select * from identity.project_memberships where project_id = $1 order by user_id`),
@@ -242,6 +259,22 @@ beforeAll(async () => {
   const session = await login(t.db, { email: 'admin@b.example.test', password: PW });
   if (session.kind !== 'session') throw new Error('unexpected MFA challenge');
   const principalB = (await resolveSession(t.db, session.token))!;
+  // Requirements of organization B: two requirements, a conflict between them, a source.
+  for (const title of ['B requirement one', 'B requirement two']) {
+    await json(await b.fetch(V('/projects/TWO/requirements'), send('POST', { title })));
+  }
+  const findingB = await json<{ id: string }>(
+    await b.fetch(
+      V('/projects/TWO/requirement-findings'),
+      send('POST', { keys: ['TWO-R-1', 'TWO-R-2'], note: 'b' }),
+    ),
+  );
+  const sourceB = await json<{ id: string }>(
+    await b.fetch(
+      V('/projects/TWO/requirement-sources'),
+      send('POST', { kind: 'document_set', name: 'B docs' }),
+    ),
+  );
   const approval = await t.db.transaction((tx) =>
     requestApproval(tx, principalB, {
       projectId: projectB,
@@ -261,6 +294,8 @@ beforeAll(async () => {
     template: tpl.id,
     approval: (approval as { id: string }).id,
     operation: probe.operationId,
+    source: sourceB.id,
+    finding: findingB.id,
   };
 
   await populate(a, 'ONE', 'Repo A');

@@ -33,7 +33,8 @@
     "@qos/adapters-github": "workspace:*",
     "@qos/adapters-azure-devops": "workspace:*",
     "@qos/adapters-ai-gemini": "workspace:*",
-    "@qos/adapters-local-git": "workspace:*"
+    "@qos/adapters-local-git": "workspace:*",
+    "@qos/requirements": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*",

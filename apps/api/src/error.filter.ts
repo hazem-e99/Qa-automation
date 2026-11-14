@@ -81,6 +81,18 @@ const DOMAIN_STATUS: Readonly<Record<string, number>> = {
   'mapping.not_discovered': 409,
   'mapping.discovery_failed': 502,
   'binding.role_invalid': 422,
+  'requirement.not_found': 404,
+  'requirement.version_conflict': 409,
+  'requirement.in_review': 409,
+  'requirement.not_draft': 409,
+  'requirement.not_in_review': 409,
+  'requirement.obsolete': 409,
+  'requirement.open_conflict': 409,
+  'requirement.inferred_confirmation_required': 409,
+  'requirement_source.not_found': 404,
+  'requirement_source.name_taken': 409,
+  'finding.not_open': 409,
+  'finding.not_found': 404,
 };
 
 /**
