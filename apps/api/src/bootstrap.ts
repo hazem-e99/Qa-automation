@@ -22,6 +22,7 @@ import {
 } from '@qos/kernel-infra';
 import { currentCorrelationId, runWithCorrelation } from '@qos/observability';
 import type { ObjectStorage, SecretStore } from '@qos/ports';
+import { UPLOAD_BODY_LIMIT } from './documents.controller.js';
 import { AppModule } from './app.module.js';
 import { ApiConfig } from './config.js';
 import { ApiErrorFilter } from './error.filter.js';
@@ -99,6 +100,12 @@ export async function createApiApp(
       { logger: false },
     );
     const fastify = app.getHttpAdapter().getInstance();
+    // Document uploads are raw bodies; only this content type gets the larger limit (T-P3-04).
+    fastify.addContentTypeParser(
+      'application/octet-stream',
+      { parseAs: 'buffer', bodyLimit: UPLOAD_BODY_LIMIT },
+      (_req, body, done) => done(null, body),
+    );
     const limiter = new TokenBucketLimiter({
       ratePerSecond: config.RATE_LIMIT_RPS,
       burst: config.RATE_LIMIT_BURST,

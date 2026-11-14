@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -8,6 +9,8 @@ import { startTestDatabase, type TestDatabase } from '@qos/db/testing';
 import { requestApproval } from '@qos/governance';
 import { hashPassword, login, resolveSession } from '@qos/identity';
 import { uuidv7 } from '@qos/kernel-domain';
+import type { ParsedDocument } from '@qos/ports';
+import { processParseJob } from '@qos/requirements';
 import { createApiApp, type ApiApp } from '../dist/bootstrap.js';
 import { listRoutes } from '../dist/route-inventory.js';
 import { AUTH_ENV, setupAndSignIn, signIn, type Session } from './helpers.js';
@@ -42,6 +45,9 @@ type Ids = {
   operation: string;
   source: string;
   finding: string;
+  snapshot: string;
+  item: string;
+  link: string;
 };
 let foreignOrg: Ids; // organization B
 let otherProject: { key: string; env: string; binding: string }; // A's second project
@@ -111,6 +117,8 @@ function foreignPaths(route: { method: string; path: string }): string[] {
       .replace(':reqKey', 'TWO-R-1')
       .replace(':sourceId', foreignOrg.source)
       .replace(':findingId', foreignOrg.finding)
+      .replace(':snapshotId', foreignOrg.snapshot)
+      .replace(':linkId', foreignOrg.link)
       .replace(':templateId', foreignOrg.template)
       .replace(':section', 'quality')
       .replace(':action', 'testcase.approve')
@@ -118,7 +126,7 @@ function foreignPaths(route: { method: string; path: string }): string[] {
       .replace(':id', id ?? ':id');
   const out = [fill('TWO', { env: foreignOrg.env, binding: foreignOrg.binding, user: foreignOrg.user })];
   // Own project key, sub-resource of another project (same org) or another org.
-  if (/:envId|:bindingId|:userId|:reqKey|:sourceId|:findingId/.test(route.path)) {
+  if (/:envId|:bindingId|:userId|:reqKey|:sourceId|:findingId|:snapshotId|:linkId/.test(route.path)) {
     out.push(fill('ONE', { env: otherProject.env, binding: otherProject.binding, user: foreignOrg.user }));
     out.push(fill('ONE', { env: foreignOrg.env, binding: foreignOrg.binding, user: foreignOrg.user }));
   }
@@ -135,6 +143,10 @@ async function orgBFingerprint(): Promise<string> {
     q(`select * from requirements.requirement_versions where project_id = $1 order by id`),
     q(`select * from requirements.requirement_findings where project_id = $1 order by id`),
     q(`select * from requirements.requirement_sources where project_id = $1 order by id`),
+    q(`select * from requirements.source_documents where project_id = $1 order by id`),
+    q(`select * from requirements.source_snapshots where project_id = $1 order by id`),
+    q(`select * from requirements.extracted_items where project_id = $1 order by id`),
+    q(`select * from traceability.traceability_links where project_id = $1 order by id`),
     q(`select * from projects.project_bindings where project_id = $1 order by id`),
     q(`select * from projects.project_settings where project_id = $1 order by section`),
     q(`select * from identity.project_memberships where project_id = $1 order by user_id`),
@@ -211,6 +223,7 @@ beforeAll(async () => {
     RATE_LIMIT_RPS: '10000',
     QOS_MASTER_KEY_FILE: keyFile,
     QOS_DEMO_MODE: 'true',
+    STORAGE_DIR: path.join(dir, 'storage'),
     ...AUTH_ENV,
   });
   base = await api.listen();
@@ -269,12 +282,48 @@ beforeAll(async () => {
       send('POST', { keys: ['TWO-R-1', 'TWO-R-2'], note: 'b' }),
     ),
   );
+  const linkB = (
+    await json<{ related: { linkId: string }[] }>(
+      await b.fetch(
+        V('/projects/TWO/requirements/TWO-R-1/links'),
+        send('POST', { type: 'relates_to', targetKey: 'TWO-R-2' }),
+      ),
+    )
+  ).related[0]!.linkId;
   const sourceB = await json<{ id: string }>(
     await b.fetch(
       V('/projects/TWO/requirement-sources'),
       send('POST', { kind: 'document_set', name: 'B docs' }),
     ),
   );
+  // A parsed sheet in B's document source, with its candidates.
+  const csv = new URL('../../../spikes/parser/corpus/files/c25-library-en-sheet.csv', import.meta.url);
+  const parsed = new URL(
+    '../../../packages/modules/requirements/test/fixtures/parsed/c25-library-en-sheet.json',
+    import.meta.url,
+  );
+  const upB = await json<{ snapshotId: string }>(
+    await b.fetch(V(`/projects/TWO/requirement-sources/${sourceB.id}/documents?fileName=c25.csv`), {
+      method: 'POST',
+      headers: { 'content-type': 'application/octet-stream' },
+      body: readFileSync(csv),
+    }),
+  );
+  await processParseJob(
+    {
+      db: api.infra.db,
+      storage: api.storage,
+      jobs: api.infra.jobs,
+      parser: { parse: async () => JSON.parse(readFileSync(parsed, 'utf8')) as ParsedDocument },
+    },
+    { projectId: projectB, snapshotId: upB.snapshotId },
+  );
+  const itemB = (
+    await t.pool.query(
+      `select id from requirements.extracted_items where snapshot_id = $1 and kind = 'requirement' limit 1`,
+      [upB.snapshotId],
+    )
+  ).rows[0].id as string;
   const approval = await t.db.transaction((tx) =>
     requestApproval(tx, principalB, {
       projectId: projectB,
@@ -296,6 +345,9 @@ beforeAll(async () => {
     operation: probe.operationId,
     source: sourceB.id,
     finding: findingB.id,
+    snapshot: upB.snapshotId,
+    item: itemB,
+    link: linkB,
   };
 
   await populate(a, 'ONE', 'Repo A');
@@ -344,6 +396,34 @@ describe('isolation harness (T-P2-46)', () => {
       (await t.pool.query(`select * from projects.project_environments order by id`)).rows,
     );
     expect(after).toBe(onePolicies);
+  });
+
+  it('candidate ids of another organization are reported as not found and left alone', async () => {
+    const before = await orgBFingerprint();
+    expect(
+      await json(
+        await a.fetch(V('/projects/ONE/candidates/accept'), send('POST', { itemIds: [foreignOrg.item] })),
+      ),
+    ).toEqual({
+      created: [],
+      skipped: [{ itemId: foreignOrg.item, reason: 'not_found' }],
+    });
+    expect(
+      await json(
+        await a.fetch(V('/projects/ONE/candidates/reject'), send('POST', { itemIds: [foreignOrg.item] })),
+      ),
+    ).toEqual({
+      rejected: 0,
+    });
+    const own = await json<{ key: string }>(
+      await a.fetch(V('/projects/ONE/requirements'), send('POST', { title: 'A merge target' })),
+    );
+    const merge = await a.fetch(
+      V('/projects/ONE/candidates/merge'),
+      send('POST', { itemId: foreignOrg.item, requirementKey: own.key }),
+    );
+    expect(merge.status).toBe(404);
+    expect(await orgBFingerprint()).toBe(before);
   });
 
   it('organization B still works normally afterwards', async () => {

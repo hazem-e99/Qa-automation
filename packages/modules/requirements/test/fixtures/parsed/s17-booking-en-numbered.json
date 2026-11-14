@@ -1,0 +1,242 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "pdf",
+ "pages": 1,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 1,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "paragraph",
+   "text": "Hotel Booking Reservation Requirements",
+   "locator": {
+    "page": 1,
+    "line": 1
+   },
+   "language": "en",
+   "ocrConfidence": 0.776
+  },
+  {
+   "id": "b2",
+   "type": "paragraph",
+   "text": "1. Introduction",
+   "locator": {
+    "page": 1,
+    "line": 2
+   },
+   "language": "en",
+   "ocrConfidence": 0.786
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "The booking  engine is used by the public website and the call centre",
+   "locator": {
+    "page": 1,
+    "line": 3
+   },
+   "language": "en",
+   "ocrConfidence": 0.71
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "Room inventory is synchronised nightly from the property system",
+   "locator": {
+    "page": 1,
+    "line": 4
+   },
+   "language": "en",
+   "ocrConfidence": 0.567
+  },
+  {
+   "id": "b5",
+   "type": "paragraph",
+   "text": "2 Functional requirements",
+   "locator": {
+    "page": 1,
+    "line": 5
+   },
+   "language": "en",
+   "ocrConfidence": 0.516
+  },
+  {
+   "id": "b6",
+   "type": "paragraph",
+   "text": "REQ-1: The system shall show available rooms for the selected dates and number of guests",
+   "locator": {
+    "page": 1,
+    "line": 6
+   },
+   "language": "en",
+   "ocrConfidence": 0.549
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "page": 1,
+    "line": 7
+   },
+   "language": "en",
+   "ocrConfidence": 0.606
+  },
+  {
+   "id": "b8",
+   "type": "paragraph",
+   "text": "Rooms with no availability on any selected night are hidden",
+   "locator": {
+    "page": 1,
+    "line": 8
+   },
+   "language": "en",
+   "ocrConfidence": 0.743
+  },
+  {
+   "id": "b9",
+   "type": "paragraph",
+   "text": "REQ-2: The system shall not allow a check-out date earlier than or equal to the check-in date",
+   "locator": {
+    "page": 1,
+    "line": 9
+   },
+   "language": "en",
+   "ocrConfidence": 0.383
+  },
+  {
+   "id": "b10",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "page": 1,
+    "line": 10
+   },
+   "language": "en",
+   "ocrConfidence": 0.651
+  },
+  {
+   "id": "b11",
+   "type": "paragraph",
+   "text": "Same-day check-out shows a validation error",
+   "locator": {
+    "page": 1,
+    "line": 11
+   },
+   "language": "en",
+   "ocrConfidence": 0.501
+  },
+  {
+   "id": "b12",
+   "type": "paragraph",
+   "text": "REQ-3: The system shall allow free cancellation up to 48 hours before check-in",
+   "locator": {
+    "page": 1,
+    "line": 12
+   },
+   "language": "en",
+   "ocrConfidence": 0.59
+  },
+  {
+   "id": "b13",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "page": 1,
+    "line": 13
+   },
+   "language": "en",
+   "ocrConfidence": 0.992
+  },
+  {
+   "id": "b14",
+   "type": "paragraph",
+   "text": "Cancellation 49 hours before is free",
+   "locator": {
+    "page": 1,
+    "line": 14
+   },
+   "language": "en",
+   "ocrConfidence": 0.499
+  },
+  {
+   "id": "b15",
+   "type": "paragraph",
+   "text": "Cancellation 47 hours before charges one night",
+   "locator": {
+    "page": 1,
+    "line": 15
+   },
+   "language": "en",
+   "ocrConfidence": 0.607
+  },
+  {
+   "id": "b16",
+   "type": "paragraph",
+   "text": "REQ-4: The system must hold a reservation for 15 minutes while payment is in progress",
+   "locator": {
+    "page": 1,
+    "line": 16
+   },
+   "language": "en",
+   "ocrConfidence": 0.74
+  },
+  {
+   "id": "b17",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "page": 1,
+    "line": 17
+   },
+   "language": "en",
+   "ocrConfidence": 0.574
+  },
+  {
+   "id": "b18",
+   "type": "paragraph",
+   "text": "After 15 minutes without payment the hold is released",
+   "locator": {
+    "page": 1,
+    "line": 18
+   },
+   "language": "en",
+   "ocrConfidence": 0.627
+  },
+  {
+   "id": "b19",
+   "type": "paragraph",
+   "text": "REQ-5: The system shall display prices in the currency selected by the guest",
+   "locator": {
+    "page": 1,
+    "line": 19
+   },
+   "language": "en",
+   "ocrConfidence": 0.55
+  },
+  {
+   "id": "b20",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "page": 1,
+    "line": 20
+   },
+   "language": "en",
+   "ocrConfidence": 0.782
+  },
+  {
+   "id": "b21",
+   "type": "paragraph",
+   "text": "Switching currency updates all prices on the page",
+   "locator": {
+    "page": 1,
+    "line": 21
+   },
+   "language": "en",
+   "ocrConfidence": 0.474
+  }
+ ]
+}

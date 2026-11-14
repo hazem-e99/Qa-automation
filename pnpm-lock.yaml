@@ -296,6 +296,9 @@ importers:
       '@qos/projects':
         specifier: workspace:*
         version: link:../../packages/modules/projects
+      '@qos/traceability':
+        specifier: workspace:*
+        version: link:../../packages/modules/traceability
       '@types/pg':
         specifier: ^8.23.1
         version: 8.23.1
@@ -415,9 +418,15 @@ importers:
       '@qos/adapters-mock':
         specifier: workspace:*
         version: link:../../packages/adapters-mock
+      '@qos/adapters-parser-http':
+        specifier: workspace:*
+        version: link:../../packages/adapters-parser-http
       '@qos/adapters-secrets-db':
         specifier: workspace:*
         version: link:../../packages/adapters-secrets-db
+      '@qos/adapters-storage-localfs':
+        specifier: workspace:*
+        version: link:../../packages/adapters-storage-localfs
       '@qos/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -541,6 +550,16 @@ importers:
       '@qos/contract-tests':
         specifier: workspace:*
         version: link:../contract-tests
+
+  packages/adapters-parser-http:
+    dependencies:
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../ports
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../config
 
   packages/adapters-secrets-db:
     dependencies:
@@ -871,9 +890,28 @@ importers:
       '@qos/kernel-domain':
         specifier: workspace:*
         version: link:../../kernel-domain
+      '@qos/ports':
+        specifier: workspace:*
+        version: link:../../ports
       '@qos/projects':
         specifier: workspace:*
         version: link:../projects
+      '@qos/traceability':
+        specifier: workspace:*
+        version: link:../traceability
+    devDependencies:
+      '@qos/config':
+        specifier: workspace:*
+        version: link:../../config
+
+  packages/modules/traceability:
+    dependencies:
+      '@qos/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@qos/kernel-domain':
+        specifier: workspace:*
+        version: link:../../kernel-domain
     devDependencies:
       '@qos/config':
         specifier: workspace:*

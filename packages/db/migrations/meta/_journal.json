@@ -127,6 +127,27 @@
       "when": 1794673385624,
       "tag": "0017_requirements_privileges_immutability",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794681000344,
+      "tag": "0018_requirements_parsing",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794695819509,
+      "tag": "0019_traceability",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794695821322,
+      "tag": "0020_traceability_privileges",
+      "breakpoints": true
     }
   ]
 }

@@ -50,6 +50,7 @@
     "@qos/db": "workspace:*",
     "@qos/governance": "workspace:*",
     "@qos/projects": "workspace:*",
+    "@qos/traceability": "workspace:*",
     "@types/pg": "^8.23.1"
   }
 }

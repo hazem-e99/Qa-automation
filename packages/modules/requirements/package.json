@@ -23,7 +23,9 @@
     "@qos/identity": "workspace:*",
     "@qos/jobs": "workspace:*",
     "@qos/kernel-domain": "workspace:*",
-    "@qos/projects": "workspace:*"
+    "@qos/ports": "workspace:*",
+    "@qos/projects": "workspace:*",
+    "@qos/traceability": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*"

@@ -1,0 +1,464 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "docx",
+ "pages": null,
+ "languages": [
+  "ar",
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "بوابة العملاء — متطلبات تسجيل الدخول",
+   "locator": {
+    "sectionPath": [
+     "بوابة العملاء — متطلبات تسجيل الدخول"
+    ]
+   },
+   "language": "ar",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "heading",
+   "text": "1. مقدمة",
+   "locator": {
+    "sectionPath": [
+     "1. مقدمة"
+    ]
+   },
+   "language": "ar",
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "تنطبق متطلبات تسجيل الدخول على بوابة الويب وواجهة الهاتف.",
+   "locator": {
+    "sectionPath": [
+     "1. مقدمة"
+    ],
+    "paragraph": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "الدخول الموحد مخطط له في إصدار لاحق.",
+   "locator": {
+    "sectionPath": [
+     "1. مقدمة"
+    ],
+    "paragraph": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b5",
+   "type": "heading",
+   "text": "2. المتطلبات الوظيفية",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ]
+   },
+   "language": "ar",
+   "level": 1
+  },
+  {
+   "id": "b6",
+   "type": "table_cell",
+   "text": "الأولوية",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 1,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b7",
+   "type": "table_cell",
+   "text": "معايير القبول",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 1,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b8",
+   "type": "table_cell",
+   "text": "المتطلب",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 1,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b9",
+   "type": "table_cell",
+   "text": "المعرف",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 1,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b10",
+   "type": "table_cell",
+   "text": "متوسطة",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 2,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b11",
+   "type": "table_cell",
+   "text": "كلمة مرور من 11 حرفاً تُرفض.\nكلمة مرور من 12 حرفاً تُقبل.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 2,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b12",
+   "type": "table_cell",
+   "text": "يجب أن يشترط النظام كلمة مرور لا تقل عن 12 حرفاً.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 2,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b13",
+   "type": "table_cell",
+   "text": "FR-1",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 2,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b14",
+   "type": "table_cell",
+   "text": "منخفضة",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 3,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b15",
+   "type": "table_cell",
+   "text": "المحاولة السادسة تُظهر «تم قفل الحساب».\nيستمر القفل 15 دقيقة.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 3,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b16",
+   "type": "table_cell",
+   "text": "يجب أن يقفل النظام الحساب بعد 5 محاولات دخول فاشلة متتالية.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 3,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b17",
+   "type": "table_cell",
+   "text": "FR-2",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 3,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b18",
+   "type": "table_cell",
+   "text": "عالية",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 4,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b19",
+   "type": "table_cell",
+   "text": "الرابط منتهي الصلاحية يُظهر «انتهت صلاحية الرابط».",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 4,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b20",
+   "type": "table_cell",
+   "text": "يجب أن يتيح النظام إعادة تعيين كلمة المرور عبر رابط بالبريد صالح لمدة 30 دقيقة.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 4,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b21",
+   "type": "table_cell",
+   "text": "FR-3",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 4,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b22",
+   "type": "table_cell",
+   "text": "متوسطة",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 5,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b23",
+   "type": "table_cell",
+   "text": "تفعيل التحقق بخطوتين يتطلب تأكيد رمز صحيح واحد.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 5,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b24",
+   "type": "table_cell",
+   "text": "ينبغي أن يوفر النظام التحقق بخطوتين اختيارياً باستخدام رمز لمرة واحدة.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 5,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b25",
+   "type": "table_cell",
+   "text": "FR-4",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 5,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b26",
+   "type": "table_cell",
+   "text": "منخفضة",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 6,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b27",
+   "type": "table_cell",
+   "text": "بعد 20 دقيقة من عدم النشاط يعيد أي إجراء التوجيه لصفحة الدخول.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 6,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b28",
+   "type": "table_cell",
+   "text": "يجب أن ينهي النظام الجلسة الخاملة بعد 20 دقيقة.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 6,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b29",
+   "type": "table_cell",
+   "text": "FR-5",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 6,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b30",
+   "type": "table_cell",
+   "text": "عالية",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 7,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b31",
+   "type": "table_cell",
+   "text": "لا تكشف الرسالة عن وجود البريد الإلكتروني من عدمه.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 7,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b32",
+   "type": "table_cell",
+   "text": "يجب أن يعرض النظام رسالة خطأ عامة عند إدخال بيانات دخول غير صحيحة.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 7,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b33",
+   "type": "table_cell",
+   "text": "FR-6",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "table": 1,
+    "row": 7,
+    "col": 4
+   },
+   "language": "en"
+  }
+ ]
+}

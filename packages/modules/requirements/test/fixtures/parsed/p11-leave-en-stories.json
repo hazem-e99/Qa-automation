@@ -1,0 +1,271 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "pdf",
+ "pages": 1,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "HR Portal - Leave Request Requirements",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "HR Portal - Leave Request Requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "heading",
+   "text": "1. Introduction",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "Leave policies are defined by the HR department and may change yearly.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "Payroll integration is described in a separate document.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b5",
+   "type": "heading",
+   "text": "2. Functional requirements",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b6",
+   "type": "heading",
+   "text": "2.1 The system shall allow an …",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.1 The system shall allow an …"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "The system shall allow an employee to submit an annual leave request with start and end dates.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.1 The system shall allow an …"
+    ],
+    "paragraph": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b8",
+   "type": "paragraph",
+   "text": "Then The request shows the number of working days requested.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.1 The system shall allow an …"
+    ],
+    "paragraph": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b9",
+   "type": "heading",
+   "text": "2.2 The system shall prevent a …",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.2 The system shall prevent a …"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b10",
+   "type": "paragraph",
+   "text": "The system shall prevent a leave request that exceeds the remaining balance.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.2 The system shall prevent a …"
+    ],
+    "paragraph": 5
+   },
+   "language": "en"
+  },
+  {
+   "id": "b11",
+   "type": "paragraph",
+   "text": "Then Requesting 6 days with a balance of 5 shows an error.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.2 The system shall prevent a …"
+    ],
+    "paragraph": 6
+   },
+   "language": "en"
+  },
+  {
+   "id": "b12",
+   "type": "heading",
+   "text": "2.3 The system shall notify the …",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.3 The system shall notify the …"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b13",
+   "type": "paragraph",
+   "text": "The system shall notify the direct manager when a request is submitted.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.3 The system shall notify the …"
+    ],
+    "paragraph": 7
+   },
+   "language": "en"
+  },
+  {
+   "id": "b14",
+   "type": "paragraph",
+   "text": "Then The manager receives an in-app notification and an email.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.3 The system shall notify the …"
+    ],
+    "paragraph": 8
+   },
+   "language": "en"
+  },
+  {
+   "id": "b15",
+   "type": "heading",
+   "text": "2.4 The manager must approve or …",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.4 The manager must approve or …"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b16",
+   "type": "paragraph",
+   "text": "The manager must approve or reject a request within 3 working days.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.4 The manager must approve or …"
+    ],
+    "paragraph": 9
+   },
+   "language": "en"
+  },
+  {
+   "id": "b17",
+   "type": "paragraph",
+   "text": "Then After 3 working days the request escalates to HR.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.4 The manager must approve or …"
+    ],
+    "paragraph": 10
+   },
+   "language": "en"
+  },
+  {
+   "id": "b18",
+   "type": "heading",
+   "text": "2.5 The system shall exclude public …",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.5 The system shall exclude public …"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b19",
+   "type": "paragraph",
+   "text": "The system shall exclude public holidays from the calculated leave days.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.5 The system shall exclude public …"
+    ],
+    "paragraph": 11
+   },
+   "language": "en"
+  },
+  {
+   "id": "b20",
+   "type": "paragraph",
+   "text": "Then A request spanning a public holiday counts one day fewer.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2.5 The system shall exclude public …"
+    ],
+    "paragraph": 12
+   },
+   "language": "en"
+  }
+ ]
+}

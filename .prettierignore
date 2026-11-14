@@ -6,3 +6,5 @@ pnpm-lock.yaml
 spikes
 docs
 **/migrations/**
+# Parser output dumped by services/parser/tools/dump_corpus.py (generated)
+packages/modules/requirements/test/fixtures/parsed/

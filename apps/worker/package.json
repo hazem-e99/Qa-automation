@@ -34,7 +34,9 @@
     "@qos/adapters-azure-devops": "workspace:*",
     "@qos/adapters-ai-gemini": "workspace:*",
     "@qos/adapters-local-git": "workspace:*",
-    "@qos/requirements": "workspace:*"
+    "@qos/requirements": "workspace:*",
+    "@qos/adapters-parser-http": "workspace:*",
+    "@qos/adapters-storage-localfs": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*",

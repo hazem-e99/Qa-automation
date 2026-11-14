@@ -11,6 +11,7 @@ export default defineConfig({
     './src/schema/integrations.ts',
     './src/schema/approvals.ts',
     './src/schema/requirements.ts',
+    './src/schema/traceability.ts',
   ],
   out: './migrations',
 });

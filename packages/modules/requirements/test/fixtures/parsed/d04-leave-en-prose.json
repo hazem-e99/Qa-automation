@@ -1,0 +1,131 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "docx",
+ "pages": null,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "HR Portal — Leave Request Requirements",
+   "locator": {
+    "sectionPath": [
+     "HR Portal — Leave Request Requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "heading",
+   "text": "1. Introduction",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "Leave policies are defined by the HR department and may change yearly.",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "Payroll integration is described in a separate document.",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b5",
+   "type": "heading",
+   "text": "2. Functional requirements",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b6",
+   "type": "paragraph",
+   "text": "Payroll integration is described in a separate document. The system shall allow an employee to submit an annual leave request with start and end dates. For example, The request shows the number of working days requested.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "Leave policies are defined by the HR department and may change yearly. The system shall prevent a leave request that exceeds the remaining balance. For example, Requesting 6 days with a balance of 5 shows an error.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b8",
+   "type": "paragraph",
+   "text": "Payroll integration is described in a separate document. The system shall notify the direct manager when a request is submitted. For example, The manager receives an in-app notification and an email.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 5
+   },
+   "language": "en"
+  },
+  {
+   "id": "b9",
+   "type": "paragraph",
+   "text": "Leave policies are defined by the HR department and may change yearly. The manager must approve or reject a request within 3 working days. For example, After 3 working days the request escalates to HR.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 6
+   },
+   "language": "en"
+  },
+  {
+   "id": "b10",
+   "type": "paragraph",
+   "text": "Payroll integration is described in a separate document. The system shall exclude public holidays from the calculated leave days. For example, A request spanning a public holiday counts one day fewer.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 7
+   },
+   "language": "en"
+  }
+ ]
+}

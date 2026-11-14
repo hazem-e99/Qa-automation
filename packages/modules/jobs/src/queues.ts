@@ -28,6 +28,15 @@ export const QUEUES = {
     expireInSeconds: 30 * 60,
     deadLetter: 'platform.dead-letter',
   },
+  /** Parses one uploaded snapshot and extracts candidates (T-P3-04/05/06). */
+  requirementsParse: {
+    name: 'requirements.parse',
+    policy: 'standard',
+    ...defaults,
+    retryLimit: 3,
+    expireInSeconds: 30 * 60,
+    deadLetter: 'platform.dead-letter',
+  },
 } as const satisfies Record<string, QueueDefinition>;
 
 export const ALL_QUEUES: readonly QueueDefinition[] = Object.values(QUEUES);

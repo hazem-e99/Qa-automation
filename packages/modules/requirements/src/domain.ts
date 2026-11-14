@@ -133,6 +133,8 @@ export interface SnapshotDiff<T extends DiffItem> {
   readonly removed: T[];
   readonly changed: ItemChange<T>[];
   readonly unchanged: T[];
+  /** The matched pairs behind `unchanged` (same order). */
+  readonly unchangedPairs: { before: T; after: T }[];
 }
 
 /** Word-trigram-free similarity: Jaccard on normalized words (fast, language-neutral). */
@@ -185,6 +187,7 @@ export function diffSnapshots<T extends DiffItem>(
   }
   const changed: ItemChange<T>[] = [];
   const unchanged: T[] = [];
+  const unchangedPairs: { before: T; after: T }[] = [];
   for (const [before, after] of pairs) {
     const norm = (s: string) => normalizeForSearch(s);
     const fields: ItemChange<T>['fields'] = [];
@@ -198,7 +201,10 @@ export function diffSnapshots<T extends DiffItem>(
     };
     if (ac.added.length || ac.removed.length) fields.push('acceptanceCriteria');
     if (fields.length) changed.push({ before, after, fields, ac });
-    else unchanged.push(after);
+    else {
+      unchanged.push(after);
+      unchangedPairs.push({ before, after });
+    }
   }
-  return { added: [...leftNext], removed: [...leftPrev], changed, unchanged };
+  return { added: [...leftNext], removed: [...leftPrev], changed, unchanged, unchangedPairs };
 }

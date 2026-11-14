@@ -4,9 +4,10 @@
 #   pnpm dev:db            PostgreSQL only, for running the apps on the host
 #   pnpm stack:up          build and start the `core` profile (postgres, migrate, api, worker, web)
 #   pnpm stack:down        stop it (data volumes are kept)
+#   pnpm stack:parser      also build and start the document parser (large image, several GB)
 #
 # Every published port binds to 127.0.0.1. Credentials come from infra/compose/.env (gitignored).
-# Profiles still to come: n8n (P7), exec (P6: execution-controller, socket proxy, egress proxy).
+# Profiles: db, core; the parser (P3) lives in docker-compose.parser.yml. Still to come: n8n (P7), exec (P6: execution-controller, socket proxy, egress proxy).
 name: qualityos
 
 x-app: &app
@@ -116,7 +117,12 @@ services:
       WORKER_HEALTH_PORT: 3002
       QOS_MASTER_KEY_FILE: /run/secrets/master_key
       QOS_DEMO_MODE: ${QOS_DEMO_MODE:-true}
+      STORAGE_DIR: /data/storage
+      # Empty: uploads stay pending. docker-compose.parser.yml points it at the parser.
+      PARSER_URL: ${PARSER_URL:-}
     secrets: [master_key]
+    volumes:
+      - storage:/data/storage
     read_only: true
     tmpfs: [/tmp]
     healthcheck:

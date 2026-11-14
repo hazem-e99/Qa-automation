@@ -1,0 +1,63 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "pdf",
+ "pages": 1,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "Digital Library - Borrowing Requirements",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "Digital Library - Borrowing Requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "list_item",
+   "text": "Introduction",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "Digital Library - Borrowing Requirements"
+    ],
+    "paragraph": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "The digital library serves students and staff of the institute.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "Digital Library - Borrowing Requirements"
+    ],
+    "paragraph": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "E-book licensing terms are managed by the procurement office. 2. Functional requirements REQ-1: The system shall allow a member to borrow up to 5 items at the same time. Acceptance criteria: · Borrowing a 6th item shows 'Borrowing limit reached'. REQ-2: The system shall set the loan period to 14 days. Acceptance criteria: · The due date equals the borrow date plus 14 days. REQ-3: The system shall allow one renewal if no other member has reserved the item. Acceptance criteria: · Renewal is refused when a reservation exists. REQ-4: The system shall send a reminder 2 days before the due date. Acceptance criteria: · The reminder is sent by email at 09:00 local time. REQ-5: The system must block borrowing for members with overdue items. Acceptance criteria: · A member with one overdue item cannot borrow.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "Digital Library - Borrowing Requirements"
+    ],
+    "paragraph": 3
+   },
+   "language": "en"
+  }
+ ]
+}

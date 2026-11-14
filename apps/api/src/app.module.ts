@@ -8,6 +8,8 @@ import type { ApiConfig } from './config.js';
 import { DemoController } from './demo.controller.js';
 import { MappingsController } from './mappings.controller.js';
 import { RequirementsController } from './requirements.controller.js';
+import { DocumentsController } from './documents.controller.js';
+import { TraceController } from './trace.controller.js';
 import { FilesController } from './files.controller.js';
 import { GovernanceController } from './governance.controller.js';
 import { HealthController } from './health.controller.js';
@@ -46,6 +48,8 @@ export class AppModule {
         DemoController,
         MappingsController,
         RequirementsController,
+        DocumentsController,
+        TraceController,
       ],
       providers: [
         { provide: CONFIG, useValue: config },

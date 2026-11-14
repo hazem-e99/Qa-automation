@@ -1,0 +1,276 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "csv",
+ "pages": null,
+ "languages": [
+  "ar",
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "table_cell",
+   "text": "المعرف",
+   "locator": {
+    "sheet": "csv",
+    "row": 1,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b2",
+   "type": "table_cell",
+   "text": "المتطلب",
+   "locator": {
+    "sheet": "csv",
+    "row": 1,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b3",
+   "type": "table_cell",
+   "text": "معايير القبول",
+   "locator": {
+    "sheet": "csv",
+    "row": 1,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b4",
+   "type": "table_cell",
+   "text": "الأولوية",
+   "locator": {
+    "sheet": "csv",
+    "row": 1,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b5",
+   "type": "table_cell",
+   "text": "FR-1",
+   "locator": {
+    "sheet": "csv",
+    "row": 2,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b6",
+   "type": "table_cell",
+   "text": "يجب أن يتيح النظام للموظف تقديم طلب إجازة سنوية بتاريخ بداية ونهاية.",
+   "locator": {
+    "sheet": "csv",
+    "row": 2,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b7",
+   "type": "table_cell",
+   "text": "يعرض الطلب عدد أيام العمل المطلوبة.",
+   "locator": {
+    "sheet": "csv",
+    "row": 2,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b8",
+   "type": "table_cell",
+   "text": "متوسطة",
+   "locator": {
+    "sheet": "csv",
+    "row": 2,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b9",
+   "type": "table_cell",
+   "text": "FR-2",
+   "locator": {
+    "sheet": "csv",
+    "row": 3,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b10",
+   "type": "table_cell",
+   "text": "يجب أن يمنع النظام طلب إجازة يتجاوز الرصيد المتبقي.",
+   "locator": {
+    "sheet": "csv",
+    "row": 3,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b11",
+   "type": "table_cell",
+   "text": "طلب 6 أيام برصيد 5 أيام يُظهر خطأ.",
+   "locator": {
+    "sheet": "csv",
+    "row": 3,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b12",
+   "type": "table_cell",
+   "text": "منخفضة",
+   "locator": {
+    "sheet": "csv",
+    "row": 3,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b13",
+   "type": "table_cell",
+   "text": "FR-3",
+   "locator": {
+    "sheet": "csv",
+    "row": 4,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b14",
+   "type": "table_cell",
+   "text": "يجب أن يُخطر النظام المدير المباشر عند تقديم الطلب.",
+   "locator": {
+    "sheet": "csv",
+    "row": 4,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b15",
+   "type": "table_cell",
+   "text": "يتلقى المدير إشعاراً داخل النظام ورسالة بريد.",
+   "locator": {
+    "sheet": "csv",
+    "row": 4,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b16",
+   "type": "table_cell",
+   "text": "عالية",
+   "locator": {
+    "sheet": "csv",
+    "row": 4,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b17",
+   "type": "table_cell",
+   "text": "FR-4",
+   "locator": {
+    "sheet": "csv",
+    "row": 5,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b18",
+   "type": "table_cell",
+   "text": "يجب على المدير الموافقة على الطلب أو رفضه خلال 3 أيام عمل.",
+   "locator": {
+    "sheet": "csv",
+    "row": 5,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b19",
+   "type": "table_cell",
+   "text": "بعد 3 أيام عمل يُصعَّد الطلب إلى الموارد البشرية.",
+   "locator": {
+    "sheet": "csv",
+    "row": 5,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b20",
+   "type": "table_cell",
+   "text": "متوسطة",
+   "locator": {
+    "sheet": "csv",
+    "row": 5,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b21",
+   "type": "table_cell",
+   "text": "FR-5",
+   "locator": {
+    "sheet": "csv",
+    "row": 6,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b22",
+   "type": "table_cell",
+   "text": "يجب أن يستثني النظام العطلات الرسمية من أيام الإجازة المحتسبة.",
+   "locator": {
+    "sheet": "csv",
+    "row": 6,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b23",
+   "type": "table_cell",
+   "text": "الطلب الذي يشمل عطلة رسمية يُحتسب بيوم أقل.",
+   "locator": {
+    "sheet": "csv",
+    "row": 6,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b24",
+   "type": "table_cell",
+   "text": "منخفضة",
+   "locator": {
+    "sheet": "csv",
+    "row": 6,
+    "col": 4
+   },
+   "language": "ar"
+  }
+ ]
+}

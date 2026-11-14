@@ -1,0 +1,496 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "pdf",
+ "pages": 1,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "Online Store - Checkout Requirements",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "Online Store - Checkout Requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "heading",
+   "text": "1. Introduction",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "This section describes the checkout flow of the online store for registered and guest customers.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "Payment processing is provided by an external gateway and is out of scope of this document.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b5",
+   "type": "heading",
+   "text": "2. Functional requirements",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b6",
+   "type": "table_cell",
+   "text": "ID",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 1,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b7",
+   "type": "table_cell",
+   "text": "Requirement",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 1,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b8",
+   "type": "table_cell",
+   "text": "Acceptance Criteria",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 1,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b9",
+   "type": "table_cell",
+   "text": "Priority",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 1,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b10",
+   "type": "table_cell",
+   "text": "FR-1",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 2,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b11",
+   "type": "table_cell",
+   "text": "The system shall allow a customer to review the cart before payment.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 2,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b12",
+   "type": "table_cell",
+   "text": "Cart page lists item name, quantity, unit price and line total. Customer can change quantity or remove an item.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 2,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b13",
+   "type": "table_cell",
+   "text": "Medium",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 2,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b14",
+   "type": "table_cell",
+   "text": "FR-2",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 3,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b15",
+   "type": "table_cell",
+   "text": "The system shall calculate the order total including VAT at 14 percent.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 3,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b16",
+   "type": "table_cell",
+   "text": "Total equals the sum of line totals plus 14% VAT, rounded to two decimals.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 3,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b17",
+   "type": "table_cell",
+   "text": "Low",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 3,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b18",
+   "type": "table_cell",
+   "text": "FR-3",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 4,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b19",
+   "type": "table_cell",
+   "text": "The system must reject a coupon code that has expired.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 4,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b20",
+   "type": "table_cell",
+   "text": "An expired coupon shows the message 'Coupon expired' and the total is unchanged.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 4,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b21",
+   "type": "table_cell",
+   "text": "High",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 4,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b22",
+   "type": "table_cell",
+   "text": "FR-4",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 5,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b23",
+   "type": "table_cell",
+   "text": "The system shall support guest checkout without creating an account.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 5,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b24",
+   "type": "table_cell",
+   "text": "Guest checkout requires only email, phone and delivery address.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 5,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b25",
+   "type": "table_cell",
+   "text": "Medium",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 5,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b26",
+   "type": "table_cell",
+   "text": "FR-5",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 6,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b27",
+   "type": "table_cell",
+   "text": "The system shall send an order confirmation email within 5 minutes of successful payment.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 6,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b28",
+   "type": "table_cell",
+   "text": "Email contains order number, items and total.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 6,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b29",
+   "type": "table_cell",
+   "text": "Low",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 6,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b30",
+   "type": "table_cell",
+   "text": "FR-6",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 7,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b31",
+   "type": "table_cell",
+   "text": "The system must not allow an order with a quantity greater than 10 for a single item.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 7,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b32",
+   "type": "table_cell",
+   "text": "Quantity 11 shows a validation error. Quantity 10 is accepted.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 7,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b33",
+   "type": "table_cell",
+   "text": "High",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "table": 1,
+    "row": 7,
+    "col": 4
+   },
+   "language": "en"
+  }
+ ]
+}

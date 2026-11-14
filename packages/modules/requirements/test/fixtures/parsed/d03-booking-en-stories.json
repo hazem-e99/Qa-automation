@@ -1,0 +1,279 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "docx",
+ "pages": null,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "Hotel Booking — Reservation Requirements",
+   "locator": {
+    "sectionPath": [
+     "Hotel Booking — Reservation Requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "heading",
+   "text": "1. Introduction",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "The booking engine is used by the public website and the call centre.",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "Room inventory is synchronised nightly from the property system.",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b5",
+   "type": "heading",
+   "text": "2. Functional requirements",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b6",
+   "type": "heading",
+   "text": "2.1 The system shall show available …",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.1 The system shall show available …"
+    ]
+   },
+   "language": "en",
+   "level": 2
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "The system shall show available rooms for the selected dates and number of guests.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.1 The system shall show available …"
+    ],
+    "paragraph": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b8",
+   "type": "paragraph",
+   "text": "Then Rooms with no availability on any selected night are hidden.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.1 The system shall show available …"
+    ],
+    "paragraph": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b9",
+   "type": "heading",
+   "text": "2.2 The system shall not allow …",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.2 The system shall not allow …"
+    ]
+   },
+   "language": "en",
+   "level": 2
+  },
+  {
+   "id": "b10",
+   "type": "paragraph",
+   "text": "The system shall not allow a check-out date earlier than or equal to the check-in date.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.2 The system shall not allow …"
+    ],
+    "paragraph": 5
+   },
+   "language": "en"
+  },
+  {
+   "id": "b11",
+   "type": "paragraph",
+   "text": "Then Same-day check-out shows a validation error.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.2 The system shall not allow …"
+    ],
+    "paragraph": 6
+   },
+   "language": "en"
+  },
+  {
+   "id": "b12",
+   "type": "heading",
+   "text": "2.3 The system shall allow free …",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.3 The system shall allow free …"
+    ]
+   },
+   "language": "en",
+   "level": 2
+  },
+  {
+   "id": "b13",
+   "type": "paragraph",
+   "text": "The system shall allow free cancellation up to 48 hours before check-in.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.3 The system shall allow free …"
+    ],
+    "paragraph": 7
+   },
+   "language": "en"
+  },
+  {
+   "id": "b14",
+   "type": "paragraph",
+   "text": "Then Cancellation 49 hours before is free.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.3 The system shall allow free …"
+    ],
+    "paragraph": 8
+   },
+   "language": "en"
+  },
+  {
+   "id": "b15",
+   "type": "paragraph",
+   "text": "Then Cancellation 47 hours before charges one night.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.3 The system shall allow free …"
+    ],
+    "paragraph": 9
+   },
+   "language": "en"
+  },
+  {
+   "id": "b16",
+   "type": "heading",
+   "text": "2.4 The system must hold a …",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.4 The system must hold a …"
+    ]
+   },
+   "language": "en",
+   "level": 2
+  },
+  {
+   "id": "b17",
+   "type": "paragraph",
+   "text": "The system must hold a reservation for 15 minutes while payment is in progress.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.4 The system must hold a …"
+    ],
+    "paragraph": 10
+   },
+   "language": "en"
+  },
+  {
+   "id": "b18",
+   "type": "paragraph",
+   "text": "Then After 15 minutes without payment the hold is released.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.4 The system must hold a …"
+    ],
+    "paragraph": 11
+   },
+   "language": "en"
+  },
+  {
+   "id": "b19",
+   "type": "heading",
+   "text": "2.5 The system shall display prices …",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.5 The system shall display prices …"
+    ]
+   },
+   "language": "en",
+   "level": 2
+  },
+  {
+   "id": "b20",
+   "type": "paragraph",
+   "text": "The system shall display prices in the currency selected by the guest.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.5 The system shall display prices …"
+    ],
+    "paragraph": 12
+   },
+   "language": "en"
+  },
+  {
+   "id": "b21",
+   "type": "paragraph",
+   "text": "Then Switching currency updates all prices on the page.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements",
+     "2.5 The system shall display prices …"
+    ],
+    "paragraph": 13
+   },
+   "language": "en"
+  }
+ ]
+}

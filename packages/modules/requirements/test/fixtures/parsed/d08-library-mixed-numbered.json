@@ -1,0 +1,360 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "docx",
+ "pages": null,
+ "languages": [
+  "ar",
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "المكتبة الرقمية — متطلبات الإعارة",
+   "locator": {
+    "sectionPath": [
+     "المكتبة الرقمية — متطلبات الإعارة"
+    ]
+   },
+   "language": "ar",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "heading",
+   "text": "1. مقدمة",
+   "locator": {
+    "sectionPath": [
+     "1. مقدمة"
+    ]
+   },
+   "language": "ar",
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "تخدم المكتبة الرقمية طلاب المعهد وموظفيه.",
+   "locator": {
+    "sectionPath": [
+     "1. مقدمة"
+    ],
+    "paragraph": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "تدير إدارة المشتريات شروط ترخيص الكتب الإلكترونية.",
+   "locator": {
+    "sectionPath": [
+     "1. مقدمة"
+    ],
+    "paragraph": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b5",
+   "type": "heading",
+   "text": "2. المتطلبات الوظيفية",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ]
+   },
+   "language": "ar",
+   "level": 1
+  },
+  {
+   "id": "b6",
+   "type": "paragraph",
+   "text": "REQ-1: يجب أن يتيح النظام للعضو استعارة 5 مواد كحد أقصى في نفس الوقت.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "معايير القبول:",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b8",
+   "type": "list_item",
+   "text": "استعارة المادة السادسة تُظهر «تم بلوغ حد الإعارة».",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 5
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b9",
+   "type": "paragraph",
+   "text": "REQ-2: يجب أن يحدد النظام مدة الإعارة بـ 14 يوماً.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 6
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b10",
+   "type": "paragraph",
+   "text": "معايير القبول:",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 7
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b11",
+   "type": "list_item",
+   "text": "تاريخ الاستحقاق يساوي تاريخ الاستعارة مضافاً إليه 14 يوماً.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 8
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b12",
+   "type": "paragraph",
+   "text": "REQ-3: يجب أن يتيح النظام تجديداً واحداً إذا لم يحجز عضو آخر المادة.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 9
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b13",
+   "type": "paragraph",
+   "text": "معايير القبول:",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 10
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b14",
+   "type": "list_item",
+   "text": "يُرفض التجديد عند وجود حجز.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 11
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b15",
+   "type": "paragraph",
+   "text": "REQ-4: يجب أن يرسل النظام تذكيراً قبل يومين من تاريخ الاستحقاق.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 12
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b16",
+   "type": "paragraph",
+   "text": "معايير القبول:",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 13
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b17",
+   "type": "list_item",
+   "text": "يُرسل التذكير بالبريد الساعة 09:00 بالتوقيت المحلي.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 14
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b18",
+   "type": "paragraph",
+   "text": "REQ-5: يجب أن يمنع النظام الاستعارة للأعضاء الذين لديهم مواد متأخرة.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 15
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b19",
+   "type": "paragraph",
+   "text": "معايير القبول:",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 16
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b20",
+   "type": "list_item",
+   "text": "العضو الذي لديه مادة متأخرة واحدة لا يمكنه الاستعارة.",
+   "locator": {
+    "sectionPath": [
+     "2. المتطلبات الوظيفية"
+    ],
+    "paragraph": 17
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b21",
+   "type": "heading",
+   "text": "1. Introduction",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b22",
+   "type": "paragraph",
+   "text": "The digital library serves students and staff of the institute.",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 18
+   },
+   "language": "en"
+  },
+  {
+   "id": "b23",
+   "type": "paragraph",
+   "text": "E-book licensing terms are managed by the procurement office.",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 19
+   },
+   "language": "en"
+  },
+  {
+   "id": "b24",
+   "type": "heading",
+   "text": "2. Functional requirements",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b25",
+   "type": "paragraph",
+   "text": "E-book licensing terms are managed by the procurement office. The system shall allow a member to borrow up to 5 items at the same time. For example, Borrowing a 6th item shows 'Borrowing limit reached'.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 20
+   },
+   "language": "en"
+  },
+  {
+   "id": "b26",
+   "type": "paragraph",
+   "text": "The digital library serves students and staff of the institute. The system shall set the loan period to 14 days. For example, The due date equals the borrow date plus 14 days.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 21
+   },
+   "language": "en"
+  },
+  {
+   "id": "b27",
+   "type": "paragraph",
+   "text": "E-book licensing terms are managed by the procurement office. The system shall allow one renewal if no other member has reserved the item. For example, Renewal is refused when a reservation exists.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 22
+   },
+   "language": "en"
+  },
+  {
+   "id": "b28",
+   "type": "paragraph",
+   "text": "The digital library serves students and staff of the institute. The system shall send a reminder 2 days before the due date. For example, The reminder is sent by email at 09:00 local time.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 23
+   },
+   "language": "en"
+  },
+  {
+   "id": "b29",
+   "type": "paragraph",
+   "text": "E-book licensing terms are managed by the procurement office. The system must block borrowing for members with overdue items. For example, A member with one overdue item cannot borrow.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 24
+   },
+   "language": "en"
+  }
+ ]
+}

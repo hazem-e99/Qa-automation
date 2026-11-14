@@ -1,0 +1,297 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "pdf",
+ "pages": 1,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 1,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "paragraph",
+   "text": "Online Store Checkout Requirements",
+   "locator": {
+    "page": 1,
+    "line": 1
+   },
+   "language": "en",
+   "ocrConfidence": 0.861
+  },
+  {
+   "id": "b2",
+   "type": "paragraph",
+   "text": "1 Introduction",
+   "locator": {
+    "page": 1,
+    "line": 2
+   },
+   "language": "en",
+   "ocrConfidence": 0.562
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "This section describes the checkout flow of the online store for registered and guest",
+   "locator": {
+    "page": 1,
+    "line": 3
+   },
+   "language": "en",
+   "ocrConfidence": 0.563
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "customers",
+   "locator": {
+    "page": 1,
+    "line": 4
+   },
+   "language": "en",
+   "ocrConfidence": 0.805
+  },
+  {
+   "id": "b5",
+   "type": "paragraph",
+   "text": "Payment processing is provided by an external gateway and is out of scope of this document",
+   "locator": {
+    "page": 1,
+    "line": 5
+   },
+   "language": "en",
+   "ocrConfidence": 0.562
+  },
+  {
+   "id": "b6",
+   "type": "paragraph",
+   "text": "2. Functional requirements",
+   "locator": {
+    "page": 1,
+    "line": 6
+   },
+   "language": "en",
+   "ocrConfidence": 0.595
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "21 The system shall allow a",
+   "locator": {
+    "page": 1,
+    "line": 7
+   },
+   "language": "en",
+   "ocrConfidence": 0.652
+  },
+  {
+   "id": "b8",
+   "type": "paragraph",
+   "text": "The system shall allow a customer to review the cart before payment",
+   "locator": {
+    "page": 1,
+    "line": 8
+   },
+   "language": "en",
+   "ocrConfidence": 0.512
+  },
+  {
+   "id": "b9",
+   "type": "paragraph",
+   "text": "Then Cart page lists item name, quantity, unit price and line total",
+   "locator": {
+    "page": 1,
+    "line": 9
+   },
+   "language": "en",
+   "ocrConfidence": 0.413
+  },
+  {
+   "id": "b10",
+   "type": "paragraph",
+   "text": "Then Customer can change quantity or remove an item.",
+   "locator": {
+    "page": 1,
+    "line": 10
+   },
+   "language": "en",
+   "ocrConfidence": 0.7
+  },
+  {
+   "id": "b11",
+   "type": "paragraph",
+   "text": "2.2 The system shall calculate the",
+   "locator": {
+    "page": 1,
+    "line": 11
+   },
+   "language": "en",
+   "ocrConfidence": 0.809
+  },
+  {
+   "id": "b12",
+   "type": "paragraph",
+   "text": "The system shall calculate the order total including VAT at 14 percent",
+   "locator": {
+    "page": 1,
+    "line": 12
+   },
+   "language": "en",
+   "ocrConfidence": 0.515
+  },
+  {
+   "id": "b13",
+   "type": "paragraph",
+   "text": "Then Total equals the sum of line totals plus 14% VAT, rounded to two decimals.",
+   "locator": {
+    "page": 1,
+    "line": 13
+   },
+   "language": "en",
+   "ocrConfidence": 0.242
+  },
+  {
+   "id": "b14",
+   "type": "paragraph",
+   "text": "2.3 The system must reject a",
+   "locator": {
+    "page": 1,
+    "line": 14
+   },
+   "language": "en",
+   "ocrConfidence": 0.597
+  },
+  {
+   "id": "b15",
+   "type": "paragraph",
+   "text": "The system must reject a coupon code that has expired",
+   "locator": {
+    "page": 1,
+    "line": 15
+   },
+   "language": "en",
+   "ocrConfidence": 0.535
+  },
+  {
+   "id": "b16",
+   "type": "paragraph",
+   "text": "Then An expired coupon shows the message 'Coupon expired' and the total is unchanged",
+   "locator": {
+    "page": 1,
+    "line": 16
+   },
+   "language": "en",
+   "ocrConfidence": 0.458
+  },
+  {
+   "id": "b17",
+   "type": "paragraph",
+   "text": "2.4 The system shall support guest",
+   "locator": {
+    "page": 1,
+    "line": 17
+   },
+   "language": "en",
+   "ocrConfidence": 0.703
+  },
+  {
+   "id": "b18",
+   "type": "paragraph",
+   "text": "The system shall support guest checkout without creating an account",
+   "locator": {
+    "page": 1,
+    "line": 18
+   },
+   "language": "en",
+   "ocrConfidence": 0.858
+  },
+  {
+   "id": "b19",
+   "type": "paragraph",
+   "text": "Then Guest checkout requires only email, phone and delivery address",
+   "locator": {
+    "page": 1,
+    "line": 19
+   },
+   "language": "en",
+   "ocrConfidence": 0.466
+  },
+  {
+   "id": "b20",
+   "type": "paragraph",
+   "text": "2.5 The system shall send an",
+   "locator": {
+    "page": 1,
+    "line": 20
+   },
+   "language": "en",
+   "ocrConfidence": 0.572
+  },
+  {
+   "id": "b21",
+   "type": "paragraph",
+   "text": "The system shall send an order confirmation email within 5 minutes of successful payment",
+   "locator": {
+    "page": 1,
+    "line": 21
+   },
+   "language": "en",
+   "ocrConfidence": 0.461
+  },
+  {
+   "id": "b22",
+   "type": "paragraph",
+   "text": "Then Email contains order number , items and total",
+   "locator": {
+    "page": 1,
+    "line": 22
+   },
+   "language": "en",
+   "ocrConfidence": 0.549
+  },
+  {
+   "id": "b23",
+   "type": "paragraph",
+   "text": "2.6 The system must not allow",
+   "locator": {
+    "page": 1,
+    "line": 23
+   },
+   "language": "en",
+   "ocrConfidence": 0.685
+  },
+  {
+   "id": "b24",
+   "type": "paragraph",
+   "text": "The system must not allow an order with quantity greater than 10 for a single item.",
+   "locator": {
+    "page": 1,
+    "line": 24
+   },
+   "language": "en",
+   "ocrConfidence": 0.571
+  },
+  {
+   "id": "b25",
+   "type": "paragraph",
+   "text": "Then Quantity 11 shows a validation error",
+   "locator": {
+    "page": 1,
+    "line": 25
+   },
+   "language": "en",
+   "ocrConfidence": 0.436
+  },
+  {
+   "id": "b26",
+   "type": "paragraph",
+   "text": "Then Quantity 10 is accepted",
+   "locator": {
+    "page": 1,
+    "line": 26
+   },
+   "language": "en",
+   "ocrConfidence": 0.697
+  }
+ ]
+}

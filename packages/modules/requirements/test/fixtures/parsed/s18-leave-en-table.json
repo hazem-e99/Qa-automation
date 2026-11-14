@@ -1,0 +1,187 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "pdf",
+ "pages": 1,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 1,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "paragraph",
+   "text": "HR Portal Leave Request Requirements",
+   "locator": {
+    "page": 1,
+    "line": 1
+   },
+   "language": "en",
+   "ocrConfidence": 0.852
+  },
+  {
+   "id": "b2",
+   "type": "paragraph",
+   "text": "1 Introduction",
+   "locator": {
+    "page": 1,
+    "line": 2
+   },
+   "language": "en",
+   "ocrConfidence": 0.767
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "Leave policies are defined by the HR department and may change yearly",
+   "locator": {
+    "page": 1,
+    "line": 3
+   },
+   "language": "en",
+   "ocrConfidence": 0.59
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "Payroll integration is described in separate document",
+   "locator": {
+    "page": 1,
+    "line": 4
+   },
+   "language": "en",
+   "ocrConfidence": 0.698
+  },
+  {
+   "id": "b5",
+   "type": "paragraph",
+   "text": "2. Functional requirements",
+   "locator": {
+    "page": 1,
+    "line": 5
+   },
+   "language": "en",
+   "ocrConfidence": 0.865
+  },
+  {
+   "id": "b6",
+   "type": "paragraph",
+   "text": "|0 Requirement Acceptance Criteria Priority",
+   "locator": {
+    "page": 1,
+    "line": 6
+   },
+   "language": "en",
+   "ocrConfidence": 0.849
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "FR-1 The system shall allow an employee to submit an annual leave request with start and",
+   "locator": {
+    "page": 1,
+    "line": 7
+   },
+   "language": "en",
+   "ocrConfidence": 0.67
+  },
+  {
+   "id": "b8",
+   "type": "paragraph",
+   "text": "end dates The request shows the number of working days requested  Medium",
+   "locator": {
+    "page": 1,
+    "line": 8
+   },
+   "language": "en",
+   "ocrConfidence": 0.63
+  },
+  {
+   "id": "b9",
+   "type": "paragraph",
+   "text": "FR-2 | The system shall prevent a leave request that exceeds the remaining balance",
+   "locator": {
+    "page": 1,
+    "line": 9
+   },
+   "language": "en",
+   "ocrConfidence": 0.461
+  },
+  {
+   "id": "b10",
+   "type": "paragraph",
+   "text": "Requesting 6 days with a balance of 5 shows an error  Low",
+   "locator": {
+    "page": 1,
+    "line": 10
+   },
+   "language": "en",
+   "ocrConfidence": 0.701
+  },
+  {
+   "id": "b11",
+   "type": "paragraph",
+   "text": "FR-3 The system shall notify the direct manager when a request is submitted The",
+   "locator": {
+    "page": 1,
+    "line": 11
+   },
+   "language": "en",
+   "ocrConfidence": 0.816
+  },
+  {
+   "id": "b12",
+   "type": "paragraph",
+   "text": "manager receives an in-app notification and an email. High",
+   "locator": {
+    "page": 1,
+    "line": 12
+   },
+   "language": "en",
+   "ocrConfidence": 0.695
+  },
+  {
+   "id": "b13",
+   "type": "paragraph",
+   "text": "FR-4 The manager must approve or reject a request within 3 working days. After 3 working",
+   "locator": {
+    "page": 1,
+    "line": 13
+   },
+   "language": "en",
+   "ocrConfidence": 0.669
+  },
+  {
+   "id": "b14",
+   "type": "paragraph",
+   "text": "days the request escalates to HR Medium",
+   "locator": {
+    "page": 1,
+    "line": 14
+   },
+   "language": "en",
+   "ocrConfidence": 0.847
+  },
+  {
+   "id": "b15",
+   "type": "paragraph",
+   "text": "FR-5 | The system shall exclude public holidays from the calculated leave days. A request",
+   "locator": {
+    "page": 1,
+    "line": 15
+   },
+   "language": "en",
+   "ocrConfidence": 0.913
+  },
+  {
+   "id": "b16",
+   "type": "paragraph",
+   "text": "spanning a public holiday counts one day fewer  | Low",
+   "locator": {
+    "page": 1,
+    "line": 16
+   },
+   "language": "en",
+   "ocrConfidence": 0.715
+  }
+ ]
+}

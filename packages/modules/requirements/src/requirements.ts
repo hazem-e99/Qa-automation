@@ -2,7 +2,6 @@ import { createHash, randomUUID } from 'node:crypto';
 import {
   acceptanceCriteria,
   and,
-  appendAudit,
   desc,
   eq,
   extractedItems,
@@ -24,14 +23,14 @@ import { DomainError, uuidv7, type DomainEvent } from '@qos/kernel-domain';
 import { assertProjectWritable, nextSequenceValue, type Project } from '@qos/projects';
 import {
   canTransition,
-  cleanContent,
   contentHash,
   normalizeForSearch,
   originOf,
-  searchTextOf,
   type RequirementContent,
   type VersionState,
 } from './domain.js';
+import { parseMapping } from './documents.js';
+import { audit, clean, insertVersion } from './shared.js';
 
 /**
  * Requirements (M04, T-P3-01/02/03/09/13): sources, canonical requirements with immutable
@@ -85,7 +84,7 @@ export async function createSource(
   if (input.kind === 'external' && !input.bindingId)
     throw new DomainError('requirement_source.binding_required');
   const config = input.config ?? {};
-  if (JSON.stringify(config).length > 16_384) throw new DomainError('requirement_source.config_too_large');
+  assertConfig(config);
   return db.transaction(async (tx) => {
     const now = new Date();
     const id = uuidv7();
@@ -135,7 +134,10 @@ export async function updateSource(
       set.name = name;
     }
     if (input.enabled !== undefined) set.enabled = input.enabled;
-    if (input.config !== undefined) set.config = input.config;
+    if (input.config !== undefined) {
+      assertConfig(input.config);
+      set.config = input.config;
+    }
     const [updated] = await tx
       .update(requirementSources)
       .set(set)
@@ -146,6 +148,12 @@ export async function updateSource(
     });
     return sourceView(updated!);
   });
+}
+
+/** Source settings: size cap, and a valid spreadsheet column mapping when one is given (T-P3-07). */
+function assertConfig(config: Record<string, unknown>): void {
+  if (JSON.stringify(config).length > 16_384) throw new DomainError('requirement_source.config_too_large');
+  if (config.mapping !== undefined && config.mapping !== null) parseMapping(config.mapping);
 }
 
 /** The project's manual source, created on first use. */
@@ -286,67 +294,6 @@ async function versionView(db: Db | Tx, v: typeof requirementVersions.$inferSele
     approvedAt: v.approvedAt?.toISOString() ?? null,
     approvalRequestId: v.approvalRequestId,
   };
-}
-
-/** Inserts a version with its criteria and provenance; updates the requirement's latest pointer. */
-async function insertVersion(
-  tx: Tx,
-  actor: Principal,
-  project: Project,
-  requirementId: string,
-  number: number,
-  content: RequirementContent,
-  origin: string,
-  provenanceItemIds: readonly string[],
-): Promise<string> {
-  const id = uuidv7();
-  const now = new Date();
-  await tx.insert(requirementVersions).values({
-    id,
-    requirementId,
-    projectId: project.id,
-    number,
-    title: content.title,
-    bodyMd: content.bodyMd,
-    priority: content.priority,
-    tags: [...content.tags],
-    origin,
-    state: 'draft',
-    contentHash: contentHash(content),
-    searchText: searchTextOf(content),
-    createdBy: actor.userId,
-    createdAt: now,
-  });
-  if (content.acceptanceCriteria.length) {
-    await tx.insert(acceptanceCriteria).values(
-      content.acceptanceCriteria.map((a, i) => ({
-        id: uuidv7(),
-        requirementVersionId: id,
-        ordinal: i + 1,
-        text: a.text,
-        origin: a.origin,
-      })),
-    );
-  }
-  for (const itemId of new Set(provenanceItemIds)) {
-    await tx
-      .insert(requirementProvenance)
-      .values({ requirementVersionId: id, extractedItemId: itemId })
-      .onConflictDoNothing();
-  }
-  await tx
-    .update(requirements)
-    .set({ latestVersionId: id, updatedAt: now })
-    .where(eq(requirements.id, requirementId));
-  return id;
-}
-
-function clean(input: RequirementContent): RequirementContent {
-  try {
-    return cleanContent(input);
-  } catch (e) {
-    throw new DomainError((e as Error).message);
-  }
 }
 
 /** Manual entry (M04-FR-07): a new requirement `PRJ-R-n` with version 1 as a draft. */
@@ -1018,26 +965,4 @@ export async function getRequirement(
     })),
     findings: findings.map(findingView),
   };
-}
-
-async function audit(
-  tx: Tx,
-  actor: Principal,
-  project: Project,
-  action: string,
-  targetType: string,
-  targetId: string,
-  summary: Record<string, unknown>,
-) {
-  await appendAudit(tx, {
-    orgId: actor.orgId,
-    projectId: project.id,
-    actorType: 'user',
-    actorId: actor.userId,
-    action,
-    targetType,
-    targetId,
-    summary,
-    source: 'api',
-  });
 }

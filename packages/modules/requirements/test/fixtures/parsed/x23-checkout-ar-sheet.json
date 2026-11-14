@@ -1,0 +1,320 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "xlsx",
+ "pages": null,
+ "languages": [
+  "ar",
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "table_cell",
+   "text": "المعرف",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 1,
+    "col": 1
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b2",
+   "type": "table_cell",
+   "text": "المتطلب",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 1,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b3",
+   "type": "table_cell",
+   "text": "معايير القبول",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 1,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b4",
+   "type": "table_cell",
+   "text": "الأولوية",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 1,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b5",
+   "type": "table_cell",
+   "text": "FR-1",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 2,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b6",
+   "type": "table_cell",
+   "text": "يجب أن يتيح النظام للعميل مراجعة سلة المشتريات قبل الدفع.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 2,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b7",
+   "type": "table_cell",
+   "text": "تعرض صفحة السلة اسم المنتج والكمية وسعر الوحدة والإجمالي لكل بند.\nيمكن للعميل تعديل الكمية أو حذف المنتج.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 2,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b8",
+   "type": "table_cell",
+   "text": "متوسطة",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 2,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b9",
+   "type": "table_cell",
+   "text": "FR-2",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 3,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b10",
+   "type": "table_cell",
+   "text": "يجب أن يحسب النظام إجمالي الطلب شاملاً ضريبة القيمة المضافة بنسبة 14 بالمئة.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 3,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b11",
+   "type": "table_cell",
+   "text": "الإجمالي يساوي مجموع البنود مضافاً إليه 14% ضريبة مع التقريب لرقمين عشريين.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 3,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b12",
+   "type": "table_cell",
+   "text": "منخفضة",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 3,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b13",
+   "type": "table_cell",
+   "text": "FR-3",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 4,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b14",
+   "type": "table_cell",
+   "text": "يجب أن يرفض النظام رمز الخصم منتهي الصلاحية.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 4,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b15",
+   "type": "table_cell",
+   "text": "تظهر رسالة «انتهت صلاحية الرمز» ولا يتغير الإجمالي.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 4,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b16",
+   "type": "table_cell",
+   "text": "عالية",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 4,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b17",
+   "type": "table_cell",
+   "text": "FR-4",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 5,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b18",
+   "type": "table_cell",
+   "text": "ينبغي أن يدعم النظام الشراء كزائر دون إنشاء حساب.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 5,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b19",
+   "type": "table_cell",
+   "text": "يتطلب الشراء كزائر البريد الإلكتروني ورقم الهاتف وعنوان التوصيل فقط.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 5,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b20",
+   "type": "table_cell",
+   "text": "متوسطة",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 5,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b21",
+   "type": "table_cell",
+   "text": "FR-5",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 6,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b22",
+   "type": "table_cell",
+   "text": "يجب أن يرسل النظام رسالة تأكيد الطلب خلال 5 دقائق من نجاح الدفع.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 6,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b23",
+   "type": "table_cell",
+   "text": "تحتوي الرسالة على رقم الطلب والمنتجات والإجمالي.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 6,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b24",
+   "type": "table_cell",
+   "text": "منخفضة",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 6,
+    "col": 4
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b25",
+   "type": "table_cell",
+   "text": "FR-6",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 7,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b26",
+   "type": "table_cell",
+   "text": "يجب ألا يسمح النظام بطلب كمية أكبر من 10 لنفس المنتج.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 7,
+    "col": 2
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b27",
+   "type": "table_cell",
+   "text": "الكمية 11 تُظهر خطأ تحقق.\nالكمية 10 مقبولة.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 7,
+    "col": 3
+   },
+   "language": "ar"
+  },
+  {
+   "id": "b28",
+   "type": "table_cell",
+   "text": "عالية",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 7,
+    "col": 4
+   },
+   "language": "ar"
+  }
+ ]
+}

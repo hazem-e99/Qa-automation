@@ -104,6 +104,7 @@ describe('snapshot diffing (M04-FR-15)', () => {
     expect(d.added.map((i) => i.title)).toEqual(['Dark mode for the dashboard']);
     expect(d.removed.map((i) => i.title)).toEqual(['Export reports to PDF']);
     expect(d.unchanged.map((i) => i.title)).toEqual(['Password reset by email']);
+    expect(d.unchangedPairs).toEqual([{ before: prev[1], after: next[1] }]);
     const login = d.changed.find((c) => c.before.title.startsWith('The user'))!;
     expect(login.fields).toEqual(['title', 'body', 'acceptanceCriteria']);
     expect(login.ac).toEqual({ added: ['locked after 5 failures'], removed: [] });

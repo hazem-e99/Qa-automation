@@ -1,0 +1,12 @@
+# Pinned to the versions validated on the P0 corpus (spikes/parser) and in services/parser/tests.
+docling==2.149.0
+easyocr==1.7.2
+fastapi==0.162.7
+numpy==2.5.4
+openpyxl==3.1.5
+pydantic==2.14.3
+pypdfium2==5.15.1
+python-multipart==0.0.33
+torch==2.15.0
+torchvision==0.29.2
+uvicorn==0.54.0

@@ -77,6 +77,11 @@ export const sourceSnapshots = requirementsSchema.table(
     externalVersion: text('external_version'),
     checksum: text('checksum').notNull(),
     storedObjectKey: text('stored_object_key'),
+    /** Uploads: original name (display only), detected kind, content type and size. */
+    fileName: text('file_name'),
+    fileKind: text('file_kind'),
+    contentType: text('content_type'),
+    sizeBytes: integer('size_bytes'),
     capturedBy: uuid('captured_by'),
     capturedAt: timestamp('captured_at', { withTimezone: true }).notNull(),
     parseStatus: text('parse_status').notNull(), // not_needed | pending | parsed | failed | rejected
@@ -103,7 +108,12 @@ export const extractedItems = requirementsSchema.table(
     language: text('language'),
     confidence: numeric('confidence', { precision: 4, scale: 3 }).notNull(),
     method: text('method').notNull(), // structural | ai | manual
-    status: text('status').notNull(), // candidate | accepted | merged | rejected
+    /** For an acceptance criterion: the requirement candidate it belongs to. */
+    parentItemId: uuid('parent_item_id'),
+    /** Identifier found in the source (REQ-12, a work item id, a sheet ID column). */
+    externalKey: text('external_key'),
+    rule: text('rule'),
+    status: text('status').notNull(), // candidate | accepted | merged | rejected | replaced
     createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
   },
   (t) => [
@@ -214,3 +224,17 @@ export const requirementFindings = requirementsSchema.table(
   },
   (t) => [index('requirement_findings_project_ix').on(t.projectId, t.type, t.status)],
 );
+
+/** Parser output of a snapshot (doc 10): the JSON lives in object storage. */
+export const parsedDocuments = requirementsSchema.table('parsed_documents', {
+  snapshotId: uuid('snapshot_id')
+    .primaryKey()
+    .references(() => sourceSnapshots.id),
+  parserVersion: text('parser_version').notNull(),
+  storedObjectKey: text('stored_object_key').notNull(),
+  pageCount: integer('page_count'),
+  languages: text('languages').array().notNull(),
+  ocrPages: integer('ocr_pages').notNull().default(0),
+  blockCount: integer('block_count').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+});

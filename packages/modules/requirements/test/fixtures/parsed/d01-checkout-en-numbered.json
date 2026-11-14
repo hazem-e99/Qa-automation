@@ -1,0 +1,311 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "docx",
+ "pages": null,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "Online Store — Checkout Requirements",
+   "locator": {
+    "sectionPath": [
+     "Online Store — Checkout Requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "heading",
+   "text": "1. Introduction",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "This section describes the checkout flow of the online store for registered and guest customers.",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "Payment processing is provided by an external gateway and is out of scope of this document.",
+   "locator": {
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b5",
+   "type": "heading",
+   "text": "2. Functional requirements",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b6",
+   "type": "paragraph",
+   "text": "REQ-1: The system shall allow a customer to review the cart before payment.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b8",
+   "type": "list_item",
+   "text": "Cart page lists item name, quantity, unit price and line total.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 5
+   },
+   "language": "en"
+  },
+  {
+   "id": "b9",
+   "type": "list_item",
+   "text": "Customer can change quantity or remove an item.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 6
+   },
+   "language": "en"
+  },
+  {
+   "id": "b10",
+   "type": "paragraph",
+   "text": "REQ-2: The system shall calculate the order total including VAT at 14 percent.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 7
+   },
+   "language": "en"
+  },
+  {
+   "id": "b11",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 8
+   },
+   "language": "en"
+  },
+  {
+   "id": "b12",
+   "type": "list_item",
+   "text": "Total equals the sum of line totals plus 14% VAT, rounded to two decimals.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 9
+   },
+   "language": "en"
+  },
+  {
+   "id": "b13",
+   "type": "paragraph",
+   "text": "REQ-3: The system must reject a coupon code that has expired.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 10
+   },
+   "language": "en"
+  },
+  {
+   "id": "b14",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 11
+   },
+   "language": "en"
+  },
+  {
+   "id": "b15",
+   "type": "list_item",
+   "text": "An expired coupon shows the message 'Coupon expired' and the total is unchanged.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 12
+   },
+   "language": "en"
+  },
+  {
+   "id": "b16",
+   "type": "paragraph",
+   "text": "REQ-4: The system shall support guest checkout without creating an account.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 13
+   },
+   "language": "en"
+  },
+  {
+   "id": "b17",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 14
+   },
+   "language": "en"
+  },
+  {
+   "id": "b18",
+   "type": "list_item",
+   "text": "Guest checkout requires only email, phone and delivery address.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 15
+   },
+   "language": "en"
+  },
+  {
+   "id": "b19",
+   "type": "paragraph",
+   "text": "REQ-5: The system shall send an order confirmation email within 5 minutes of successful payment.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 16
+   },
+   "language": "en"
+  },
+  {
+   "id": "b20",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 17
+   },
+   "language": "en"
+  },
+  {
+   "id": "b21",
+   "type": "list_item",
+   "text": "Email contains order number, items and total.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 18
+   },
+   "language": "en"
+  },
+  {
+   "id": "b22",
+   "type": "paragraph",
+   "text": "REQ-6: The system must not allow an order with a quantity greater than 10 for a single item.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 19
+   },
+   "language": "en"
+  },
+  {
+   "id": "b23",
+   "type": "paragraph",
+   "text": "Acceptance criteria:",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 20
+   },
+   "language": "en"
+  },
+  {
+   "id": "b24",
+   "type": "list_item",
+   "text": "Quantity 11 shows a validation error.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 21
+   },
+   "language": "en"
+  },
+  {
+   "id": "b25",
+   "type": "list_item",
+   "text": "Quantity 10 is accepted.",
+   "locator": {
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 22
+   },
+   "language": "en"
+  }
+ ]
+}

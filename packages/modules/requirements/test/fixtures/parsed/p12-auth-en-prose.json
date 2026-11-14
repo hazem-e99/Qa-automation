@@ -1,0 +1,102 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "pdf",
+ "pages": 4,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "heading",
+   "text": "Customer Portal - Authentication Requirements",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "Customer Portal - Authentication Requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b2",
+   "type": "heading",
+   "text": "1. Introduction",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "type": "paragraph",
+   "text": "Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b4",
+   "type": "paragraph",
+   "text": "Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release. Authentication applies to the web portal and the mobile web view. Single sign-on is planned for a later release.",
+   "locator": {
+    "page": 1,
+    "sectionPath": [
+     "1. Introduction"
+    ],
+    "paragraph": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b5",
+   "type": "heading",
+   "text": "2. Functional requirements",
+   "locator": {
+    "page": 3,
+    "sectionPath": [
+     "2. Functional requirements"
+    ]
+   },
+   "language": "en",
+   "level": 1
+  },
+  {
+   "id": "b6",
+   "type": "paragraph",
+   "text": "Single sign-on is planned for a later release. The system shall require a password of at least 8 characters. For example, A 7-character password is rejected. For example, An 8-character password is accepted. Authentication applies to the web portal and the mobile web view. The system shall lock the account after 5 consecutive failed login attempts. For example, The 6th attempt shows 'Account locked'. For example, The lock lasts 15 minutes. Single sign-on is planned for a later release. The system shall allow users to reset their password via an emailed link valid for 30 minutes. For example, An expired link shows 'Link expired'. Authentication applies to the web portal and the mobile web view. The system should offer optional two-factor authentication using a one-time code. For example, Enabling 2FA requires confirming one valid code. Single sign-on is planned for a later release. The system must log out an idle session after 20 minutes. For example, After 20 minutes of inactivity the next action redirects to login. Authentication applies to the web portal and the mobile web view. The system shall display a generic error",
+   "locator": {
+    "page": 4,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b7",
+   "type": "paragraph",
+   "text": "message for invalid credentials. For example, The message does not reveal whether the email exists.",
+   "locator": {
+    "page": 4,
+    "sectionPath": [
+     "2. Functional requirements"
+    ],
+    "paragraph": 4
+   },
+   "language": "en"
+  }
+ ]
+}

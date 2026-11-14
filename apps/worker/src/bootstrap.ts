@@ -7,6 +7,8 @@ import { AzureDevOpsConnection } from '@qos/adapters-azure-devops';
 import { GitHubRepositoryProvider } from '@qos/adapters-github';
 import { LocalGitRepositoryProvider } from '@qos/adapters-local-git';
 import { MockIssueTracker, MockRepositoryProvider } from '@qos/adapters-mock';
+import { HttpDocumentParser } from '@qos/adapters-parser-http';
+import { LocalFsObjectStorage } from '@qos/adapters-storage-localfs';
 import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
 import { PROBE_CREATED_EVENT } from '@qos/contracts';
 import { checkBindingsHealth, checkCredentialExpiry } from '@qos/governance';
@@ -24,7 +26,8 @@ import {
   type CoreInfra,
 } from '@qos/kernel-infra';
 import { onProbeCreated, processProbeJob, type ProbeJobData } from '@qos/probe';
-import { onApprovalDecided } from '@qos/requirements';
+import { onApprovalDecided, processParseJob, type DocumentDeps, type ParseJobData } from '@qos/requirements';
+import type { DocumentParser } from '@qos/ports';
 import { z } from 'zod';
 import { SyncRuntime } from './sync-runtime.js';
 
@@ -54,6 +57,14 @@ export const WorkerConfig = BaseConfig.extend({
         .map((s) => s.trim())
         .filter(Boolean),
     ),
+  /** Object storage shared with the API (uploaded documents, parsed output). */
+  STORAGE_DIR: z.string().min(1).default('./var/storage'),
+  /**
+   * Parser sidecar (ADR-0013) on the internal network. Empty: documents stay `pending` until a
+   * parser is configured; nothing else is affected.
+   */
+  PARSER_URL: z.union([z.url({ protocol: /^https?$/ }), z.literal('')]).default(''),
+  PARSER_TIMEOUT_SECONDS: z.coerce.number().int().min(10).max(1800).default(600),
   QOS_DEMO_MODE: z
     .enum(['true', 'false'])
     .default('false')
@@ -64,6 +75,7 @@ export type WorkerConfig = z.infer<typeof WorkerConfig>;
 const INFRA = Symbol('qos.infra');
 const DISPATCHER = Symbol('qos.dispatcher');
 const SYNC = Symbol('qos.sync');
+const DOCUMENTS = Symbol('qos.documents');
 
 /** Registers job handlers and outbox subscribers. Each module adds its own lines here as it is built. */
 @Injectable()
@@ -72,6 +84,7 @@ class Registrations implements OnApplicationBootstrap {
     @Inject(INFRA) private readonly infra: CoreInfra,
     @Inject(DISPATCHER) private readonly dispatcher: OutboxDispatcher,
     @Inject(SYNC) private readonly sync: SyncRuntime,
+    @Inject(DOCUMENTS) private readonly documents: (DocumentDeps & { parser: DocumentParser }) | null,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -80,6 +93,15 @@ class Registrations implements OnApplicationBootstrap {
       const { changed } = await processProbeJob(db, job);
       logger.info({ jobId: job.id, probeId: job.data.probeId, changed }, 'probe job handled');
     });
+    if (this.documents) {
+      const deps = this.documents;
+      await jobs.work<ParseJobData>(QUEUES.requirementsParse.name, async (job) => {
+        const outcome = await processParseJob(deps, job.data);
+        logger.info({ jobId: job.id, snapshotId: job.data.snapshotId, ...outcome }, 'parse job handled');
+      });
+    } else {
+      logger.warn('PARSER_URL is not set: uploaded documents stay pending until a parser is configured');
+    }
     this.dispatcher.subscribe(PROBE_CREATED_EVENT, 'probe.seen', onProbeCreated);
     // Approvals decided in the generic inbox reach the requirement they target (idempotent).
     this.dispatcher.subscribe('approval.decided', 'requirements.apply-approval', onApprovalDecided);
@@ -90,13 +112,19 @@ class Registrations implements OnApplicationBootstrap {
 
 @Module({})
 class WorkerModule {
-  static register(infra: CoreInfra, dispatcher: OutboxDispatcher, sync: SyncRuntime): DynamicModule {
+  static register(
+    infra: CoreInfra,
+    dispatcher: OutboxDispatcher,
+    sync: SyncRuntime,
+    documents: (DocumentDeps & { parser: DocumentParser }) | null,
+  ): DynamicModule {
     return {
       module: WorkerModule,
       providers: [
         { provide: INFRA, useValue: infra },
         { provide: DISPATCHER, useValue: dispatcher },
         { provide: SYNC, useValue: sync },
+        { provide: DOCUMENTS, useValue: documents },
         Registrations,
       ],
     };
@@ -142,6 +170,17 @@ export async function createWorkerApp(env: NodeJS.ProcessEnv = process.env): Pro
     http: new SafeHttpClient({ timeoutMs: 15_000, retries: 2 }),
     logger: infra.logger,
   };
+  const documents = config.PARSER_URL
+    ? {
+        db: infra.db,
+        jobs: infra.jobs,
+        storage: new LocalFsObjectStorage(config.STORAGE_DIR),
+        parser: new HttpDocumentParser({
+          baseUrl: config.PARSER_URL,
+          timeoutMs: config.PARSER_TIMEOUT_SECONDS * 1000,
+        }),
+      }
+    : null;
   const sync = new SyncRuntime(integrations, infra.jobs, {
     pollSeconds: config.SYNC_POLL_SECONDS,
     inboxSeconds: config.INBOX_POLL_SECONDS,
@@ -166,9 +205,12 @@ export async function createWorkerApp(env: NodeJS.ProcessEnv = process.env): Pro
   let bindingsTimer: NodeJS.Timeout | null = null;
   let health: Server | null = null;
   try {
-    const ctx = await NestFactory.createApplicationContext(WorkerModule.register(infra, dispatcher, sync), {
-      logger: false,
-    });
+    const ctx = await NestFactory.createApplicationContext(
+      WorkerModule.register(infra, dispatcher, sync, documents),
+      {
+        logger: false,
+      },
+    );
     void expiryCheck();
     expiryTimer = setInterval(() => void expiryCheck(), config.EXPIRY_CHECK_SECONDS * 1000);
     expiryTimer.unref();

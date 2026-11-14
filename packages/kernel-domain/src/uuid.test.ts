@@ -18,6 +18,11 @@ describe('uuidv7', () => {
   it('is unique across many calls', () => {
     expect(new Set(Array.from({ length: 5000 }, () => uuidv7())).size).toBe(5000);
   });
+  it('is strictly increasing within a process, even inside one millisecond', () => {
+    const ids = Array.from({ length: 20_000 }, () => uuidv7());
+    for (let i = 1; i < ids.length; i++) expect(ids[i - 1]! < ids[i]!).toBe(true);
+    expect(ids.every(isUuid)).toBe(true);
+  });
 });
 
 describe('projectScope', () => {

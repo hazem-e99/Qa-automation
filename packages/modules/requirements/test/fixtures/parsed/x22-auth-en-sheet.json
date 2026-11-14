@@ -1,0 +1,319 @@
+{
+ "parserVersion": "qos-parser/0.1.0",
+ "kind": "xlsx",
+ "pages": null,
+ "languages": [
+  "en"
+ ],
+ "ocrPages": 0,
+ "blocks": [
+  {
+   "id": "b1",
+   "type": "table_cell",
+   "text": "ID",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 1,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b2",
+   "type": "table_cell",
+   "text": "Requirement",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 1,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b3",
+   "type": "table_cell",
+   "text": "Acceptance Criteria",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 1,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b4",
+   "type": "table_cell",
+   "text": "Priority",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 1,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b5",
+   "type": "table_cell",
+   "text": "FR-1",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 2,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b6",
+   "type": "table_cell",
+   "text": "The system shall require a password of at least 8 characters.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 2,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b7",
+   "type": "table_cell",
+   "text": "A 7-character password is rejected.\nAn 8-character password is accepted.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 2,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b8",
+   "type": "table_cell",
+   "text": "Medium",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 2,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b9",
+   "type": "table_cell",
+   "text": "FR-2",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 3,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b10",
+   "type": "table_cell",
+   "text": "The system shall lock the account after 5 consecutive failed login attempts.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 3,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b11",
+   "type": "table_cell",
+   "text": "The 6th attempt shows 'Account locked'.\nThe lock lasts 15 minutes.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 3,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b12",
+   "type": "table_cell",
+   "text": "Low",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 3,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b13",
+   "type": "table_cell",
+   "text": "FR-3",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 4,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b14",
+   "type": "table_cell",
+   "text": "The system shall allow users to reset their password via an emailed link valid for 30 minutes.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 4,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b15",
+   "type": "table_cell",
+   "text": "An expired link shows 'Link expired'.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 4,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b16",
+   "type": "table_cell",
+   "text": "High",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 4,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b17",
+   "type": "table_cell",
+   "text": "FR-4",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 5,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b18",
+   "type": "table_cell",
+   "text": "The system should offer optional two-factor authentication using a one-time code.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 5,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b19",
+   "type": "table_cell",
+   "text": "Enabling 2FA requires confirming one valid code.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 5,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b20",
+   "type": "table_cell",
+   "text": "Medium",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 5,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b21",
+   "type": "table_cell",
+   "text": "FR-5",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 6,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b22",
+   "type": "table_cell",
+   "text": "The system must log out an idle session after 20 minutes.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 6,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b23",
+   "type": "table_cell",
+   "text": "After 20 minutes of inactivity the next action redirects to login.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 6,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b24",
+   "type": "table_cell",
+   "text": "Low",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 6,
+    "col": 4
+   },
+   "language": "en"
+  },
+  {
+   "id": "b25",
+   "type": "table_cell",
+   "text": "FR-6",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 7,
+    "col": 1
+   },
+   "language": "en"
+  },
+  {
+   "id": "b26",
+   "type": "table_cell",
+   "text": "The system shall display a generic error message for invalid credentials.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 7,
+    "col": 2
+   },
+   "language": "en"
+  },
+  {
+   "id": "b27",
+   "type": "table_cell",
+   "text": "The message does not reveal whether the email exists.",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 7,
+    "col": 3
+   },
+   "language": "en"
+  },
+  {
+   "id": "b28",
+   "type": "table_cell",
+   "text": "High",
+   "locator": {
+    "sheet": "Requirements",
+    "row": 7,
+    "col": 4
+   },
+   "language": "en"
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+# Document parser sidecar (P3, ADR-0013), layered on docker-compose.yml:
+#
+#   pnpm stack:parser      build and start core + parser (the parser image is several GB)
+#
+# The parser network is internal (no route out) and only the worker joins it; nothing is published.
+services:
+  worker:
+    environment:
+      PARSER_URL: http://parser:8090
+    networks: [core, parser]
+
+  # Parses untrusted uploads (ADR-0013). Only the worker can reach it: the parser network is
+  # internal (no route out), nothing is published, and the root filesystem is read-only.
+  parser:
+    image: qualityos/parser:dev
+    build:
+      context: ../../services/parser
+    init: true
+    restart: unless-stopped
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    read_only: true
+    tmpfs: ['/tmp:size=512m']
+    environment:
+      QOS_PARSER_MAX_BYTES: '52428800'
+    networks: [parser]
+    mem_limit: 4g
+    cpus: 2
+    pids_limit: 256
+
+networks:
+  parser:
+    internal: true
