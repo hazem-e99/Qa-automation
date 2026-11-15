@@ -1,5 +1,6 @@
 // Backend for the journey tests: a throwaway PostgreSQL (Testcontainers) and the API from its
 // compiled output, in demo mode. Started by Playwright as a web server; stops on SIGTERM/SIGINT.
+import { Buffer } from 'node:buffer';
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -50,6 +51,14 @@ const parser = {
   async parse(input) {
     const name = input.fileName.replace(/.[a-z]+$/i, '');
     return JSON.parse(readFileSync(path.join(PARSED, `${name}.json`), 'utf8'));
+  },
+  // Pages as images: a small white PNG stands in for the PDFium rendering of the sidecar.
+  async renderPage() {
+    const png = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=',
+      'base64',
+    );
+    return { png: new Uint8Array(png), pageCount: 1 };
   },
 };
 await api.infra.jobs.work('requirements.parse', async (job) => {

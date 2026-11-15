@@ -55,6 +55,8 @@ export interface DocumentDeps {
 export const BULK_ACCEPT_MIN_CONFIDENCE = 0.6;
 /** Trigram similarity from which an existing requirement is suggested as a duplicate (M04-FR-12 fallback, OD-06). */
 export const DUPLICATE_MIN_SIMILARITY = 0.5;
+/** PDF pages rendered as images for the source viewer; later pages are shown as text only. */
+export const MAX_RENDERED_PAGES = 30;
 const UPLOAD_SOURCE_KINDS = ['document_set', 'spreadsheet'];
 const SPREADSHEET_KINDS = ['xlsx', 'csv'];
 
@@ -299,8 +301,9 @@ export async function processParseJob(
     return { status: 'skipped' };
   const s = snap.s;
   let doc: ParsedDocument;
+  let bytes: Uint8Array;
   try {
-    const bytes = await deps.storage.get(s.storedObjectKey!);
+    bytes = await deps.storage.get(s.storedObjectKey!);
     doc = await deps.parser.parse({
       kind: s.fileKind as ParsedDocument['kind'],
       fileName: s.fileName ?? 'upload',
@@ -332,6 +335,8 @@ export async function processParseJob(
   const parsedKey = s.storedObjectKey!.replace(/[^/]+$/, 'parsed.json');
   await deps.storage.put(parsedKey, new TextEncoder().encode(JSON.stringify(doc)), 'application/json');
   const candidates = extractCandidates(doc.blocks, { mapping: mappingOf(snap.config) });
+  const renderedPages =
+    s.fileKind === 'pdf' ? await renderPages(deps, s.storedObjectKey!, bytes, doc.pages ?? 0) : 0;
   const done = await deps.db.transaction(async (tx) => {
     const quality = qualityOf(doc, candidates);
     const rows = await tx
@@ -350,6 +355,7 @@ export async function processParseJob(
         languages: [...doc.languages],
         ocrPages: doc.ocrPages,
         blockCount: doc.blocks.length,
+        renderedPages,
         createdAt: new Date(),
       })
       .onConflictDoNothing();
@@ -365,6 +371,53 @@ export async function processParseJob(
     return true;
   });
   return done ? { status: 'parsed', candidates: candidates.length } : { status: 'skipped' };
+}
+
+const pageKey = (originalKey: string, page: number) => originalKey.replace(/[^/]+$/, `pages/${page}.png`);
+
+/**
+ * Stores PDF pages as images next to the original (T-P3-14). Rendering is best effort: a page
+ * the parser cannot render stops it there, and the document stays readable as text.
+ */
+async function renderPages(
+  deps: Pick<DocumentDeps, 'storage'> & { parser: DocumentParser },
+  originalKey: string,
+  bytes: Uint8Array,
+  pages: number,
+): Promise<number> {
+  if (!deps.parser.renderPage || !bytes.length) return 0;
+  const last = Math.min(pages, MAX_RENDERED_PAGES);
+  let done = 0;
+  for (let page = 1; page <= last; page++) {
+    try {
+      const r = await deps.parser.renderPage({ bytes, page });
+      await deps.storage.put(pageKey(originalKey, page), r.png, 'image/png');
+      done = page;
+    } catch (e) {
+      // A retryable outage fails the job (it is retried); anything else just ends rendering.
+      if (e instanceof DocumentParseError && e.retryable) throw e;
+      break;
+    }
+  }
+  return done;
+}
+
+/** A stored PDF page image of a parsed snapshot. */
+export async function getPageImage(
+  deps: Pick<DocumentDeps, 'db' | 'storage'>,
+  project: Project,
+  snapshotId: string,
+  page: number,
+): Promise<Uint8Array> {
+  const [row] = await deps.db
+    .select({ key: sourceSnapshots.storedObjectKey, rendered: parsedDocuments.renderedPages })
+    .from(sourceSnapshots)
+    .leftJoin(parsedDocuments, eq(parsedDocuments.snapshotId, sourceSnapshots.id))
+    .where(and(eq(sourceSnapshots.id, snapshotId), eq(sourceSnapshots.projectId, project.id)));
+  if (!row) throw new DomainError('snapshot.not_found');
+  if (!row.key || !Number.isInteger(page) || page < 1 || page > (row.rendered ?? 0))
+    throw new DomainError('page.not_found');
+  return deps.storage.get(pageKey(row.key, page));
 }
 
 function qualityOf(doc: ParsedDocument, candidates: readonly Candidate[]) {
@@ -447,6 +500,8 @@ export interface SnapshotView {
   readonly extractionQuality: Record<string, unknown> | null;
   readonly capturedAt: string;
   readonly counts: { candidate: number; accepted: number; rejected: number };
+  /** PDF pages available as images (0: text view only). */
+  readonly renderedPages: number;
 }
 export interface DocumentView {
   readonly id: string;
@@ -460,12 +515,14 @@ async function snapshotViews(
   project: Project,
   where: ReturnType<typeof eq>,
 ): Promise<SnapshotView[]> {
-  const rows = await db
-    .select()
+  const joined = await db
+    .select({ s: sourceSnapshots, rendered: parsedDocuments.renderedPages })
     .from(sourceSnapshots)
+    .leftJoin(parsedDocuments, eq(parsedDocuments.snapshotId, sourceSnapshots.id))
     .where(and(eq(sourceSnapshots.projectId, project.id), where))
     .orderBy(asc(sourceSnapshots.capturedAt), asc(sourceSnapshots.id));
-  if (!rows.length) return [];
+  if (!joined.length) return [];
+  const rows = joined.map((j) => ({ ...j.s, renderedPages: j.rendered ?? 0 }));
   const counts = await db
     .select({
       snapshotId: extractedItems.snapshotId,
@@ -501,6 +558,7 @@ async function snapshotViews(
       extractionQuality: (r.extractionQuality as Record<string, unknown> | null) ?? null,
       capturedAt: r.capturedAt.toISOString(),
       counts: { candidate: c('candidate'), accepted: c('accepted'), rejected: c('rejected') },
+      renderedPages: r.renderedPages,
     };
   });
 }
@@ -748,6 +806,70 @@ export async function acceptCandidates(
       created.push({ itemId: id, requirementId, key });
     }
     return { created, skipped };
+  });
+}
+
+/**
+ * Splits a requirement candidate that holds several requirements (M04-FR-08) into new candidates
+ * with the same location and confidence. Its criteria go with the first part; the original is
+ * marked `replaced`. Parts may be edited text, so this is also the candidate editor.
+ */
+export async function splitCandidate(
+  db: Db,
+  actor: Principal,
+  project: Project,
+  itemId: string,
+  rawParts: readonly string[],
+): Promise<{ itemIds: string[] }> {
+  assertProjectWritable(project);
+  const parts = rawParts.map((p) => p.trim()).filter(Boolean);
+  if (parts.length < 1 || parts.length > 20 || parts.some((p) => p.length > 20_000))
+    throw new DomainError('candidate.split_invalid');
+  return db.transaction(async (tx) => {
+    const [item] = await tx
+      .select()
+      .from(extractedItems)
+      .where(
+        and(
+          eq(extractedItems.id, itemId),
+          eq(extractedItems.projectId, project.id),
+          eq(extractedItems.kind, 'requirement'),
+        ),
+      )
+      .for('update');
+    if (!item) throw new DomainError('candidate.not_found');
+    if (item.status !== 'candidate') throw new DomainError('candidate.not_a_candidate');
+    if (parts.length === 1 && parts[0] === item.text.trim()) throw new DomainError('candidate.split_invalid');
+    const now = new Date();
+    const ids = parts.map(() => uuidv7());
+    await tx.insert(extractedItems).values(
+      parts.map((text, i) => ({
+        id: ids[i]!,
+        projectId: project.id,
+        snapshotId: item.snapshotId,
+        kind: 'requirement',
+        text,
+        locator: item.locator,
+        language: item.language,
+        confidence: item.confidence,
+        method: 'manual',
+        externalKey: i === 0 ? item.externalKey : null,
+        rule: 'manual.split',
+        status: 'candidate',
+        createdAt: now,
+      })),
+    );
+    await tx
+      .update(extractedItems)
+      .set({ parentItemId: ids[0]! })
+      .where(and(eq(extractedItems.parentItemId, itemId), eq(extractedItems.status, 'candidate')));
+    await tx.update(extractedItems).set({ status: 'replaced' }).where(eq(extractedItems.id, itemId));
+    await audit(tx, actor, project, 'requirement.candidate.split', 'extracted_item', itemId, {
+      snapshotId: item.snapshotId,
+      parts: parts.length,
+      itemIds: ids,
+    });
+    return { itemIds: ids };
   });
 }
 

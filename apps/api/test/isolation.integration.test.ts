@@ -119,6 +119,7 @@ function foreignPaths(route: { method: string; path: string }): string[] {
       .replace(':findingId', foreignOrg.finding)
       .replace(':snapshotId', foreignOrg.snapshot)
       .replace(':linkId', foreignOrg.link)
+      .replace(':page', '1')
       .replace(':templateId', foreignOrg.template)
       .replace(':section', 'quality')
       .replace(':action', 'testcase.approve')

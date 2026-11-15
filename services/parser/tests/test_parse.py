@@ -130,6 +130,24 @@ class HttpTest(unittest.TestCase):
             broken = client.post("/v1/parse", data={"kind": "pdf"}, files={"file": ("x.pdf", f, "application/pdf")})
         self.assertEqual(broken.status_code, 422)
 
+    def test_render_a_pdf_page_as_png(self) -> None:
+        client = TestClient(app)
+        pdf = (CORPUS / "files" / "p09-library-en-numbered.pdf").read_bytes()
+        res = client.post("/v1/render", data={"page": "1", "scale": "1"}, files={"file": ("x.pdf", pdf, "application/pdf")})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.headers["content-type"], "image/png")
+        self.assertTrue(res.content.startswith(b"\x89PNG\r\n\x1a\n"))
+        self.assertGreaterEqual(int(res.headers["x-page-count"]), 1)
+        # A4/Letter at 72 dpi: roughly 600 x 800 pixels.
+        width = int.from_bytes(res.content[16:20], "big")
+        self.assertTrue(500 <= width <= 700, width)
+        far = client.post("/v1/render", data={"page": "999"}, files={"file": ("x.pdf", pdf, "application/pdf")})
+        self.assertEqual((far.status_code, far.json()["detail"]["code"]), (422, "page_out_of_range"))
+        scale = client.post("/v1/render", data={"page": "1", "scale": "9"}, files={"file": ("x.pdf", pdf, "application/pdf")})
+        self.assertEqual(scale.status_code, 422)
+        not_pdf = client.post("/v1/render", data={"page": "1"}, files={"file": ("x.pdf", b"MZ\x90\x00", "application/pdf")})
+        self.assertEqual((not_pdf.status_code, not_pdf.json()["detail"]["code"]), (422, "unsupported_type"))
+
 
 if __name__ == "__main__":
     unittest.main()

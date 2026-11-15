@@ -219,7 +219,9 @@
     "trace_parent_exists": "لهذا المتطلب أب بالفعل.",
     "trace_cycle": "هذا الارتباط يجعل المتطلب سلفًا لنفسه.",
     "trace_link_type_invalid": "هذا النوع من الارتباط غير مسموح هنا.",
-    "export_too_large": "عدد المتطلبات أكبر من أن يُصدَّر مرة واحدة."
+    "export_too_large": "عدد المتطلبات أكبر من أن يُصدَّر مرة واحدة.",
+    "candidate_split_invalid": "أدخل جزءًا واحدًا على الأقل يختلف عن النص الأصلي.",
+    "page_not_found": "هذه الصفحة غير متاحة كصورة."
   },
   "wizard": {
     "title": "مشروع جديد",
@@ -983,6 +985,18 @@
     "reextracted": "أُعيد الاستخراج: {count} مرشحات.",
     "noTables": "لم يُعثر على جدول في هذا الملف.",
     "loc_workItem": "عنصر العمل {id}، المراجعة {revision}",
-    "openInTracker": "فتحه في المتتبع"
+    "openInTracker": "فتحه في المتتبع",
+    "split": "تقسيم أو تعديل",
+    "splitHint": "افصل بين المتطلبات بسطر فارغ. ويمكنك تعديل النص أيضًا.",
+    "splitSave": "حفظ",
+    "splitDone": "{count, plural, one {عُدّل المرشح.} other {قُسّم المرشح إلى # مرشحات.}}",
+    "viewMode": "العرض",
+    "view_text": "نص",
+    "view_pages": "صفحات",
+    "pageOf": "الصفحة {page} من {total}",
+    "previousPage": "الصفحة السابقة",
+    "nextPage": "الصفحة التالية",
+    "pagesLimited": "أول {count} صفحات فقط متاحة كصور؛ عرض النص يحوي كل الصفحات.",
+    "pageImage": "الصفحة {page} من المستند"
   }
 }

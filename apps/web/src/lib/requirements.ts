@@ -91,6 +91,7 @@ export interface SnapshotView {
   extractionQuality: Record<string, unknown> | null;
   capturedAt: string;
   counts: { candidate: number; accepted: number; rejected: number };
+  renderedPages: number;
 }
 export interface DocumentView {
   id: string;

@@ -41,6 +41,11 @@ export interface DocumentParser {
     fileName: string;
     bytes: Uint8Array;
   }): Promise<ParsedDocument>;
+  /** One PDF page as PNG for the source viewer (T-P3-14). Optional: parsers may not render. */
+  renderPage?(input: { bytes: Uint8Array; page: number; scale?: number }): Promise<{
+    png: Uint8Array;
+    pageCount: number;
+  }>;
 }
 
 /** A document the parser could not read. `code` is stable and shown to users. */

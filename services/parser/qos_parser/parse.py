@@ -236,6 +236,40 @@ def parse_pdf(path: Path) -> dict[str, Any]:
     return _result("pdf", b, n, len(scanned))
 
 
+MAX_RENDER_PIXELS = 12_000_000
+
+
+def render_pdf_page(path: Path, page: int, scale: float) -> tuple[bytes, int]:
+    """One PDF page as PNG (source viewer, T-P3-14). Returns the image and the page count.
+
+    Scale 1 is 72 dpi; the caller keeps it between 0.5 and 2. Pages too large to render at that
+    scale are rendered smaller rather than refused, so a poster-sized page cannot exhaust memory.
+    """
+    import io as _io
+
+    import pypdfium2 as pdfium
+
+    try:
+        pdf = pdfium.PdfDocument(str(path))
+    except pdfium.PdfiumError as e:
+        raise ParseError("pdf_unreadable", str(e)) from e
+    try:
+        n = len(pdf)
+        if page < 1 or page > n:
+            raise ParseError("page_out_of_range", f"{page} of {n}")
+        p = pdf[page - 1]
+        width, height = p.get_size()
+        if width * height * scale * scale > MAX_RENDER_PIXELS:
+            scale = (MAX_RENDER_PIXELS / (width * height)) ** 0.5
+        image = p.render(scale=scale).to_pil()
+        p.close()
+        out = _io.BytesIO()
+        image.save(out, format="PNG", optimize=True)
+        return out.getvalue(), n
+    finally:
+        pdf.close()  # releases the file (Windows keeps it locked otherwise)
+
+
 PARSERS = {"pdf": parse_pdf, "docx": parse_docx, "xlsx": parse_xlsx, "csv": parse_csv}
 
 

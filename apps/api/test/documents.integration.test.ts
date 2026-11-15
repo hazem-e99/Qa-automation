@@ -32,6 +32,10 @@ let viewer: Session;
 let docsSource: string;
 let sheetSource: string;
 const parserCalls: string[] = [];
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=',
+  'base64',
+);
 
 /** Answers like the sidecar: the dumped output for corpus files, or a scripted failure. */
 const fakeParser: DocumentParser & { failNext: DocumentParseError | null } = {
@@ -45,6 +49,9 @@ const fakeParser: DocumentParser & { failNext: DocumentParseError | null } = {
     }
     const base = input.fileName.replace(/\.[a-z]+$/, '');
     return JSON.parse(readFileSync(path.join(PARSED, `${base}.json`), 'utf8')) as ParsedDocument;
+  },
+  async renderPage() {
+    return { png: new Uint8Array(PNG), pageCount: 1 };
   },
 };
 const deps = (): DocumentDeps & { parser: DocumentParser } => ({
@@ -489,5 +496,74 @@ describe('spreadsheet mapping (T-P3-07)', () => {
     const kinds = new Set(list.flatMap((r) => r.sourceKinds));
     expect([...kinds].sort()).toEqual(['document_set', 'manual', 'spreadsheet']);
     expect(list.every((r) => r.sourceKinds.length >= 1)).toBe(true);
+  });
+});
+
+describe('candidate split (M04-FR-08)', () => {
+  it('splits a candidate into new ones at the same place; its criteria follow the first part', async () => {
+    const up = await uploadAndParse(docsSource, 'd01-checkout-en-numbered.docx');
+    const open = await candidates(up.snapshotId);
+    const target = open.find((c) => c.acceptanceCriteria.length > 0)!;
+    const res = await json<{ itemIds: string[] }>(
+      await lead.fetch(
+        V('/candidates/split'),
+        send('POST', {
+          itemId: target.id,
+          parts: ['First half of the rule.', '  ', 'Second half of the rule.'],
+        }),
+      ),
+    );
+    expect(res.itemIds).toHaveLength(2);
+    const after = await candidates(up.snapshotId);
+    expect(after.map((c) => c.id)).not.toContain(target.id);
+    const first = after.find((c) => c.id === res.itemIds[0])!;
+    const second = after.find((c) => c.id === res.itemIds[1])!;
+    expect(first).toMatchObject({
+      text: 'First half of the rule.',
+      externalKey: target.externalKey,
+      locator: target.locator,
+    });
+    expect(first.acceptanceCriteria.map((a) => a.id)).toEqual(target.acceptanceCriteria.map((a) => a.id));
+    expect(second).toMatchObject({
+      text: 'Second half of the rule.',
+      externalKey: null,
+      acceptanceCriteria: [],
+    });
+    expect(
+      await code(await lead.fetch(V('/candidates/split'), send('POST', { itemId: target.id, parts: ['x'] }))),
+    ).toMatchObject({
+      code: 'candidate.not_a_candidate',
+    });
+    expect(
+      await code(
+        await lead.fetch(V('/candidates/split'), send('POST', { itemId: second.id, parts: [second.text] })),
+      ),
+    ).toMatchObject({ code: 'candidate.split_invalid' });
+    expect(
+      (await viewer.fetch(V('/candidates/split'), send('POST', { itemId: second.id, parts: ['a', 'b'] })))
+        .status,
+    ).toBe(403);
+  });
+});
+
+describe('PDF pages for the source viewer (T-P3-14)', () => {
+  it('serves the pages rendered at parse time, and nothing else', async () => {
+    const pdf = await uploadAndParse(docsSource, 'p11-leave-en-stories.pdf');
+    const snap = await json<{ renderedPages: number; extractionQuality: { pages: number } }>(
+      await lead.fetch(V(`/snapshots/${pdf.snapshotId}`)),
+    );
+    expect(snap.renderedPages).toBe(Math.min(snap.extractionQuality.pages, 30));
+    expect(snap.renderedPages).toBeGreaterThan(0);
+    const page = await viewer.fetch(V(`/snapshots/${pdf.snapshotId}/pages/1`));
+    expect(page.status).toBe(200);
+    expect(page.headers.get('content-type')).toBe('image/png');
+    expect(page.headers.get('x-content-type-options')).toBe('nosniff');
+    expect(Buffer.from(await page.arrayBuffer())).toEqual(PNG);
+    for (const p of ['0', String(snap.renderedPages + 1), 'x', '../parsed.json'])
+      expect((await lead.fetch(V(`/snapshots/${pdf.snapshotId}/pages/${p}`))).status, p).toBe(404);
+    const docx = await uploadAndParse(docsSource, 'd06-auth-ar-table.docx');
+    const res = await lead.fetch(V(`/snapshots/${docx.snapshotId}/pages/1`));
+    expect(res.status).toBe(404);
+    expect(await code(res)).toMatchObject({ code: 'page.not_found' });
   });
 });

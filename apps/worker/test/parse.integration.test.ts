@@ -28,6 +28,11 @@ let worker: WorkerApp;
 let sidecar: Server;
 let mode: 'ok' | 'reject' = 'ok';
 const received: string[] = [];
+const rendered: number[] = [];
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=',
+  'base64',
+);
 const actor = {
   kind: 'user',
   orgId: uuidv7(),
@@ -61,6 +66,12 @@ beforeAll(async () => {
     req.on('data', (c: Buffer) => chunks.push(c));
     req.on('end', () => {
       const body = Buffer.concat(chunks).toString('latin1');
+      if (req.url === '/v1/render') {
+        rendered.push(Number(/name="page"\r\n\r\n(\d+)/.exec(body)?.[1]));
+        res.writeHead(200, { 'content-type': 'image/png', 'x-page-count': '1' });
+        res.end(PNG);
+        return;
+      }
       const name = /filename="([^"]+)"/.exec(body)?.[1] ?? '';
       received.push(name);
       res.writeHead(mode === 'ok' ? 200 : 422, { 'content-type': 'application/json' });
@@ -134,6 +145,25 @@ describe('parse job in the worker', () => {
       `projects/${project.id}/requirement-sources/${sourceId}/snapshots/${up.snapshotId}/parsed.json`,
     );
     expect(stored).toBe(true);
+  });
+
+  it('PDF pages are stored as images for the source viewer (T-P3-14)', async () => {
+    const file = 's17-booking-en-numbered.pdf';
+    const up = await uploadDocument(deps(), actor, project, sourceId, {
+      fileName: file,
+      bytes: new Uint8Array(readFileSync(path.join(CORPUS, file))),
+    });
+    await until(async () => (await statusOf(up.snapshotId)) === 'parsed');
+    const row = (
+      await t.pool.query(
+        'select page_count, rendered_pages from requirements.parsed_documents where snapshot_id = $1',
+        [up.snapshotId],
+      )
+    ).rows[0] as { page_count: number; rendered_pages: number };
+    expect(row.rendered_pages).toBe(Math.min(row.page_count, 30));
+    expect(rendered).toEqual(Array.from({ length: row.rendered_pages }, (_, i) => i + 1));
+    const key = `projects/${project.id}/requirement-sources/${sourceId}/snapshots/${up.snapshotId}/pages/1.png`;
+    expect(Buffer.from(await new LocalFsObjectStorage(dir).get(key))).toEqual(PNG);
   });
 
   it('a document the parser cannot read fails without retries', async () => {

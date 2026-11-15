@@ -284,6 +284,65 @@ test('P3: one list for every source; a requirement links back to its place in th
   await expect(page.getByTestId('source-blocks').locator('[data-hit="true"]').first()).toBeVisible();
 });
 
+test('P3: a spreadsheet is mapped column by column, previewed and re-extracted (T-P3-07)', async () => {
+  await page.goto('/en/projects/WS/requirements/sources');
+  await page.getByTestId('source-kind').selectOption('spreadsheet');
+  await page.getByTestId('source-name').fill('Backlog sheet');
+  await page.getByTestId('create-source').click();
+  await expect(page.getByTestId('sources-message')).toHaveText('Source added.');
+  const card = page.getByTestId('source-Backlog sheet');
+  await card.getByTestId('upload-input').setInputFiles(path.join(CORPUS, 'x22-auth-en-sheet.xlsx'));
+  await expect(card.getByTestId('parse-status')).toHaveText('Read', { timeout: 30_000 });
+  await card.getByTestId('review-link').click();
+
+  const panel = page.getByTestId('mapping-panel');
+  // Roles suggested from the header row: ID, Requirement, Acceptance Criteria, Priority.
+  await expect(panel.getByTestId('role-1')).toHaveValue('id');
+  await expect(panel.getByTestId('role-2')).toHaveValue('text');
+  await expect(panel.getByTestId('role-3')).toHaveValue('ac');
+  await expect(panel.getByTestId('role-4')).toHaveValue('priority');
+  await expect(panel.getByTestId('mapping-result')).toHaveText(
+    /extracts [1-9]\d* requirements and [1-9]\d* criteria/,
+  );
+  // Without the criteria column, the preview extracts no criteria; saving re-extracts.
+  await panel.getByTestId('role-3').selectOption('');
+  await panel.getByTestId('preview-mapping').click();
+  await expect(panel.getByTestId('mapping-result')).toHaveText(
+    /extracts [1-9]\d* requirements and 0 criteria/,
+  );
+  await panel.getByTestId('save-mapping').click();
+  await expect(page.getByTestId('review-message')).toContainText('Re-extracted');
+  await expect(page.getByTestId('candidates').locator('li[data-status="candidate"] ul')).toHaveCount(0);
+
+  // Split one candidate into two (M04-FR-08).
+  const first = page.getByTestId('candidates').locator('li[data-status="candidate"]').first();
+  const before = await page.getByTestId('candidates').locator('li[data-status="candidate"]').count();
+  await first.getByTestId('split').click();
+  await first
+    .getByTestId('split-text')
+    .fill('Passwords have at least 8 characters.\n\nPasswords are checked against a list of common ones.');
+  await first.getByTestId('split-save').click();
+  await expect(page.getByTestId('review-message')).toHaveText('The candidate was split into 2 candidates.');
+  await expect(page.getByTestId('candidates').locator('li[data-status="candidate"]')).toHaveCount(before + 1);
+});
+
+test('P3: a PDF can be reviewed next to its pages as images (T-P3-14)', async () => {
+  await page.goto('/en/projects/WS/requirements/sources');
+  const card = page.getByTestId('source-Specs');
+  await card.getByTestId('upload-input').setInputFiles(path.join(CORPUS, 'p09-library-en-numbered.pdf'));
+  const pdf = card.locator('[data-document="p09-library-en-numbered"]');
+  await expect(pdf.getByTestId('parse-status')).toHaveText('Read', { timeout: 30_000 });
+  await pdf.getByTestId('review-link').click();
+  await page.getByTestId('view-pages').click();
+  const viewer = page.getByTestId('page-viewer');
+  await expect(viewer.getByTestId('page-number')).toHaveText(/^Page 1 of \d+$/);
+  const image = viewer.getByTestId('page-image');
+  await expect(image).toBeVisible();
+  expect(await image.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+  await page.getByTestId('view-text').click();
+  await expect(page.getByTestId('source-blocks')).toBeVisible();
+});
+
 test('P3: the requirements export downloads as CSV and XLSX (T-P3-16)', async () => {
   await page.goto('/en/projects/WS/requirements');
   const [csv] = await Promise.all([page.waitForEvent('download'), page.getByTestId('export-csv').click()]);

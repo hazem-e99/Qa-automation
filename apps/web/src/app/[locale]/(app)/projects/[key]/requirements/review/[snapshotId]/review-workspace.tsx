@@ -54,6 +54,7 @@ export function ReviewWorkspace({
   const [changes, setChanges] = useState<SnapshotChanges | null>(null);
   const [msg, setMsg] = useState<Msg>(null);
   const [missing, setMissing] = useState(false);
+  const [view, setView] = useState<'text' | 'pages'>('text');
   const P = `/projects/${project.key}`;
   const base = `/${locale}/projects/${project.key}/requirements`;
   const canAccept = permissions.includes('requirement.create');
@@ -138,6 +139,15 @@ export function ReviewWorkspace({
       act(
         () => api(`${P}/candidates/merge`, { method: 'POST', body: { itemId: id, requirementKey: key } }),
         () => ({ tone: 'success', text: t('mergedInto', { key }) }),
+      ),
+    [act, api, P, t],
+  );
+
+  const split = useCallback(
+    (id: string, parts: string[]) =>
+      act(
+        () => api(`${P}/candidates/split`, { method: 'POST', body: { itemId: id, parts } }),
+        () => ({ tone: 'success', text: t('splitDone', { count: parts.length }) }),
       ),
     [act, api, P, t],
   );
@@ -247,11 +257,38 @@ export function ReviewWorkspace({
             />
           ) : null}
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card title={t('sourceViewer')} testId="source-viewer">
-              {doc ? (
-                <SourceViewer doc={doc} highlight={current} />
-              ) : (
+            <Card
+              title={t('sourceViewer')}
+              testId="source-viewer"
+              actions={
+                snapshot.renderedPages > 0 ? (
+                  <div className="flex gap-1" role="group" aria-label={t('viewMode')}>
+                    {(['text', 'pages'] as const).map((m) => (
+                      <Button
+                        key={m}
+                        tone={view === m ? 'primary' : 'secondary'}
+                        aria-pressed={view === m}
+                        onClick={() => setView(m)}
+                        data-testid={`view-${m}`}
+                      >
+                        {t(`view_${m}`)}
+                      </Button>
+                    ))}
+                  </div>
+                ) : null
+              }
+            >
+              {!doc ? (
                 <p className="text-sm text-muted">{t('loading')}</p>
+              ) : view === 'pages' && snapshot.renderedPages > 0 ? (
+                <PageViewer
+                  src={(page) => `/api/v1${P}/snapshots/${snapshotId}/pages/${page}`}
+                  rendered={snapshot.renderedPages}
+                  total={doc.pages ?? snapshot.renderedPages}
+                  focus={current?.locator.page ?? null}
+                />
+              ) : (
+                <SourceViewer doc={doc} highlight={current} />
               )}
             </Card>
             <Card
@@ -324,6 +361,7 @@ export function ReviewWorkspace({
                       onAccept={() => accept([c.id])}
                       onReject={() => reject([c.id])}
                       onMerge={(key) => merge(c.id, key)}
+                      onSplit={(parts) => split(c.id, parts)}
                     />
                   ))}
                 </ul>
@@ -362,6 +400,7 @@ function CandidateCard({
   onAccept,
   onReject,
   onMerge,
+  onSplit,
 }: {
   c: Candidate;
   active: boolean;
@@ -373,9 +412,11 @@ function CandidateCard({
   onAccept: () => void;
   onReject: () => void;
   onMerge: (key: string) => void;
+  onSplit: (parts: string[]) => void;
 }) {
   const t = useTranslations('requirements');
   const ref = useRef<HTMLLIElement>(null);
+  const [editing, setEditing] = useState<string | null>(null);
   useEffect(() => {
     if (active) ref.current?.scrollIntoView({ block: 'nearest' });
   }, [active]);
@@ -410,9 +451,41 @@ function CandidateCard({
             {low ? <span className="text-xs text-warning">{t('lowConfidence')}</span> : null}
             {c.status !== 'candidate' ? <Badge>{t(`item_${c.status}`)}</Badge> : null}
           </div>
-          <p className="mt-1" dir="auto">
-            {c.text}
-          </p>
+          {editing === null ? (
+            <p className="mt-1" dir="auto">
+              {c.text}
+            </p>
+          ) : (
+            <div className="mt-1 flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
+              <textarea
+                value={editing}
+                onChange={(e) => setEditing(e.target.value)}
+                rows={Math.min(12, Math.max(3, editing.split('\n').length + 1))}
+                dir="auto"
+                className="rounded-md border border-line bg-surface px-2 py-1 text-sm"
+                aria-label={t('splitHint')}
+                data-testid="split-text"
+              />
+              <span className="text-xs text-muted">{t('splitHint')}</span>
+              <div className="flex gap-2">
+                <Button
+                  tone="primary"
+                  data-testid="split-save"
+                  onClick={() => {
+                    const parts = editing
+                      .split(/\n\s*\n/)
+                      .map((p) => p.trim())
+                      .filter(Boolean);
+                    if (parts.length) onSplit(parts);
+                    setEditing(null);
+                  }}
+                >
+                  {t('splitSave')}
+                </Button>
+                <Button onClick={() => setEditing(null)}>{t('cancel')}</Button>
+              </div>
+            </div>
+          )}
           {c.acceptanceCriteria.length ? (
             <ul className="mt-1 list-disc ps-5 text-muted">
               {c.acceptanceCriteria.map((a) => (
@@ -468,10 +541,61 @@ function CandidateCard({
             >
               {t('rejectItem')}
             </Button>
+            <Button
+              tone="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditing(c.text);
+              }}
+              data-testid="split"
+            >
+              {t('split')}
+            </Button>
           </div>
         ) : null}
       </div>
     </li>
+  );
+}
+
+/** PDF pages as images (rendered at parse time); follows the selected candidate's page. */
+function PageViewer({
+  src,
+  rendered,
+  total,
+  focus,
+}: {
+  src: (page: number) => string;
+  rendered: number;
+  total: number;
+  focus: number | null;
+}) {
+  const t = useTranslations('requirements');
+  const [page, setPage] = useState(1);
+  useEffect(() => {
+    if (focus !== null && focus >= 1 && focus <= rendered) setPage(focus);
+  }, [focus, rendered]);
+  return (
+    <div className="flex flex-col gap-2 text-sm" data-testid="page-viewer">
+      <div className="flex items-center gap-2">
+        <Button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} aria-label={t('previousPage')}>
+          ‹
+        </Button>
+        <span data-testid="page-number">{t('pageOf', { page, total })}</span>
+        <Button disabled={page >= rendered} onClick={() => setPage((p) => p + 1)} aria-label={t('nextPage')}>
+          ›
+        </Button>
+      </div>
+      {total > rendered ? (
+        <p className="text-xs text-muted">{t('pagesLimited', { count: rendered })}</p>
+      ) : null}
+      <img
+        src={src(page)}
+        alt={t('pageImage', { page })}
+        className="max-h-[70vh] w-full rounded border border-line bg-white object-contain"
+        data-testid="page-image"
+      />
+    </div>
   );
 }
 

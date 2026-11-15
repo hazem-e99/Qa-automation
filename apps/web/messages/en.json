@@ -219,7 +219,9 @@
     "trace_parent_exists": "This requirement already has a parent.",
     "trace_cycle": "This link would make a requirement its own ancestor.",
     "trace_link_type_invalid": "This kind of link is not allowed here.",
-    "export_too_large": "Too many requirements to export at once."
+    "export_too_large": "Too many requirements to export at once.",
+    "candidate_split_invalid": "Give at least one part that differs from the original text.",
+    "page_not_found": "This page is not available as an image."
   },
   "wizard": {
     "title": "New project",
@@ -983,6 +985,18 @@
     "reextracted": "Re-extracted: {count} candidates.",
     "noTables": "No table was found in this file.",
     "loc_workItem": "Work item {id}, revision {revision}",
-    "openInTracker": "Open in the tracker"
+    "openInTracker": "Open in the tracker",
+    "split": "Split or edit",
+    "splitHint": "Separate the requirements with an empty line. You can also edit the text.",
+    "splitSave": "Save",
+    "splitDone": "{count, plural, one {The candidate was edited.} other {The candidate was split into # candidates.}}",
+    "viewMode": "View",
+    "view_text": "Text",
+    "view_pages": "Pages",
+    "pageOf": "Page {page} of {total}",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "pagesLimited": "Only the first {count} pages are available as images; the text view has every page.",
+    "pageImage": "Page {page} of the document"
   }
 }

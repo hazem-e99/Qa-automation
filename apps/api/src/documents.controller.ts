@@ -4,6 +4,7 @@ import type { ObjectStorage } from '@qos/ports';
 import type { Project } from '@qos/projects';
 import {
   acceptCandidates,
+  getPageImage,
   getParsedDocument,
   getSnapshot,
   listCandidates,
@@ -11,6 +12,7 @@ import {
   previewMapping,
   reextractSnapshot,
   rejectCandidates,
+  splitCandidate,
   uploadDocument,
   type DocumentDeps,
 } from '@qos/requirements';
@@ -31,6 +33,7 @@ const UploadQuery = z
   .strict();
 const ItemIds = z.object({ itemIds: z.array(z.uuid()).min(1).max(500) }).strict();
 const Reject = ItemIds.extend({ reason: z.string().max(500).default('') }).strict();
+const Split = z.object({ itemId: z.uuid(), parts: z.array(z.string().max(20_000)).min(1).max(20) }).strict();
 const Preview = z.object({ mapping: z.record(z.string(), z.unknown()).nullish() }).strict();
 const Status = z.enum(['candidate', 'accepted', 'rejected', 'merged', 'replaced']);
 
@@ -91,6 +94,28 @@ export class DocumentsController {
     return getParsedDocument(this.deps, project, z.uuid().parse(snapshotId));
   }
 
+  /** A PDF page rendered at parse time (source viewer). Served from storage, never re-rendered here. */
+  @Get('snapshots/:snapshotId/pages/:page')
+  @RequireProjectPermission('project.read')
+  async page(
+    @Param('snapshotId') snapshotId: string,
+    @Param('page') page: string,
+    @CurrentProject() project: Project,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    const png = await getPageImage(
+      this.deps,
+      project,
+      z.uuid().parse(snapshotId),
+      /^\d{1,4}$/.test(page) ? Number(page) : 0,
+    );
+    void reply
+      .header('content-type', 'image/png')
+      .header('x-content-type-options', 'nosniff')
+      .header('cache-control', 'private, max-age=3600');
+    return Buffer.from(png.buffer, png.byteOffset, png.byteLength);
+  }
+
   @Get('snapshots/:snapshotId/candidates')
   @RequireProjectPermission('project.read')
   candidates(
@@ -149,5 +174,14 @@ export class DocumentsController {
   reject(@Body() body: unknown, @Auth() auth: AuthContext, @CurrentProject() project: Project) {
     const input = Reject.parse(body);
     return rejectCandidates(this.deps.db, auth.principal, project, input.itemIds, input.reason);
+  }
+
+  /** Splits (or edits) a candidate into new candidates at the same place in the source. */
+  @Post('candidates/split')
+  @RequireProjectPermission('requirement.create')
+  @HttpCode(200)
+  split(@Body() body: unknown, @Auth() auth: AuthContext, @CurrentProject() project: Project) {
+    const input = Split.parse(body);
+    return splitCandidate(this.deps.db, auth.principal, project, input.itemId, input.parts);
   }
 }

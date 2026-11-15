@@ -1,0 +1,1 @@
+ALTER TABLE "requirements"."parsed_documents" ADD COLUMN "rendered_pages" integer DEFAULT 0 NOT NULL;

@@ -236,5 +236,7 @@ export const parsedDocuments = requirementsSchema.table('parsed_documents', {
   languages: text('languages').array().notNull(),
   ocrPages: integer('ocr_pages').notNull().default(0),
   blockCount: integer('block_count').notNull(),
+  /** PDF pages stored as images for the source viewer (`pages/{n}.png` next to the original). */
+  renderedPages: integer('rendered_pages').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
 });
