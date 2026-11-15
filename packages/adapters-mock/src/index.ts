@@ -19,6 +19,9 @@ import {
   type RepoInfo,
   type RepoSummary,
   type RepositoryProvider,
+  type RequirementsSource,
+  type SourceItem,
+  type SourceItemHeader,
 } from '@qos/ports';
 
 /**
@@ -344,6 +347,159 @@ export class MockIssueTracker extends MockAdapter implements IssueTracker {
         { name: 'System.Title', required: true },
         { name: 'Microsoft.VSTS.TCM.ReproSteps', required: false },
       ],
+    };
+  }
+}
+
+// ---- requirements (doc 12 §4.2) ----
+
+interface MockWorkItem {
+  id: string;
+  rev: number;
+  type: string;
+  title: string;
+  description: string;
+  ac: string | null;
+  state: string;
+  tags: string[];
+  parent: string | null;
+  changedAt: string;
+}
+
+/**
+ * Work items of the demo tracker. One store per process, shared by every mock instance, so a test
+ * can change an item "at the source" and let a worker's sync pick it up.
+ */
+export class MockWorkItemStore {
+  private items = new Map<string, MockWorkItem>();
+  private clock = Date.UTC(2026, 0, 1);
+
+  constructor() {
+    this.reset();
+  }
+
+  reset(): void {
+    this.items.clear();
+    this.clock = Date.UTC(2026, 0, 1);
+    const features = ['Checkout', 'Search', 'Accounts'];
+    for (let i = 1; i <= 45; i++) {
+      const id = String(500 + i);
+      const feature = features[i % 3]!;
+      this.items.set(id, {
+        id,
+        rev: 1,
+        type: 'User Story',
+        title: `As a shopper I want ${feature.toLowerCase()} improvement ${i} so that I finish faster`,
+        description: `${feature} story ${i}.\n\nThe shopper completes the ${feature.toLowerCase()} flow without help.`,
+        ac: `Given a signed-in shopper\nWhen they use ${feature.toLowerCase()} step ${i}\nThen the step completes within 2 seconds`,
+        state: 'New',
+        tags: [feature.toLowerCase(), 'demo'],
+        parent: null,
+        changedAt: this.tick(),
+      });
+    }
+  }
+
+  private tick(): string {
+    this.clock += 60_000;
+    return new Date(this.clock).toISOString();
+  }
+
+  /** A new revision at the source (M04-AC-03). */
+  update(
+    id: string,
+    patch: Partial<Pick<MockWorkItem, 'title' | 'description' | 'ac' | 'state' | 'tags'>>,
+  ): void {
+    const item = this.items.get(id);
+    if (!item) throw new Error(`no mock work item ${id}`);
+    Object.assign(item, patch, { rev: item.rev + 1, changedAt: this.tick() });
+  }
+
+  sorted(): MockWorkItem[] {
+    return [...this.items.values()].sort(
+      (a, b) => a.changedAt.localeCompare(b.changedAt) || a.id.localeCompare(b.id),
+    );
+  }
+
+  get(id: string): MockWorkItem | undefined {
+    return this.items.get(id);
+  }
+}
+export const MOCK_WORK_ITEMS = new MockWorkItemStore();
+
+/** Requirements source mock: a demo work-item tracker with Markdown text. */
+export class MockRequirementsSource extends MockAdapter implements RequirementsSource {
+  static readonly TYPE = 'mock_requirements';
+  protected readonly base: CapabilityManifest = {
+    providerType: MockRequirementsSource.TYPE,
+    family: 'requirements',
+    adapterVersion: '1.0.0',
+    displayName: 'Demo requirements tracker (mock)',
+    capabilities: ['requirements.list_changed@1', 'requirements.get@1', 'requirements.links@1'],
+    limits: { richText: 'markdown', maxPageSize: 20 },
+    authStrategies: ['pat'],
+    demoOnly: true,
+  };
+  protected readonly scopeFor = {
+    'requirements.list_changed@1': 'issues:read',
+    'requirements.get@1': 'issues:read',
+    'requirements.links@1': 'issues:read',
+  } as const;
+
+  constructor(
+    controls?: MockControls,
+    private readonly store: MockWorkItemStore = MOCK_WORK_ITEMS,
+  ) {
+    super(controls);
+  }
+
+  async listChanged(
+    _ctx: ConnectionContext,
+    _config: Readonly<Record<string, unknown>>,
+    cursor?: string,
+  ): Promise<Page<SourceItemHeader>> {
+    this.controls.enter();
+    this.require('requirements.list_changed@1');
+    const after = cursor ? cursor.split('|') : null;
+    if (after && after.length !== 2)
+      throw new ProviderError('validation', 'invalid cursor', { field: 'cursor' });
+    const rest = this.store
+      .sorted()
+      .filter((i) => !after || i.changedAt > after[0]! || (i.changedAt === after[0] && i.id > after[1]!));
+    const items = rest.slice(0, PAGE);
+    const last = items.at(-1);
+    const key = last ? `${last.changedAt}|${last.id}` : cursor;
+    return {
+      items: items.map((i) => ({ externalId: i.id, revision: String(i.rev), changedAt: i.changedAt })),
+      ...(rest.length > PAGE ? { nextCursor: key! } : {}),
+      ...(key ? { resumeCursor: key } : {}),
+    };
+  }
+
+  async getItem(
+    _ctx: ConnectionContext,
+    _config: Readonly<Record<string, unknown>>,
+    externalId: string,
+  ): Promise<SourceItem> {
+    this.controls.enter();
+    this.require('requirements.get@1');
+    const i = this.store.get(externalId);
+    if (!i) throw new ProviderError('not_found', 'work item not found', { providerCode: '404' });
+    return {
+      externalId: i.id,
+      revision: String(i.rev),
+      type: i.type,
+      title: i.title,
+      descriptionMarkdown: i.description,
+      acceptanceCriteriaMarkdown: i.ac,
+      state: i.state,
+      removed: i.state === 'Removed',
+      tags: [...i.tags],
+      area: 'Demo\\Shop',
+      iteration: 'Demo\\Sprint 1',
+      links: i.parent ? [{ kind: 'parent', externalId: i.parent }] : [],
+      changedAt: i.changedAt,
+      url: `https://mock.example.test/demo-org/_workitems/edit/${i.id}`,
     };
   }
 }

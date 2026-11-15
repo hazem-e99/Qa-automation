@@ -42,6 +42,7 @@
     "@qos/config": "workspace:*",
     "@qos/db": "workspace:*",
     "pg": "~8.23.1",
-    "@types/pg": "^8.23.1"
+    "@types/pg": "^8.23.1",
+    "@qos/traceability": "workspace:*"
   }
 }

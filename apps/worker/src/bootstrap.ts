@@ -6,7 +6,7 @@ import { GeminiConnection } from '@qos/adapters-ai-gemini';
 import { AzureDevOpsConnection } from '@qos/adapters-azure-devops';
 import { GitHubRepositoryProvider } from '@qos/adapters-github';
 import { LocalGitRepositoryProvider } from '@qos/adapters-local-git';
-import { MockIssueTracker, MockRepositoryProvider } from '@qos/adapters-mock';
+import { MockIssueTracker, MockRepositoryProvider, MockRequirementsSource } from '@qos/adapters-mock';
 import { HttpDocumentParser } from '@qos/adapters-parser-http';
 import { LocalFsObjectStorage } from '@qos/adapters-storage-localfs';
 import { DbEnvelopeSecretStore, loadMasterKeyFile } from '@qos/adapters-secrets-db';
@@ -26,7 +26,14 @@ import {
   type CoreInfra,
 } from '@qos/kernel-infra';
 import { onProbeCreated, processProbeJob, type ProbeJobData } from '@qos/probe';
-import { onApprovalDecided, processParseJob, type DocumentDeps, type ParseJobData } from '@qos/requirements';
+import {
+  onApprovalDecided,
+  onRequirementItemChanged,
+  processParseJob,
+  REQUIREMENT_ITEM_CHANGED,
+  type DocumentDeps,
+  type ParseJobData,
+} from '@qos/requirements';
 import type { DocumentParser } from '@qos/ports';
 import { z } from 'zod';
 import { SyncRuntime } from './sync-runtime.js';
@@ -105,6 +112,10 @@ class Registrations implements OnApplicationBootstrap {
     this.dispatcher.subscribe(PROBE_CREATED_EVENT, 'probe.seen', onProbeCreated);
     // Approvals decided in the generic inbox reach the requirement they target (idempotent).
     this.dispatcher.subscribe('approval.decided', 'requirements.apply-approval', onApprovalDecided);
+    // Work items synced from an external tracker become requirement versions (T-P3-10).
+    this.dispatcher.subscribe(REQUIREMENT_ITEM_CHANGED, 'requirements.external-item', async (event, tx) => {
+      await onRequirementItemChanged(event, tx);
+    });
     await this.dispatcher.start();
     await this.sync.start();
   }
@@ -162,7 +173,11 @@ export async function createWorkerApp(env: NodeJS.ProcessEnv = process.env): Pro
     .register(new GeminiConnection());
   if (config.QOS_LOCAL_GIT_ROOTS.length)
     registry.register(new LocalGitRepositoryProvider({ roots: config.QOS_LOCAL_GIT_ROOTS }));
-  if (config.QOS_DEMO_MODE) registry.register(new MockRepositoryProvider()).register(new MockIssueTracker());
+  if (config.QOS_DEMO_MODE)
+    registry
+      .register(new MockRepositoryProvider())
+      .register(new MockIssueTracker())
+      .register(new MockRequirementsSource());
   const integrations: IntegrationDeps = {
     db: infra.db,
     registry,

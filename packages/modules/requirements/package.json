@@ -21,6 +21,7 @@
     "@qos/db": "workspace:*",
     "@qos/governance": "workspace:*",
     "@qos/identity": "workspace:*",
+    "@qos/integrations": "workspace:*",
     "@qos/jobs": "workspace:*",
     "@qos/kernel-domain": "workspace:*",
     "@qos/ports": "workspace:*",

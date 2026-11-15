@@ -44,8 +44,17 @@ export class SyncRuntime {
     private readonly opts: { pollSeconds: number; inboxSeconds: number },
   ) {
     this.inbox = new InboxProcessor({ db: deps.db, logger: deps.logger });
-    // Source-control events: re-fetch through the sync streams of every binding on that connection.
-    for (const eventType of ['push', 'pull_request', 'create']) {
+    // Source-control and work-item events: re-fetch through the sync streams of every binding on
+    // that connection (work-item service hooks are not signed, so their payload is never used).
+    for (const eventType of [
+      'push',
+      'pull_request',
+      'create',
+      'workitem.created',
+      'workitem.updated',
+      'workitem.deleted',
+      'workitem.restored',
+    ]) {
       this.inbox.register(eventType, async (message, tx) => {
         const targets = await syncTargets(this.deps.db, message.connectionId);
         if (targets.length === 0) return 'ignored_out_of_scope';

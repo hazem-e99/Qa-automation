@@ -40,6 +40,7 @@ export function locatorText(
   if (l.line !== undefined) parts.push(t('loc_line', { line: l.line }));
   if (l.sectionPath?.length) parts.push(l.sectionPath.join(' › '));
   if (l.manual) parts.push(t(l.manual === 'edit' ? 'loc_manualEdit' : 'loc_manualEntry'));
+  if (l.workItem) parts.push(t('loc_workItem', { id: l.workItem, revision: l.revision ?? '?' }));
   return parts.join(' · ');
 }
 
@@ -249,6 +250,17 @@ export function RequirementDetailView({
                       >
                         {t('openInSource')}
                       </Link>
+                    ) : null}
+                    {p.locator.url && /^https:\/\//.test(p.locator.url) ? (
+                      <a
+                        href={p.locator.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-accent hover:underline"
+                        data-testid="open-tracker"
+                      >
+                        {t('openInTracker')}
+                      </a>
                     ) : null}
                   </li>
                 ))}

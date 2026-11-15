@@ -24,3 +24,4 @@ export {
   type ExportFormat,
   type ExportView,
 } from './export.js';
+export * from './external.js';

@@ -18,10 +18,13 @@ import { cleanContent, contentHash, originOf, searchTextOf, type RequirementCont
 
 // Helpers shared by the requirement and document workflows. Not part of the module's public surface.
 
+/** Who makes a change: a user, or null for the system (a sync). */
+export type Actor = Pick<Principal, 'userId'> | null;
+
 /** Inserts a version with its criteria and provenance; updates the requirement's latest pointer. */
 export async function insertVersion(
   tx: Tx,
-  actor: Principal,
+  actor: Actor,
   project: Project,
   requirementId: string,
   number: number,
@@ -44,7 +47,7 @@ export async function insertVersion(
     state: 'draft',
     contentHash: contentHash(content),
     searchText: searchTextOf(content),
-    createdBy: actor.userId,
+    createdBy: actor?.userId ?? null,
     createdAt: now,
   });
   if (content.acceptanceCriteria.length) {
@@ -190,7 +193,7 @@ export type SourceVersionOutcome =
  */
 export async function sourceDrivenVersion(
   tx: Tx,
-  actor: Principal,
+  actor: Actor,
   project: Project,
   requirementId: string,
   build: (latest: RequirementContent) => RequirementContent,

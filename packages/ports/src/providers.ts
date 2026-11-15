@@ -216,6 +216,61 @@ export interface RepositoryProvider extends ProviderAdapter {
 /** Branches QualityOS may create or push to (doc 12 §4.1). */
 export const QOS_BRANCH_PREFIX = 'qos/';
 
+// ---- requirements (doc 12 §4.2) ----
+/** What a source returns when listing changes: enough to decide whether to fetch the item. */
+export interface SourceItemHeader {
+  readonly externalId: string;
+  readonly revision: string;
+  readonly changedAt: string;
+}
+export interface SourceItemLink {
+  readonly kind: 'parent' | 'child' | 'related';
+  readonly externalId: string;
+}
+/**
+ * One work item / story / requirement of an external source, normalized: rich text is converted
+ * to Markdown by the adapter, fields are a fixed allow-list (no raw provider payloads).
+ */
+export interface SourceItem {
+  readonly externalId: string;
+  readonly revision: string;
+  readonly type: string;
+  readonly title: string;
+  readonly descriptionMarkdown: string;
+  readonly acceptanceCriteriaMarkdown: string | null;
+  readonly state: string;
+  /** The item was removed at the source (a removed state); a deleted item answers not_found. */
+  readonly removed: boolean;
+  readonly tags: readonly string[];
+  readonly area: string | null;
+  readonly iteration: string | null;
+  readonly links: readonly SourceItemLink[];
+  readonly changedAt: string;
+  readonly url: string;
+}
+/**
+ * External requirement sources (work-item trackers). `config` is the binding config: which
+ * project and item types to read. `listChanged` pages through items changed after the cursor,
+ * oldest change first; its `resumeCursor` is where the next incremental run starts.
+ */
+export interface RequirementsSource extends ProviderAdapter {
+  validateQuery?(
+    ctx: ConnectionContext,
+    config: Readonly<Record<string, unknown>>,
+  ): Promise<{ ok: boolean; estimatedCount?: number; error?: string }>;
+  listChanged(
+    ctx: ConnectionContext,
+    config: Readonly<Record<string, unknown>>,
+    cursor?: string,
+  ): Promise<Page<SourceItemHeader>>;
+  getItem(
+    ctx: ConnectionContext,
+    config: Readonly<Record<string, unknown>>,
+    externalId: string,
+    revision?: string,
+  ): Promise<SourceItem>;
+}
+
 // ---- issue tracking (doc 12 §4.3, the subset used up to P2) ----
 export type TrackerStateCategory = 'proposed' | 'in_progress' | 'resolved' | 'completed' | 'removed';
 /** What the tracker accepts, used to build and lint mappings (M03-FR-07/13). */

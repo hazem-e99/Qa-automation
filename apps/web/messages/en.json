@@ -981,6 +981,8 @@
     "previewMapping": "Preview",
     "saveMapping": "Save and re-extract",
     "reextracted": "Re-extracted: {count} candidates.",
-    "noTables": "No table was found in this file."
+    "noTables": "No table was found in this file.",
+    "loc_workItem": "Work item {id}, revision {revision}",
+    "openInTracker": "Open in the tracker"
   }
 }

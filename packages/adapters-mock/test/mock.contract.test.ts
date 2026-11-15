@@ -1,6 +1,12 @@
-import { repositoryContract, spyContext } from '@qos/contract-tests';
+import { repositoryContract, requirementsContract, spyContext } from '@qos/contract-tests';
 import { describe, expect, it } from 'vitest';
-import { MockControls, MockIssueTracker, MockRepositoryProvider } from '../src/index.js';
+import {
+  MockControls,
+  MockIssueTracker,
+  MockRepositoryProvider,
+  MockRequirementsSource,
+  MockWorkItemStore,
+} from '../src/index.js';
 
 const controls = new MockControls();
 repositoryContract('mock_repository', () => ({
@@ -43,3 +49,21 @@ describe('mock credentials and permission checks', () => {
     await expect(new MockIssueTracker().testConnection(ctx)).rejects.toMatchObject({ kind: 'auth_failed' });
   });
 });
+
+const reqControls = new MockControls();
+const reqStore = new MockWorkItemStore();
+requirementsContract('mock_requirements', () => ({
+  adapter: new MockRequirementsSource(reqControls, reqStore),
+  mode: 'mock',
+  secret: 'mock-secret-value-for-contract',
+  config: {},
+  changeItem: () => {
+    reqStore.update('503', { title: 'As a shopper I want a changed story so that the contract sees it' });
+    return '503';
+  },
+  injectFault: (kind, retryAfterMs) => reqControls.failNext(kind, 1, retryAfterMs),
+  reset: () => {
+    reqControls.reset();
+    reqStore.reset();
+  },
+}));

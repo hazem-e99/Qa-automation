@@ -23,7 +23,8 @@
     "@qos/db": "workspace:*",
     "@qos/observability": "workspace:*",
     "@qos/ports": "workspace:*",
-    "@qos/platform": "workspace:*"
+    "@qos/platform": "workspace:*",
+    "@qos/jobs": "workspace:*"
   },
   "devDependencies": {
     "@qos/config": "workspace:*",

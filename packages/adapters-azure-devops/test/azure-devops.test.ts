@@ -48,7 +48,8 @@ describe('Azure DevOps PAT connection (T-P2-28)', () => {
   it('reads the organization with Basic auth and an explicit api-version', async () => {
     const f = fixture();
     const r = await adapter.testConnection(ctx(f.http));
-    expect(r).toMatchObject({ identity: 'organization contoso-qa', permissionChecks: [] });
+    expect(r.identity).toBe('organization contoso-qa');
+    expect(r.permissionChecks.every((c) => c.ok)).toBe(true);
     expect(f.calls[0]!.url).toBe('https://dev.azure.com/contoso-qa/_apis/projects?api-version=7.1&$top=100');
     expect(f.calls[0]!.headers.authorization).toBe(`Basic ${Buffer.from(`:${PAT}`).toString('base64')}`);
     expect(f.calls[0]!.url).not.toContain(PAT);
@@ -95,11 +96,13 @@ describe('Azure DevOps PAT connection (T-P2-28)', () => {
     });
   });
 
-  it('declares no work-item capabilities yet, so it cannot be bound before P3/P8', () => {
-    expect(adapter.manifest()).toMatchObject({
+  it('declares requirements capabilities only (issue sync arrives with P8)', () => {
+    const m = adapter.manifest();
+    expect(m).toMatchObject({
       providerType: 'azure_devops',
-      capabilities: [],
+      family: 'requirements',
       authStrategies: ['pat'],
     });
+    expect(m.capabilities.every((c) => c.startsWith('requirements.'))).toBe(true);
   });
 });

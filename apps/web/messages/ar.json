@@ -981,6 +981,8 @@
     "previewMapping": "معاينة",
     "saveMapping": "حفظ وإعادة الاستخراج",
     "reextracted": "أُعيد الاستخراج: {count} مرشحات.",
-    "noTables": "لم يُعثر على جدول في هذا الملف."
+    "noTables": "لم يُعثر على جدول في هذا الملف.",
+    "loc_workItem": "عنصر العمل {id}، المراجعة {revision}",
+    "openInTracker": "فتحه في المتتبع"
   }
 }

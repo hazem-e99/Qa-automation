@@ -107,6 +107,9 @@ export interface Locator {
   row?: number;
   col?: number;
   manual?: string;
+  workItem?: string;
+  revision?: string;
+  url?: string;
 }
 export interface Candidate {
   id: string;

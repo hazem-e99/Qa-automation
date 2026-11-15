@@ -73,11 +73,13 @@ describe('connections API', () => {
       'github',
       'mock_issue_tracker',
       'mock_repository',
+      'mock_requirements',
     ]);
     // Only the mock providers are demo-only; they are registered because QOS_DEMO_MODE=true here.
     expect(providers.filter((p) => p.demoOnly).map((p) => p.providerType)).toEqual([
       'mock_issue_tracker',
       'mock_repository',
+      'mock_requirements',
     ]);
   });
 

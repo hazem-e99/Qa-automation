@@ -12,6 +12,7 @@ import {
   syncRuns,
   type Db,
 } from '@qos/db';
+import { appendOutbox } from '@qos/jobs';
 import { DomainError, uuidv7 } from '@qos/kernel-domain';
 import {
   ProviderError,
@@ -21,6 +22,7 @@ import {
   type Page,
   type ProviderAdapter,
   type RepositoryProvider,
+  type RequirementsSource,
 } from '@qos/ports';
 import { contextFor, type IntegrationDeps } from './connections.js';
 import { upsertExternalRef } from './external-refs.js';
@@ -34,6 +36,8 @@ export interface SyncStream {
   readonly name: string;
   readonly role: string;
   readonly requires: readonly CapabilityId[];
+  /** Outbox event written (in the page's transaction) for every new or changed item. */
+  readonly changedEvent?: string;
   fetchPage(
     adapter: ProviderAdapter,
     ctx: ConnectionContext,
@@ -72,7 +76,58 @@ export const repositoryCommitsStream: SyncStream = {
   },
 };
 
-export const SYNC_STREAMS: readonly SyncStream[] = [repositoryCommitsStream];
+/** Event type of a new or changed requirement item; the requirements module turns it into a version. */
+export const REQUIREMENT_ITEM_CHANGED = 'integration.requirement_item.changed';
+const MAX_TEXT = 50_000;
+
+/**
+ * Work items of a requirements binding (T-P3-10). Each changed header is read in full; the
+ * normalized item becomes the external ref snapshot, its revision the external version.
+ */
+export const requirementItemsStream: SyncStream = {
+  name: 'requirements.items',
+  role: 'requirements',
+  requires: ['requirements.list_changed@1', 'requirements.get@1'],
+  changedEvent: REQUIREMENT_ITEM_CHANGED,
+  async fetchPage(adapter, ctx, config, cursor) {
+    const source = adapter as RequirementsSource;
+    const page = await source.listChanged(ctx, config, cursor);
+    const items: ExternalRefData[] = [];
+    for (const h of page.items) {
+      let item;
+      try {
+        item = await source.getItem(ctx, config, h.externalId);
+      } catch (e) {
+        // Deleted between listing and reading: nothing to store.
+        if (e instanceof ProviderError && e.kind === 'not_found') continue;
+        throw e;
+      }
+      items.push({
+        externalType: 'work_item',
+        externalId: item.externalId,
+        externalUrl: item.url,
+        externalVersion: item.revision,
+        snapshot: {
+          type: item.type,
+          title: item.title.slice(0, 500),
+          descriptionMarkdown: item.descriptionMarkdown.slice(0, MAX_TEXT),
+          acceptanceCriteriaMarkdown: item.acceptanceCriteriaMarkdown?.slice(0, MAX_TEXT) ?? null,
+          state: item.state,
+          removed: item.removed,
+          tags: item.tags.slice(0, 50),
+          area: item.area,
+          iteration: item.iteration,
+          links: item.links.slice(0, 100),
+          changedAt: item.changedAt,
+          revision: item.revision,
+        },
+      });
+    }
+    return { ...page, items };
+  },
+};
+
+export const SYNC_STREAMS: readonly SyncStream[] = [repositoryCommitsStream, requirementItemsStream];
 export const streamsForRole = (role: string) => SYNC_STREAMS.filter((s) => s.role === role);
 const streamByName = (name: string) => SYNC_STREAMS.find((s) => s.name === name);
 
@@ -194,8 +249,24 @@ export async function runSync(
       const nextSaved = page.nextCursor ?? page.resumeCursor ?? cursor ?? null;
       await deps.db.transaction(async (tx) => {
         for (const item of page.items) {
-          const before = await upsertExternalRefChanged(tx, row.connection.id, item, row.binding.projectId);
-          if (before) itemsChanged++;
+          const r = await upsertExternalRefChanged(tx, row.connection.id, item, row.binding.projectId);
+          if (!r.changed) continue;
+          itemsChanged++;
+          if (stream.changedEvent) {
+            await appendOutbox(tx, {
+              type: stream.changedEvent,
+              aggregateType: 'external_ref',
+              aggregateId: r.id,
+              projectId: row.binding.projectId,
+              payload: {
+                bindingId,
+                connectionId: row.connection.id,
+                externalRefId: r.id,
+                externalId: item.externalId,
+                externalVersion: item.externalVersion ?? null,
+              },
+            });
+          }
         }
         await tx
           .insert(syncCursors)
@@ -247,13 +318,17 @@ async function upsertExternalRefChanged(
   connectionId: string,
   item: ExternalRefData,
   projectId: string,
-): Promise<boolean> {
+): Promise<{ changed: boolean; id: string }> {
   const existing = await tx.execute<{ external_version: string | null }>(
     sql`select external_version from integrations.external_refs
         where connection_id = ${connectionId} and external_type = ${item.externalType} and external_id = ${item.externalId}`,
   );
-  await upsertExternalRef(tx, connectionId, item, projectId);
-  return existing.rows.length === 0 || existing.rows[0]!.external_version !== (item.externalVersion ?? null);
+  const ref = await upsertExternalRef(tx, connectionId, item, projectId);
+  return {
+    changed:
+      existing.rows.length === 0 || existing.rows[0]!.external_version !== (item.externalVersion ?? null),
+    id: ref.id,
+  };
 }
 
 /** Active bindings that have at least one sync stream, for the poller and for webhook re-fetch. */
