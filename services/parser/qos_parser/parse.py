@@ -165,9 +165,15 @@ def _walk_docling(doc, b: _Builder, skip_pages: set[int] = frozenset()) -> None:
 
 
 def parse_docx(path: Path) -> dict[str, Any]:
+    from .layout import sanitize_html
+
     b = _Builder()
-    _walk_docling(_docling_items(path, pdf=False), b)
-    return _result("docx", b, None)
+    doc = _docling_items(path, pdf=False)
+    _walk_docling(doc, b)
+    result = _result("docx", b, None)
+    # The document as laid out (structure only, sanitized) for the source viewer.
+    result["layoutHtml"] = sanitize_html(doc.export_to_html())
+    return result
 
 
 def _ocr_page(page, reader) -> list[tuple[str, float]]:

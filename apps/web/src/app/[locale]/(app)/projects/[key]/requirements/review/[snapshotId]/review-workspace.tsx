@@ -54,7 +54,8 @@ export function ReviewWorkspace({
   const [changes, setChanges] = useState<SnapshotChanges | null>(null);
   const [msg, setMsg] = useState<Msg>(null);
   const [missing, setMissing] = useState(false);
-  const [view, setView] = useState<'text' | 'pages'>('text');
+  const [view, setView] = useState<'text' | 'pages' | 'layout'>('text');
+  const [layout, setLayout] = useState<string | null>(null);
   const P = `/projects/${project.key}`;
   const base = `/${locale}/projects/${project.key}/requirements`;
   const canAccept = permissions.includes('requirement.create');
@@ -79,6 +80,13 @@ export function ReviewWorkspace({
       setSource(sources.find((s) => s.id === snap.sourceId) ?? null);
       if (snap.parseStatus !== 'parsed') return;
       setDoc(await api<ParsedDocument>(`${P}/snapshots/${snapshotId}/parsed`));
+      if (snap.fileKind === 'docx') {
+        try {
+          setLayout((await api<{ html: string }>(`${P}/snapshots/${snapshotId}/layout`)).html);
+        } catch (e) {
+          if (!(e instanceof ApiFailure && e.status === 404)) throw e;
+        }
+      }
       try {
         setChanges(await api<SnapshotChanges>(`${P}/snapshots/${snapshotId}/changes`));
       } catch (e) {
@@ -261,9 +269,15 @@ export function ReviewWorkspace({
               title={t('sourceViewer')}
               testId="source-viewer"
               actions={
-                snapshot.renderedPages > 0 ? (
+                snapshot.renderedPages > 0 || layout ? (
                   <div className="flex gap-1" role="group" aria-label={t('viewMode')}>
-                    {(['text', 'pages'] as const).map((m) => (
+                    {(
+                      [
+                        'text',
+                        ...(snapshot.renderedPages > 0 ? ['pages' as const] : []),
+                        ...(layout ? ['layout' as const] : []),
+                      ] as const
+                    ).map((m) => (
                       <Button
                         key={m}
                         tone={view === m ? 'primary' : 'secondary'}
@@ -280,6 +294,8 @@ export function ReviewWorkspace({
             >
               {!doc ? (
                 <p className="text-sm text-muted">{t('loading')}</p>
+              ) : view === 'layout' && layout ? (
+                <LayoutViewer html={layout} title={snapshot.fileName ?? ''} />
               ) : view === 'pages' && snapshot.renderedPages > 0 ? (
                 <PageViewer
                   src={(page) => `/api/v1${P}/snapshots/${snapshotId}/pages/${page}`}
@@ -555,6 +571,31 @@ function CandidateCard({
         ) : null}
       </div>
     </li>
+  );
+}
+
+/**
+ * A DOCX as laid out. The HTML is sanitized by the parser (structure only); it is shown in a
+ * frame without scripts, same-origin access, forms or network (sandbox + CSP), as defense in depth.
+ */
+function LayoutViewer({ html, title }: { html: string; title: string }) {
+  const t = useTranslations('requirements');
+  const srcDoc =
+    '<!doctype html><html><head><meta charset="utf-8">' +
+    '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'">' +
+    '<style>body{font:14px/1.6 system-ui,sans-serif;margin:16px;color:#111;background:#fff}' +
+    'table{border-collapse:collapse;width:100%;margin:8px 0}th,td{border:1px solid #ccc;padding:4px 6px;vertical-align:top;white-space:pre-wrap}' +
+    'th{background:#f3f3f3}</style></head><body dir="auto">' +
+    html +
+    '</body></html>';
+  return (
+    <iframe
+      sandbox=""
+      srcDoc={srcDoc}
+      title={t('layoutOf', { name: title })}
+      className="h-[70vh] w-full rounded border border-line bg-white"
+      data-testid="layout-frame"
+    />
   );
 }
 

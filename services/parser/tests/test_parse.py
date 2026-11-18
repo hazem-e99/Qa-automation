@@ -116,6 +116,36 @@ class ContractTest(unittest.TestCase):
         self.assertTrue(all(0 <= b["ocrConfidence"] <= 1 for b in scan["blocks"]))
 
 
+class LayoutTest(unittest.TestCase):
+    def test_sanitizer_keeps_structure_and_drops_everything_else(self) -> None:
+        from qos_parser.layout import sanitize_html
+
+        dirty = (
+            '<html><head><style>p{}</style><script>alert(1)</script></head><body>'
+            '<h1 onclick="x()" style="color:red">Title &amp; <b>bold</b></h1>'
+            '<p dir="rtl">نص <a href="javascript:alert(1)">رابط</a></p>'
+            '<img src="data:image/png;base64,AAAA" onerror="alert(1)">'
+            '<table><tr><td colspan="2" rowspan="x" dir="evil">c</td></tr></table>'
+            '<p>&lt;script&gt;not code&lt;/script&gt;<svg><script>alert(2)</script></svg>'
+            '<div><span>unclosed</div><iframe src="https://x.example.test"></iframe></body></html>'
+        )
+        self.assertEqual(
+            sanitize_html(dirty),
+            '<h1>Title &amp; <b>bold</b></h1><p dir="rtl">نص رابط</p>'
+            '<table><tr><td colspan="2">c</td></tr></table>'
+            '<p>&lt;script&gt;not code&lt;/script&gt;<div><span>unclosed</span></div></p>',
+        )
+
+    def test_docx_has_a_sanitized_right_to_left_layout(self) -> None:
+        doc = parse("docx", CORPUS / "files" / "d06-auth-ar-table.docx")
+        html = doc["layoutHtml"]
+        self.assertIn("<table>", html)
+        self.assertIn('<td dir="rtl">', html)
+        self.assertIn("بوابة العملاء", html)
+        for bad in ("<style", "<script", "<img", "style=", "class=", "<html"):
+            self.assertNotIn(bad, html)
+
+
 class HttpTest(unittest.TestCase):
     def test_parse_over_http_and_errors(self) -> None:
         client = TestClient(app)

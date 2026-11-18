@@ -48,7 +48,8 @@ const fakeParser: DocumentParser & { failNext: DocumentParseError | null } = {
       throw e;
     }
     const base = input.fileName.replace(/\.[a-z]+$/, '');
-    return JSON.parse(readFileSync(path.join(PARSED, `${base}.json`), 'utf8')) as ParsedDocument;
+    const doc = JSON.parse(readFileSync(path.join(PARSED, `${base}.json`), 'utf8')) as ParsedDocument;
+    return input.kind === 'docx' ? { ...doc, layoutHtml: `<h1>${base}</h1><p dir="rtl">نص</p>` } : doc;
   },
   async renderPage() {
     return { png: new Uint8Array(PNG), pageCount: 1 };
@@ -565,5 +566,27 @@ describe('PDF pages for the source viewer (T-P3-14)', () => {
     const res = await lead.fetch(V(`/snapshots/${docx.snapshotId}/pages/1`));
     expect(res.status).toBe(404);
     expect(await code(res)).toMatchObject({ code: 'page.not_found' });
+  });
+});
+
+describe('DOCX layout for the source viewer (T-P3-14)', () => {
+  it('serves the sanitized layout of a DOCX as data, kept out of the parsed blocks', async () => {
+    const docx = await uploadAndParse(docsSource, 'd07-booking-ar-stories.docx');
+    const layout = await json<{ html: string }>(
+      await viewer.fetch(V(`/snapshots/${docx.snapshotId}/layout`)),
+    );
+    expect(layout.html).toBe('<h1>d07-booking-ar-stories</h1><p dir="rtl">نص</p>');
+    const parsed = await json<Record<string, unknown>>(
+      await lead.fetch(V(`/snapshots/${docx.snapshotId}/parsed`)),
+    );
+    expect(parsed).not.toHaveProperty('layoutHtml');
+    expect(Array.isArray(parsed.blocks)).toBe(true);
+    const sheet = await json<{ id: string }[]>(
+      await lead.fetch(V(`/requirement-sources/${sheetSource}/documents`)),
+    );
+    const sheetSnapshot = (sheet[0] as unknown as { versions: { id: string }[] }).versions[0]!.id;
+    const none = await lead.fetch(V(`/snapshots/${sheetSnapshot}/layout`));
+    expect(none.status).toBe(404);
+    expect(await code(none)).toMatchObject({ code: 'layout.not_found' });
   });
 });

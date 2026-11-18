@@ -101,6 +101,7 @@ const DOMAIN_STATUS: Readonly<Record<string, number>> = {
   'snapshot.not_found': 404,
   'snapshot.not_parsed': 409,
   'page.not_found': 404,
+  'layout.not_found': 404,
   'candidates.count_invalid': 400,
   'mapping.invalid': 400,
   'mapping.text_required': 400,

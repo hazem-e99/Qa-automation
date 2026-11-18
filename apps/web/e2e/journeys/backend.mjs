@@ -50,7 +50,13 @@ const PARSED = path.resolve('../../packages/modules/requirements/test/fixtures/p
 const parser = {
   async parse(input) {
     const name = input.fileName.replace(/.[a-z]+$/i, '');
-    return JSON.parse(readFileSync(path.join(PARSED, `${name}.json`), 'utf8'));
+    const doc = JSON.parse(readFileSync(path.join(PARSED, `${name}.json`), 'utf8'));
+    if (input.kind !== 'docx') return doc;
+    const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const layoutHtml = doc.blocks
+      .map((b) => (b.type === 'heading' ? `<h2>${esc(b.text)}</h2>` : `<p>${esc(b.text)}</p>`))
+      .join('');
+    return { ...doc, layoutHtml };
   },
   // Pages as images: a small white PNG stands in for the PDFium rendering of the sidecar.
   async renderPage() {

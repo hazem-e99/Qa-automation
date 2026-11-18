@@ -263,6 +263,12 @@ test('P3: an uploaded document is read, reviewed side by side and accepted (J2)'
   await expect(page.getByTestId('review-message')).toHaveText('5 requirements created.');
   await page.getByTestId('candidate-filter').selectOption('accepted');
   await expect(candidates.locator('[data-status="accepted"]')).toHaveCount(5);
+
+  // The document as laid out, in a sandboxed frame (T-P3-14).
+  await page.getByTestId('view-layout').click();
+  await expect(page.getByTestId('layout-frame')).toHaveAttribute('sandbox', '');
+  await expect(page.frameLocator('[data-testid="layout-frame"]').locator('h2').first()).toBeVisible();
+  await page.getByTestId('view-text').click();
 });
 
 test('P3: one list for every source; a requirement links back to its place in the document (M04-AC-01)', async () => {

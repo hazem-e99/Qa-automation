@@ -33,6 +33,8 @@ export interface ParsedDocument {
   readonly languages: readonly string[];
   readonly ocrPages: number;
   readonly blocks: readonly ParsedBlock[];
+  /** DOCX: the document as laid out, as sanitized structural HTML (source viewer). */
+  readonly layoutHtml?: string;
 }
 
 export interface DocumentParser {

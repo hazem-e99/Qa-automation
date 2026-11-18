@@ -221,7 +221,8 @@
     "trace_link_type_invalid": "This kind of link is not allowed here.",
     "export_too_large": "Too many requirements to export at once.",
     "candidate_split_invalid": "Give at least one part that differs from the original text.",
-    "page_not_found": "This page is not available as an image."
+    "page_not_found": "This page is not available as an image.",
+    "layout_not_found": "This document has no layout view."
   },
   "wizard": {
     "title": "New project",
@@ -997,6 +998,8 @@
     "previousPage": "Previous page",
     "nextPage": "Next page",
     "pagesLimited": "Only the first {count} pages are available as images; the text view has every page.",
-    "pageImage": "Page {page} of the document"
+    "pageImage": "Page {page} of the document",
+    "view_layout": "Layout",
+    "layoutOf": "Layout of {name}"
   }
 }

@@ -4,6 +4,7 @@ import type { ObjectStorage } from '@qos/ports';
 import type { Project } from '@qos/projects';
 import {
   acceptCandidates,
+  getLayout,
   getPageImage,
   getParsedDocument,
   getSnapshot,
@@ -92,6 +93,13 @@ export class DocumentsController {
   @RequireProjectPermission('project.read')
   parsed(@Param('snapshotId') snapshotId: string, @CurrentProject() project: Project) {
     return getParsedDocument(this.deps, project, z.uuid().parse(snapshotId));
+  }
+
+  /** A DOCX as laid out: sanitized HTML as JSON data, for a sandboxed frame in the viewer. */
+  @Get('snapshots/:snapshotId/layout')
+  @RequireProjectPermission('project.read')
+  layout(@Param('snapshotId') snapshotId: string, @CurrentProject() project: Project) {
+    return getLayout(this.deps, project, z.uuid().parse(snapshotId));
   }
 
   /** A PDF page rendered at parse time (source viewer). Served from storage, never re-rendered here. */

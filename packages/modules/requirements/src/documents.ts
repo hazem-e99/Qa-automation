@@ -333,7 +333,14 @@ export async function processParseJob(
     return failed ? { status: 'failed', error: e.code } : { status: 'skipped' };
   }
   const parsedKey = s.storedObjectKey!.replace(/[^/]+$/, 'parsed.json');
-  await deps.storage.put(parsedKey, new TextEncoder().encode(JSON.stringify(doc)), 'application/json');
+  const { layoutHtml, ...blocksOnly } = doc;
+  await deps.storage.put(parsedKey, new TextEncoder().encode(JSON.stringify(blocksOnly)), 'application/json');
+  if (typeof layoutHtml === 'string' && layoutHtml.length)
+    await deps.storage.put(
+      layoutKey(s.storedObjectKey!),
+      new TextEncoder().encode(layoutHtml.slice(0, 2_000_000)),
+      'text/html; charset=utf-8',
+    );
   const candidates = extractCandidates(doc.blocks, { mapping: mappingOf(snap.config) });
   const renderedPages =
     s.fileKind === 'pdf' ? await renderPages(deps, s.storedObjectKey!, bytes, doc.pages ?? 0) : 0;
@@ -371,6 +378,27 @@ export async function processParseJob(
     return true;
   });
   return done ? { status: 'parsed', candidates: candidates.length } : { status: 'skipped' };
+}
+
+const layoutKey = (originalKey: string) => originalKey.replace(/[^/]+$/, 'layout.html');
+
+/**
+ * The sanitized layout HTML of a DOCX snapshot (sanitized by the parser; the web app shows it in a
+ * sandboxed frame). Returned as data, never served as a page of this origin.
+ */
+export async function getLayout(
+  deps: Pick<DocumentDeps, 'db' | 'storage'>,
+  project: Project,
+  snapshotId: string,
+): Promise<{ html: string }> {
+  const [row] = await deps.db
+    .select({ key: sourceSnapshots.storedObjectKey, status: sourceSnapshots.parseStatus })
+    .from(sourceSnapshots)
+    .where(and(eq(sourceSnapshots.id, snapshotId), eq(sourceSnapshots.projectId, project.id)));
+  if (!row) throw new DomainError('snapshot.not_found');
+  if (!row.key || row.status !== 'parsed' || !(await deps.storage.exists(layoutKey(row.key))))
+    throw new DomainError('layout.not_found');
+  return { html: new TextDecoder().decode(await deps.storage.get(layoutKey(row.key))) };
 }
 
 const pageKey = (originalKey: string, page: number) => originalKey.replace(/[^/]+$/, `pages/${page}.png`);
